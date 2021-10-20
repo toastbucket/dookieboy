@@ -1,0 +1,255 @@
+// src/cpu.rs
+
+use crate::memory::Memory;
+use crate::mmu::Mmu;
+
+#[derive(Debug, Copy, Clone)]
+enum Instruction {
+    Add(ArithmeticOperand),
+    AddImm(),
+    AddHL(),
+    Adc(ArithmeticOperand),
+    Inc(ArithmeticOperand),
+    Dec(ArithmeticOperand),
+}
+
+#[derive(Debug, Copy, Clone)]
+enum ArithmeticOperand {
+    A = 0, B, C, D, E, H, L
+}
+const ARITHMETIC_REGOP_LEN: usize = 7;
+
+impl Instruction {
+    fn from_byte(byte: u8) -> Option<Instruction> {
+        match byte {
+            // INC r
+            0x04 => Some(Instruction::Inc(ArithmeticOperand::B)),
+            0x0c => Some(Instruction::Inc(ArithmeticOperand::C)),
+            0x14 => Some(Instruction::Inc(ArithmeticOperand::D)),
+            0x1c => Some(Instruction::Inc(ArithmeticOperand::E)),
+            0x24 => Some(Instruction::Inc(ArithmeticOperand::H)),
+            0x2c => Some(Instruction::Inc(ArithmeticOperand::L)),
+            0x3c => Some(Instruction::Inc(ArithmeticOperand::A)),
+            // DEC r
+            0x05 => Some(Instruction::Dec(ArithmeticOperand::B)),
+            0x0d => Some(Instruction::Dec(ArithmeticOperand::C)),
+            0x15 => Some(Instruction::Dec(ArithmeticOperand::D)),
+            0x1d => Some(Instruction::Dec(ArithmeticOperand::E)),
+            0x25 => Some(Instruction::Dec(ArithmeticOperand::H)),
+            0x2d => Some(Instruction::Dec(ArithmeticOperand::L)),
+            0x3d => Some(Instruction::Dec(ArithmeticOperand::A)),
+            // ADD A,r
+            0x80 => Some(Instruction::Add(ArithmeticOperand::B)),
+            0x81 => Some(Instruction::Add(ArithmeticOperand::C)),
+            0x82 => Some(Instruction::Add(ArithmeticOperand::D)),
+            0x83 => Some(Instruction::Add(ArithmeticOperand::E)),
+            0x84 => Some(Instruction::Add(ArithmeticOperand::H)),
+            0x85 => Some(Instruction::Add(ArithmeticOperand::L)),
+            0x87 => Some(Instruction::Add(ArithmeticOperand::A)),
+            // ADD A,d8
+            0xc6 => Some(Instruction::AddImm()),
+            // ADD A,(HL)
+            0x86 => Some(Instruction::AddHL()),
+            // ADC A,r
+            0x88 => Some(Instruction::Adc(ArithmeticOperand::B)),
+            0x89 => Some(Instruction::Adc(ArithmeticOperand::C)),
+            0x8a => Some(Instruction::Adc(ArithmeticOperand::D)),
+            0x8b => Some(Instruction::Adc(ArithmeticOperand::E)),
+            0x8c => Some(Instruction::Adc(ArithmeticOperand::H)),
+            0x8d => Some(Instruction::Adc(ArithmeticOperand::L)),
+            0x8f => Some(Instruction::Adc(ArithmeticOperand::A)),
+            _ => None
+        }
+    }
+
+    fn as_byte(self) -> u8 {
+        match self {
+            // INC r
+            Instruction::Inc(ArithmeticOperand::B) => 0x04,
+            Instruction::Inc(ArithmeticOperand::C) => 0x0c,
+            Instruction::Inc(ArithmeticOperand::D) => 0x14,
+            Instruction::Inc(ArithmeticOperand::E) => 0x1c,
+            Instruction::Inc(ArithmeticOperand::H) => 0x24,
+            Instruction::Inc(ArithmeticOperand::L) => 0x2c,
+            Instruction::Inc(ArithmeticOperand::A) => 0x3c,
+            // DEC r
+            Instruction::Dec(ArithmeticOperand::B) => 0x05,
+            Instruction::Dec(ArithmeticOperand::C) => 0x0d,
+            Instruction::Dec(ArithmeticOperand::D) => 0x15,
+            Instruction::Dec(ArithmeticOperand::E) => 0x1d,
+            Instruction::Dec(ArithmeticOperand::H) => 0x25,
+            Instruction::Dec(ArithmeticOperand::L) => 0x2d,
+            Instruction::Dec(ArithmeticOperand::A) => 0x3d,
+            // ADD A,r
+            Instruction::Add(ArithmeticOperand::B) => 0x80,
+            Instruction::Add(ArithmeticOperand::C) => 0x81,
+            Instruction::Add(ArithmeticOperand::D) => 0x82,
+            Instruction::Add(ArithmeticOperand::E) => 0x83,
+            Instruction::Add(ArithmeticOperand::H) => 0x84,
+            Instruction::Add(ArithmeticOperand::L) => 0x85,
+            Instruction::Add(ArithmeticOperand::A) => 0x87,
+            // ADD A,d8
+            Instruction::AddImm() => 0xc6,
+            // ADD A,(HL)
+            Instruction::AddHL() => 0x86,
+            // ADC A,R
+            Instruction::Adc(ArithmeticOperand::B) => 0x88,
+            Instruction::Adc(ArithmeticOperand::C) => 0x89,
+            Instruction::Adc(ArithmeticOperand::D) => 0x8a,
+            Instruction::Adc(ArithmeticOperand::E) => 0x8b,
+            Instruction::Adc(ArithmeticOperand::H) => 0x8c,
+            Instruction::Adc(ArithmeticOperand::L) => 0x8d,
+            Instruction::Adc(ArithmeticOperand::A) => 0x8f,
+            _ => panic!("Invalid instruction"),
+        }
+    }
+
+    fn size(&self) -> usize {
+        match self {
+            Instruction::Inc(_) => 1,
+            Instruction::Dec(_) => 1,
+            Instruction::Add(_) => 1,
+            Instruction::AddImm() => 2,
+            Instruction::AddHL() => 1,
+            Instruction::Adc(_) => 1,
+            _ => panic!("Invalid instruction"),
+        }
+    }
+
+    fn cycles(&self) -> usize {
+        match self {
+            Instruction::Inc(_) => 1,
+            Instruction::Dec(_) => 1,
+            Instruction::Add(_) => 1,
+            Instruction::AddImm() => 2,
+            Instruction::AddHL() => 2,
+            Instruction::Adc(_) => 1,
+            _ => panic!("Invalid instruction"),
+        }
+    }
+}
+
+#[cfg(test)]
+const TEST_RAM_SIZE: usize = 128;
+
+pub struct Cpu {
+    rf: [u8; ARITHMETIC_REGOP_LEN],
+    sp: u16,
+    pc: u16,
+    z: bool,
+    n: bool,
+    h: bool,
+    cy: bool,
+    mmu: Mmu,
+
+    #[cfg(test)]
+    test_ram: [u8; TEST_RAM_SIZE],
+}
+
+impl Cpu {
+    pub fn new() -> Cpu {
+        Cpu {
+            rf: [0; ARITHMETIC_REGOP_LEN],
+            sp: 0,
+            pc: 0,
+            z: false,
+            n: false,
+            h: false,
+            cy: false,
+            mmu: Mmu::new(),
+
+            #[cfg(test)]
+            test_ram: [0; TEST_RAM_SIZE],
+        }
+    }
+
+    #[cfg(test)]
+    fn load_test_ram(&mut self, data: &[u8]) {
+        self.test_ram[..data.len()].clone_from_slice(data);
+    }
+
+    #[cfg(test)]
+    fn read_byte(&self, addr: u16) -> u8 {
+        if addr > TEST_RAM_SIZE as u16{
+            panic!("Address {:#04x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+        }
+
+        self.test_ram[addr as usize]
+    }
+
+    #[cfg(not(test))]
+    fn read_byte(&self, addr: u16) -> u8 {
+        self.mmu.mem_read_byte(addr)
+    }
+
+    #[cfg(test)]
+    fn write_byte(&mut self, addr: u16, val: u8) {
+        if addr > TEST_RAM_SIZE as u16 {
+            panic!("Address {:#04x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+        }
+
+        self.test_ram[addr as usize] = val;
+    }
+
+    #[cfg(not(test))]
+    fn write_byte(&mut self, addr: u16, val: u8) {
+        self.mmu.mem_write_byte(addr, val);
+    }
+
+    fn get_hl(&self) -> u16 {
+        ((self.get_reg(ArithmeticOperand::H) as u16) << 8) | (self.get_reg(ArithmeticOperand::L) as u16)
+    }
+
+    fn get_reg(&self, regop: ArithmeticOperand) -> u8 {
+        self.rf[regop as usize]
+    }
+
+    fn set_reg(&mut self, regop: ArithmeticOperand, val: u8) {
+        self.rf[regop as usize] = val; 
+    }
+
+    fn add(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
+        let (result, did_wrap) = if with_carry {
+            let (carry_result, carry_did_wrap) = operand.overflowing_add(self.cy as u8);
+            let (operand_result, operand_did_wrap) = carry_result.overflowing_add(self.get_reg(regop));
+            (operand_result, carry_did_wrap | operand_did_wrap)
+        } else {
+            operand.overflowing_add(self.get_reg(regop))
+        };
+
+        self.z = result == 0;
+        self.n = false;
+        self.h = (self.get_reg(regop) & 0xf) + (operand & 0xf)
+            + (if with_carry { self.cy as u8 } else { 0 }) > 0xf;
+        self.cy = did_wrap;
+        self.set_reg(regop, result);
+    }
+
+    fn execute_instruction(&mut self, instruction: Instruction) {
+        match instruction {
+            Instruction::Inc(regop) => self.add(regop, 1, false),
+            Instruction::Add(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), false),
+            Instruction::Adc(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), true),
+            Instruction::AddImm() => self.add(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
+            Instruction::AddHL() => self.add(ArithmeticOperand::A, self.read_byte(self.get_hl()), false),
+            _ => panic!("Invalid instruction"),
+        };
+    }
+
+    pub fn dump(&self) {
+        println!("Registers {:#04x?}", self.rf);
+        println!("flags z:{}, n:{}, h:{}, cy:{}", self.z, self.n, self.h, self.cy);
+    }
+
+    pub fn step(&mut self) {
+        let instruction_byte = self.read_byte(self.pc);
+        if let Some(instruction) = Instruction::from_byte(instruction_byte) {
+            self.execute_instruction(instruction);
+            self.pc += instruction.size() as u16;
+        }
+    }
+}
+
+#[cfg(test)]
+mod test;
+
