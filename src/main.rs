@@ -1,4 +1,5 @@
 mod cpu;
+mod joypad;
 mod memory;
 mod mmu;
 
