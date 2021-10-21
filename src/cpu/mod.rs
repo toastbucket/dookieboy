@@ -5,12 +5,18 @@ use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
 enum Instruction {
+    Inc(ArithmeticOperand),
+    Dec(ArithmeticOperand),
     Add(ArithmeticOperand),
     AddImm(),
     AddHL(),
     Adc(ArithmeticOperand),
-    Inc(ArithmeticOperand),
-    Dec(ArithmeticOperand),
+    // TODO: AdcHL
+    Sub(ArithmeticOperand),
+    Sbc(ArithmeticOperand),
+    SubImm(),
+    SubHL(),
+    // TODO: SbcHL
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -58,6 +64,26 @@ impl Instruction {
             0x8c => Some(Instruction::Adc(ArithmeticOperand::H)),
             0x8d => Some(Instruction::Adc(ArithmeticOperand::L)),
             0x8f => Some(Instruction::Adc(ArithmeticOperand::A)),
+            // SUB A,r
+            0x90 => Some(Instruction::Sub(ArithmeticOperand::B)),
+            0x91 => Some(Instruction::Sub(ArithmeticOperand::C)),
+            0x92 => Some(Instruction::Sub(ArithmeticOperand::D)),
+            0x93 => Some(Instruction::Sub(ArithmeticOperand::E)),
+            0x94 => Some(Instruction::Sub(ArithmeticOperand::H)),
+            0x95 => Some(Instruction::Sub(ArithmeticOperand::L)),
+            0x97 => Some(Instruction::Sub(ArithmeticOperand::A)),
+            // SUB A,d8
+            0xd6 => Some(Instruction::SubImm()),
+            // SUB A,(HL)
+            0x96 => Some(Instruction::SubHL()),
+            // SBC A,r
+            0x98 => Some(Instruction::Sbc(ArithmeticOperand::B)),
+            0x99 => Some(Instruction::Sbc(ArithmeticOperand::C)),
+            0x9a => Some(Instruction::Sbc(ArithmeticOperand::D)),
+            0x9b => Some(Instruction::Sbc(ArithmeticOperand::E)),
+            0x9c => Some(Instruction::Sbc(ArithmeticOperand::H)),
+            0x9d => Some(Instruction::Sbc(ArithmeticOperand::L)),
+            0x9f => Some(Instruction::Sbc(ArithmeticOperand::A)),
             _ => None
         }
     }
@@ -100,6 +126,26 @@ impl Instruction {
             Instruction::Adc(ArithmeticOperand::H) => 0x8c,
             Instruction::Adc(ArithmeticOperand::L) => 0x8d,
             Instruction::Adc(ArithmeticOperand::A) => 0x8f,
+            // SUB A,r
+            Instruction::Sub(ArithmeticOperand::B) => 0x90,
+            Instruction::Sub(ArithmeticOperand::C) => 0x91,
+            Instruction::Sub(ArithmeticOperand::D) => 0x92,
+            Instruction::Sub(ArithmeticOperand::E) => 0x93,
+            Instruction::Sub(ArithmeticOperand::H) => 0x94,
+            Instruction::Sub(ArithmeticOperand::L) => 0x95,
+            Instruction::Sub(ArithmeticOperand::A) => 0x97,
+            // SUB A,d8
+            Instruction::SubImm() => 0xd6,
+            // SUB A,(HL)
+            Instruction::SubHL() => 0x96,
+            // SBC A,r
+            Instruction::Sbc(ArithmeticOperand::B) => 0x98,
+            Instruction::Sbc(ArithmeticOperand::C) => 0x99,
+            Instruction::Sbc(ArithmeticOperand::D) => 0x9a,
+            Instruction::Sbc(ArithmeticOperand::E) => 0x9b,
+            Instruction::Sbc(ArithmeticOperand::H) => 0x9c,
+            Instruction::Sbc(ArithmeticOperand::L) => 0x9d,
+            Instruction::Sbc(ArithmeticOperand::A) => 0x9f,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -112,6 +158,10 @@ impl Instruction {
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 1,
             Instruction::Adc(_) => 1,
+            Instruction::Sub(_) => 1,
+            Instruction::SubImm() => 2,
+            Instruction::SubHL() => 1,
+            Instruction::Sbc(_) => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -124,6 +174,10 @@ impl Instruction {
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 2,
             Instruction::Adc(_) => 1,
+            Instruction::Sub(_) => 1,
+            Instruction::SubImm() => 2,
+            Instruction::SubHL() => 1,
+            Instruction::Sbc(_) => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -208,6 +262,24 @@ impl Cpu {
         self.rf[regop as usize] = val; 
     }
 
+    fn subtract(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
+        let (result, did_wrap) = if with_carry {
+            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
+            let (operand_result, operand_did_wrap) = carry_result.overflowing_sub(operand);
+            (operand_result, carry_did_wrap | operand_did_wrap)
+        } else {
+            self.get_reg(regop).overflowing_sub(operand)
+        };
+
+        self.z = result == 0;
+        self.n = true;
+        self.h = ((self.get_reg(regop) as i8) & 0xf)
+            .wrapping_sub((operand as i8) & 0xf)
+            .wrapping_sub(if with_carry { self.cy as i8 } else { 0 }) < 0;
+        self.cy = did_wrap;
+        self.set_reg(regop, result);
+    }
+
     fn add(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
             let (carry_result, carry_did_wrap) = operand.overflowing_add(self.cy as u8);
@@ -228,10 +300,15 @@ impl Cpu {
     fn execute_instruction(&mut self, instruction: Instruction) {
         match instruction {
             Instruction::Inc(regop) => self.add(regop, 1, false),
+            Instruction::Dec(regop) => self.subtract(regop, 1, false),
             Instruction::Add(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), false),
             Instruction::Adc(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), true),
             Instruction::AddImm() => self.add(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
             Instruction::AddHL() => self.add(ArithmeticOperand::A, self.read_byte(self.get_hl()), false),
+            Instruction::Sub(regop) => self.subtract(ArithmeticOperand::A, self.get_reg(regop), false),
+            Instruction::Sbc(regop) => self.subtract(ArithmeticOperand::A, self.get_reg(regop), true),
+            Instruction::SubImm() => self.subtract(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
+            Instruction::SubHL() => self.subtract(ArithmeticOperand::A, self.read_byte(self.get_hl()), false),
             _ => panic!("Invalid instruction"),
         };
     }
