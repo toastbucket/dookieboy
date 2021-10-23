@@ -282,17 +282,18 @@ impl Cpu {
 
     fn add(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
-            let (carry_result, carry_did_wrap) = operand.overflowing_add(self.cy as u8);
-            let (operand_result, operand_did_wrap) = carry_result.overflowing_add(self.get_reg(regop));
+            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_add(self.cy as u8);
+            let (operand_result, operand_did_wrap) = carry_result.overflowing_add(operand);
             (operand_result, carry_did_wrap | operand_did_wrap)
         } else {
-            operand.overflowing_add(self.get_reg(regop))
+            self.get_reg(regop).overflowing_add(operand)
         };
 
         self.z = result == 0;
         self.n = false;
-        self.h = (self.get_reg(regop) & 0xf) + (operand & 0xf)
-            + (if with_carry { self.cy as u8 } else { 0 }) > 0xf;
+        self.h = (self.get_reg(regop) & 0xf)
+            .wrapping_add(operand & 0xf)
+            .wrapping_add(if with_carry { self.cy as u8 } else { 0 }) > 0xf;
         self.cy = did_wrap;
         self.set_reg(regop, result);
     }
