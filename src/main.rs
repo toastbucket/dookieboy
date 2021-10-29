@@ -1,9 +1,12 @@
 mod cartridge;
 mod cpu;
+mod gameboy;
 mod joypad;
 mod memory;
 mod mmu;
 
+use crate::gameboy::Gameboy;
+
 fn main() {
-    println!("Hello, world!");
+    let gameboy = Gameboy::new();
 }
