@@ -23,13 +23,13 @@ fn test_all_increments() {
     for i in 0..test_ram.len() {
         cpu.step();
     }
-    assert_eq!(cpu.rf[ArithmeticOperand::B as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::C as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::D as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::E as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::H as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::L as usize], 1);
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::C), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::D), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::E), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::H), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::L), 1);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 1);
 }
 
 // Verify overflow when incrementing 0xff
@@ -41,9 +41,9 @@ fn test_increment_overflow() {
         Instruction::Inc(ArithmeticOperand::B).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.rf[ArithmeticOperand::B as usize] = 0xff;
+    cpu.set_reg(ArithmeticOperand::B, 0xff);
     cpu.step();
-    assert_eq!(cpu.rf[ArithmeticOperand::B as usize], 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
@@ -65,17 +65,17 @@ fn test_add() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 0;
+        cpu.set_reg(ArithmeticOperand::A, 0);
         cpu.step();
 
         assert_eq!(cpu.z, false);
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 1);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 1);
     }
 }
 
@@ -94,17 +94,17 @@ fn test_add_overflow() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 0xff);
+    cpu.set_all_regs(0xff);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 1;
+        cpu.set_reg(ArithmeticOperand::A, 1);
         cpu.step();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     }
 }
 
@@ -123,10 +123,10 @@ fn test_add_carry() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 0;
+        cpu.set_reg(ArithmeticOperand::A, 0);
         cpu.cy = true;
         cpu.step();
 
@@ -134,7 +134,7 @@ fn test_add_carry() {
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 2);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 2);
     }
 }
 
@@ -153,10 +153,10 @@ fn test_add_carry_overflow() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 0xff);
+    cpu.set_all_regs(0xff);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 0;
+        cpu.set_reg(ArithmeticOperand::A, 0);
         cpu.cy = true;
         cpu.step();
         cpu.dump();
@@ -165,7 +165,7 @@ fn test_add_carry_overflow() {
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     }
 }
 
@@ -180,7 +180,7 @@ fn test_add_immediate() {
     ];
     cpu.load_test_ram(&test_ram);
     cpu.step();
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0x10);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x10);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, false);
@@ -197,9 +197,9 @@ fn test_add_immediate_overflow() {
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.rf[ArithmeticOperand::A as usize] = 1;
+    cpu.set_reg(ArithmeticOperand::A, 1);
     cpu.step();
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
@@ -221,18 +221,18 @@ fn test_all_decrements() {
         Instruction::Dec(ArithmeticOperand::A).as_byte(),
     ];
 
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
     cpu.load_test_ram(&test_ram);
     for i in 0..test_ram.len() {
         cpu.step();
     }
-    assert_eq!(cpu.rf[ArithmeticOperand::B as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::C as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::D as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::E as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::H as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::L as usize], 0);
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::C), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::D), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::E), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::H), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::L), 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
 }
 
 // Verify subtracting registers
@@ -250,17 +250,17 @@ fn test_sub() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 1;
+        cpu.set_reg(ArithmeticOperand::A, 1);
         cpu.step();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     }
 }
 
@@ -279,17 +279,17 @@ fn test_sub_overflow() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 0;
+        cpu.set_reg(ArithmeticOperand::A, 0);
         cpu.step();
 
         assert_eq!(cpu.z, false);
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0xff);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xff);
     }
 }
 
@@ -308,10 +308,10 @@ fn test_sub_carry() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 2;
+        cpu.set_reg(ArithmeticOperand::A, 2);
         cpu.cy = true;
         cpu.step();
 
@@ -319,7 +319,7 @@ fn test_sub_carry() {
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     }
 }
 
@@ -338,10 +338,10 @@ fn test_sub_carry_overflow() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.rf.iter_mut().for_each(|x| *x = 1);
+    cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.rf[ArithmeticOperand::A as usize] = 0;
+        cpu.set_reg(ArithmeticOperand::A, 0);
         cpu.cy = true;
         cpu.step();
 
@@ -349,7 +349,7 @@ fn test_sub_carry_overflow() {
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0xfe);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xfe);
     }
 }
 
@@ -362,10 +362,10 @@ fn test_sub_immediate() {
         Instruction::SubImm().as_byte(),
         0x10,
     ];
-    cpu.rf[ArithmeticOperand::A as usize] = 0x10;
+    cpu.set_reg(ArithmeticOperand::A, 0x10);
     cpu.load_test_ram(&test_ram);
     cpu.step();
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, false);
@@ -382,9 +382,9 @@ fn test_sub_immediate_overflow() {
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.rf[ArithmeticOperand::A as usize] = 0;
+    cpu.set_reg(ArithmeticOperand::A, 0);
     cpu.step();
-    assert_eq!(cpu.rf[ArithmeticOperand::A as usize], 0xff);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xff);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, true);
