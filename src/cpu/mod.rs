@@ -262,6 +262,10 @@ impl Cpu {
         self.rf[regop as usize] = val; 
     }
 
+    fn set_all_regs(&mut self, val: u8) {
+        self.rf.iter_mut().for_each(|x| *x = val);
+    }
+
     fn subtract(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
             let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
