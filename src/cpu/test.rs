@@ -8,7 +8,7 @@ use super::*;
 // Verify incrementing registers
 #[test]
 fn test_all_increments() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Inc(ArithmeticOperand::B).as_byte(),
@@ -35,7 +35,7 @@ fn test_all_increments() {
 // Verify overflow when incrementing 0xff
 #[test]
 fn test_increment_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Inc(ArithmeticOperand::B).as_byte(),
@@ -53,7 +53,7 @@ fn test_increment_overflow() {
 // Verify adding to registers
 #[test]
 fn test_add() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Add(ArithmeticOperand::B).as_byte(),
@@ -82,7 +82,7 @@ fn test_add() {
 // Verify adding to registers with overflow
 #[test]
 fn test_add_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Add(ArithmeticOperand::B).as_byte(),
@@ -111,7 +111,7 @@ fn test_add_overflow() {
 // Verify adding to registers with carry
 #[test]
 fn test_add_carry() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Adc(ArithmeticOperand::B).as_byte(),
@@ -141,7 +141,7 @@ fn test_add_carry() {
 // Verify adding to registers with overflow
 #[test]
 fn test_add_carry_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Adc(ArithmeticOperand::B).as_byte(),
@@ -172,7 +172,7 @@ fn test_add_carry_overflow() {
 // Verify adding immediates
 #[test]
 fn test_add_immediate() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::AddImm().as_byte(),
@@ -190,7 +190,7 @@ fn test_add_immediate() {
 // Verify adding immediates with overflow
 #[test]
 fn test_add_immediate_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::AddImm().as_byte(),
@@ -209,7 +209,7 @@ fn test_add_immediate_overflow() {
 // Verify decrementing registers
 #[test]
 fn test_all_decrements() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Dec(ArithmeticOperand::B).as_byte(),
@@ -238,7 +238,7 @@ fn test_all_decrements() {
 // Verify subtracting registers
 #[test]
 fn test_sub() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Sub(ArithmeticOperand::B).as_byte(),
@@ -267,7 +267,7 @@ fn test_sub() {
 // Verify subtracting registers with overflow
 #[test]
 fn test_sub_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Sub(ArithmeticOperand::B).as_byte(),
@@ -296,7 +296,7 @@ fn test_sub_overflow() {
 // Verify subtracting registers with carry
 #[test]
 fn test_sub_carry() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Sbc(ArithmeticOperand::B).as_byte(),
@@ -326,7 +326,7 @@ fn test_sub_carry() {
 // Verify adding to registers with overflow
 #[test]
 fn test_sub_carry_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::Sbc(ArithmeticOperand::B).as_byte(),
@@ -356,7 +356,7 @@ fn test_sub_carry_overflow() {
 // Verify subtracting immediates
 #[test]
 fn test_sub_immediate() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::SubImm().as_byte(),
@@ -375,7 +375,7 @@ fn test_sub_immediate() {
 // Verify subtracting immediates with overflow
 #[test]
 fn test_sub_immediate_overflow() {
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
         Instruction::SubImm().as_byte(),

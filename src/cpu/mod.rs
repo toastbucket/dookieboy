@@ -1,5 +1,8 @@
 // src/cpu.rs
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use crate::memory::Memory;
 use crate::mmu::Mmu;
 
@@ -194,14 +197,14 @@ pub struct Cpu {
     n: bool,
     h: bool,
     cy: bool,
-    mmu: Mmu,
+    mmu: Rc<RefCell<Mmu>>,
 
     #[cfg(test)]
     test_ram: [u8; TEST_RAM_SIZE],
 }
 
 impl Cpu {
-    pub fn new() -> Cpu {
+    pub fn new(mmu: Rc<RefCell<Mmu>>) -> Cpu {
         Cpu {
             rf: [0; ARITHMETIC_REGOP_LEN],
             sp: 0,
@@ -210,7 +213,7 @@ impl Cpu {
             n: false,
             h: false,
             cy: false,
-            mmu: Mmu::new(),
+            mmu: mmu,
 
             #[cfg(test)]
             test_ram: [0; TEST_RAM_SIZE],
@@ -233,7 +236,7 @@ impl Cpu {
 
     #[cfg(not(test))]
     fn read_byte(&self, addr: u16) -> u8 {
-        self.mmu.mem_read_byte(addr)
+        self.mmu.borrow().mem_read_byte(addr)
     }
 
     #[cfg(test)]
@@ -247,7 +250,7 @@ impl Cpu {
 
     #[cfg(not(test))]
     fn write_byte(&mut self, addr: u16, val: u8) {
-        self.mmu.mem_write_byte(addr, val);
+        self.mmu.borrow_mut().mem_write_byte(addr, val);
     }
 
     fn get_hl(&self) -> u16 {
