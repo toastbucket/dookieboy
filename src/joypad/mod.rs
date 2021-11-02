@@ -51,19 +51,22 @@ impl Joypad {
         }
     }
 
+    // All bits are represented inverted in the P1 register
+    // i.e. 0b00011110 indicates that action buttons are
+    // selected and only the A button is pressed
     fn build_reg(&self) -> u8 {
         let reg;
         if self.action_select {
-            reg = (self.a as u8)
-                | (self.b as u8) << 1
-                | (self.select as u8) << 2
-                | (self.start as u8) << 3;
+            reg = (!self.a as u8)
+                | (!self.b as u8) << 1
+                | (!self.select as u8) << 2
+                | (!self.start as u8) << 3;
         } else {
-            reg = (self.right as u8)
-                | (self.left as u8) << 1
-                | (self.up as u8) << 2
-                | (self.down as u8) << 3;
+            reg = (!self.right as u8)
+                | (!self.left as u8) << 1
+                | (!self.up as u8) << 2
+                | (!self.down as u8) << 3;
         }
-         reg | ((self.direction_select as u8) << 4) | ((self.action_select as u8) << 5)
+         reg | ((!self.direction_select as u8) << 4) | ((!self.action_select as u8) << 5)
     }
 }
