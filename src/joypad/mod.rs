@@ -70,3 +70,7 @@ impl Joypad {
          reg | ((!self.direction_select as u8) << 4) | ((!self.action_select as u8) << 5)
     }
 }
+
+#[cfg(test)]
+mod test;
+
