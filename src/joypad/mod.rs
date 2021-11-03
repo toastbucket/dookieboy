@@ -3,16 +3,16 @@
 use crate::memory::Memory;
 
 pub struct Joypad {
-   action_select: bool,
-   direction_select: bool,
-   up: bool,
-   down: bool,
-   left: bool,
-   right: bool,
-   a: bool,
-   b: bool,
-   start: bool,
-   select: bool,
+   pub action_select: bool,
+   pub direction_select: bool,
+   pub up: bool,
+   pub down: bool,
+   pub left: bool,
+   pub right: bool,
+   pub a: bool,
+   pub b: bool,
+   pub start: bool,
+   pub select: bool,
 }
 
 impl Memory for Joypad {
