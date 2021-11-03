@@ -9,4 +9,5 @@ use crate::gameboy::Gameboy;
 
 fn main() {
     let gameboy = Gameboy::new();
+    gameboy.run();
 }
