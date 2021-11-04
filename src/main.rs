@@ -7,7 +7,12 @@ mod mmu;
 
 use crate::gameboy::Gameboy;
 
-fn main() {
-    let gameboy = Gameboy::new();
-    gameboy.run();
+const WIDTH: u32 = 800;
+const HEIGHT: u32 = 600;
+
+fn main() -> Result<(), String> {
+    let mut gameboy = Gameboy::init(WIDTH, HEIGHT)?;
+    gameboy.run()?;
+
+    Ok(())
 }
