@@ -594,3 +594,52 @@ fn test_sbc_mem_carry_overflow() {
     assert_eq!(cpu.h, true);
     assert_eq!(cpu.cy, true);
 }
+
+// Verify loading register B
+#[test]
+fn test_ld_b_a() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdRegister(Register8Bit::B, Register8Bit::A).as_byte(),
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x69);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0x69);
+}
+
+// Verify loading register B to memory offset @ hl
+#[test]
+fn test_ld_from_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToMem(Register8Bit::B).as_byte(),
+        0x24,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::B, 0x69);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x01), 0x69);
+}
+
+// Verify loading register B from memory offset @ hl
+#[test]
+fn test_ld_to_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdFromMem(Register8Bit::B).as_byte(),
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0x69);
+}
