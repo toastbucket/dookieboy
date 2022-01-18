@@ -10,6 +10,9 @@ use crate::mmu::Mmu;
 enum Instruction {
     Inc(ArithmeticOperand),
     Dec(ArithmeticOperand),
+    And(ArithmeticOperand),
+    AndHL(),
+    AndImm(),
     Add(ArithmeticOperand),
     AddImm(),
     AddHL(),
@@ -47,6 +50,18 @@ impl Instruction {
             0x25 => Some(Instruction::Dec(ArithmeticOperand::H)),
             0x2d => Some(Instruction::Dec(ArithmeticOperand::L)),
             0x3d => Some(Instruction::Dec(ArithmeticOperand::A)),
+            // AND r
+            0xa0 => Some(Instruction::And(ArithmeticOperand::B)),
+            0xa1 => Some(Instruction::And(ArithmeticOperand::C)),
+            0xa2 => Some(Instruction::And(ArithmeticOperand::D)),
+            0xa3 => Some(Instruction::And(ArithmeticOperand::E)),
+            0xa4 => Some(Instruction::And(ArithmeticOperand::H)),
+            0xa5 => Some(Instruction::And(ArithmeticOperand::L)),
+            0xa7 => Some(Instruction::And(ArithmeticOperand::A)),
+            // AND (HL)
+            0xa6 => Some(Instruction::AndHL()),
+            // AND n
+            0xe6 => Some(Instruction::AndImm()),
             // ADD A,r
             0x80 => Some(Instruction::Add(ArithmeticOperand::B)),
             0x81 => Some(Instruction::Add(ArithmeticOperand::C)),
@@ -109,6 +124,18 @@ impl Instruction {
             Instruction::Dec(ArithmeticOperand::H) => 0x25,
             Instruction::Dec(ArithmeticOperand::L) => 0x2d,
             Instruction::Dec(ArithmeticOperand::A) => 0x3d,
+            // AND r
+            Instruction::And(ArithmeticOperand::B) => 0xa0,
+            Instruction::And(ArithmeticOperand::C) => 0xa1,
+            Instruction::And(ArithmeticOperand::D) => 0xa2,
+            Instruction::And(ArithmeticOperand::E) => 0xa3,
+            Instruction::And(ArithmeticOperand::H) => 0xa4,
+            Instruction::And(ArithmeticOperand::L) => 0xa5,
+            Instruction::And(ArithmeticOperand::A) => 0xa7,
+            // AND (HL)
+            Instruction::AndHL() => 0xa6,
+            // AND n
+            Instruction::AndImm() => 0xe6,
             // ADD A,r
             Instruction::Add(ArithmeticOperand::B) => 0x80,
             Instruction::Add(ArithmeticOperand::C) => 0x81,
@@ -157,6 +184,9 @@ impl Instruction {
         match self {
             Instruction::Inc(_) => 1,
             Instruction::Dec(_) => 1,
+            Instruction::And(_) => 1,
+            Instruction::AndHL() => 1,
+            Instruction::AndImm() => 2,
             Instruction::Add(_) => 1,
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 1,
@@ -173,6 +203,9 @@ impl Instruction {
         match self {
             Instruction::Inc(_) => 1,
             Instruction::Dec(_) => 1,
+            Instruction::And(_) => 1,
+            Instruction::AndHL() => 2,
+            Instruction::AndImm() => 2,
             Instruction::Add(_) => 1,
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 2,
@@ -269,6 +302,15 @@ impl Cpu {
         self.rf.iter_mut().for_each(|x| *x = val);
     }
 
+    fn and(&mut self, regop: ArithmeticOperand, operand: u8) {
+        let result = self.get_reg(regop) & operand;
+        self.z = result == 0;
+        self.n = false;
+        self.h = true;
+        self.cy = false;
+        self.set_reg(regop, result);
+    }
+
     fn subtract(&mut self, regop: ArithmeticOperand, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
             let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
@@ -309,6 +351,9 @@ impl Cpu {
         match instruction {
             Instruction::Inc(regop) => self.add(regop, 1, false),
             Instruction::Dec(regop) => self.subtract(regop, 1, false),
+            Instruction::And(regop) => self.and(ArithmeticOperand::A, self.get_reg(regop)),
+            Instruction::AndHL() => self.and(ArithmeticOperand::A, self.read_byte(self.get_hl())),
+            Instruction::AndImm() => self.and(ArithmeticOperand::A, self.read_byte(self.pc + 1)),
             Instruction::Add(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), false),
             Instruction::Adc(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), true),
             Instruction::AddImm() => self.add(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
