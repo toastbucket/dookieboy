@@ -391,3 +391,75 @@ fn test_sub_immediate_overflow() {
     assert_eq!(cpu.cy, true);
 }
 
+// Verify anding registers
+#[test]
+fn test_and() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 6;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::And(ArithmeticOperand::B).as_byte(),
+        Instruction::And(ArithmeticOperand::C).as_byte(),
+        Instruction::And(ArithmeticOperand::D).as_byte(),
+        Instruction::And(ArithmeticOperand::E).as_byte(),
+        Instruction::And(ArithmeticOperand::H).as_byte(),
+        Instruction::And(ArithmeticOperand::L).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_all_regs(0xaa);
+
+    for i in 0..test_ram.len() {
+        cpu.set_reg(ArithmeticOperand::A, 0x55);
+        cpu.step();
+
+        assert_eq!(cpu.z, true);
+        assert_eq!(cpu.n, false);
+        assert_eq!(cpu.h, true);
+        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    }
+}
+
+// Verify anding registers and immediates
+#[test]
+fn test_and_imm() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AndImm().as_byte(),
+        0x05,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 0x07);
+    cpu.step();
+
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, true);
+    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x05);
+}
+
+// Verify anding registers and memory
+#[test]
+fn test_and_hl() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AndHL().as_byte(),
+        0x05,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 0x07);
+    cpu.set_reg(ArithmeticOperand::H, 0x00);
+    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.step();
+
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, true);
+    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x05);
+}
