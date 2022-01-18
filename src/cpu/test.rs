@@ -463,3 +463,92 @@ fn test_and_hl() {
     assert_eq!(cpu.cy, false);
     assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x05);
 }
+
+// Verify adding values from memory with carry
+#[test]
+fn test_adc_hl_carry() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AdcHL().as_byte(),
+        0x01,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 0);
+    cpu.set_reg(ArithmeticOperand::H, 0x00);
+    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.cy = true;
+    cpu.step();
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 2);
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+}
+
+// Verify adding values from memory with carry and overflow
+#[test]
+fn test_adc_hl_carry_overflow() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AdcHL().as_byte(),
+        0xff,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 0);
+    cpu.set_reg(ArithmeticOperand::H, 0x00);
+    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.cy = true;
+    cpu.step();
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.z, true);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, true);
+    assert_eq!(cpu.cy, true);
+}
+
+// Verify subtracting values from memory with carry
+#[test]
+fn test_sbc_hl_carry() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::SbcHL().as_byte(),
+        0x01,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 2);
+    cpu.set_reg(ArithmeticOperand::H, 0x00);
+    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.cy = true;
+    cpu.step();
+    cpu.dump();
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.z, true);
+    assert_eq!(cpu.n, true);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+}
+
+// Verify subtracting values from memory with carry and overflow
+#[test]
+fn test_sbc_hl_carry_overflow() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::SbcHL().as_byte(),
+        0x01,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(ArithmeticOperand::A, 0);
+    cpu.set_reg(ArithmeticOperand::H, 0x00);
+    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.cy = true;
+    cpu.step();
+    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xfe);
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, true);
+    assert_eq!(cpu.h, true);
+    assert_eq!(cpu.cy, true);
+}
