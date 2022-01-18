@@ -17,12 +17,12 @@ enum Instruction {
     AddImm(),
     AddHL(),
     Adc(ArithmeticOperand),
-    // TODO: AdcHL
+    AdcHL(),
     Sub(ArithmeticOperand),
     Sbc(ArithmeticOperand),
     SubImm(),
     SubHL(),
-    // TODO: SbcHL
+    SbcHL(),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -82,6 +82,8 @@ impl Instruction {
             0x8c => Some(Instruction::Adc(ArithmeticOperand::H)),
             0x8d => Some(Instruction::Adc(ArithmeticOperand::L)),
             0x8f => Some(Instruction::Adc(ArithmeticOperand::A)),
+            // ADC A,(HL)
+            0x8e => Some(Instruction::AdcHL()),
             // SUB A,r
             0x90 => Some(Instruction::Sub(ArithmeticOperand::B)),
             0x91 => Some(Instruction::Sub(ArithmeticOperand::C)),
@@ -102,6 +104,8 @@ impl Instruction {
             0x9c => Some(Instruction::Sbc(ArithmeticOperand::H)),
             0x9d => Some(Instruction::Sbc(ArithmeticOperand::L)),
             0x9f => Some(Instruction::Sbc(ArithmeticOperand::A)),
+            // SBC A,(HL)
+            0x9e => Some(Instruction::SbcHL()),
             _ => None
         }
     }
@@ -156,6 +160,8 @@ impl Instruction {
             Instruction::Adc(ArithmeticOperand::H) => 0x8c,
             Instruction::Adc(ArithmeticOperand::L) => 0x8d,
             Instruction::Adc(ArithmeticOperand::A) => 0x8f,
+            // ADC A,(HL)
+            Instruction::AdcHL() => 0x8e,
             // SUB A,r
             Instruction::Sub(ArithmeticOperand::B) => 0x90,
             Instruction::Sub(ArithmeticOperand::C) => 0x91,
@@ -176,6 +182,8 @@ impl Instruction {
             Instruction::Sbc(ArithmeticOperand::H) => 0x9c,
             Instruction::Sbc(ArithmeticOperand::L) => 0x9d,
             Instruction::Sbc(ArithmeticOperand::A) => 0x9f,
+            // SBC A,(HL)
+            Instruction::SbcHL() => 0x9e,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -191,10 +199,12 @@ impl Instruction {
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 1,
             Instruction::Adc(_) => 1,
+            Instruction::AdcHL() => 1,
             Instruction::Sub(_) => 1,
             Instruction::SubImm() => 2,
             Instruction::SubHL() => 1,
             Instruction::Sbc(_) => 1,
+            Instruction::SbcHL() => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -210,10 +220,12 @@ impl Instruction {
             Instruction::AddImm() => 2,
             Instruction::AddHL() => 2,
             Instruction::Adc(_) => 1,
+            Instruction::AdcHL() => 2,
             Instruction::Sub(_) => 1,
             Instruction::SubImm() => 2,
             Instruction::SubHL() => 1,
             Instruction::Sbc(_) => 1,
+            Instruction::SbcHL() => 2,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -358,10 +370,12 @@ impl Cpu {
             Instruction::Adc(regop) => self.add(ArithmeticOperand::A, self.get_reg(regop), true),
             Instruction::AddImm() => self.add(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
             Instruction::AddHL() => self.add(ArithmeticOperand::A, self.read_byte(self.get_hl()), false),
+            Instruction::AdcHL() => self.add(ArithmeticOperand::A, self.read_byte(self.get_hl()), true),
             Instruction::Sub(regop) => self.subtract(ArithmeticOperand::A, self.get_reg(regop), false),
             Instruction::Sbc(regop) => self.subtract(ArithmeticOperand::A, self.get_reg(regop), true),
             Instruction::SubImm() => self.subtract(ArithmeticOperand::A, self.read_byte(self.pc + 1), false),
             Instruction::SubHL() => self.subtract(ArithmeticOperand::A, self.read_byte(self.get_hl()), false),
+            Instruction::SbcHL() => self.subtract(ArithmeticOperand::A, self.read_byte(self.get_hl()), true),
             _ => panic!("Invalid instruction"),
         };
     }
