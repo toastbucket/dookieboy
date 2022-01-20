@@ -443,11 +443,11 @@ fn test_and_imm() {
 
 // Verify anding registers and memory
 #[test]
-fn test_and_hl() {
+fn test_and_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AndHL().as_byte(),
+        Instruction::AndFromMem().as_byte(),
         0x05,
     ];
 
@@ -466,11 +466,11 @@ fn test_and_hl() {
 
 // Verify adding values from memory with carry
 #[test]
-fn test_adc_hl_carry() {
+fn test_adc_mem_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AdcHL().as_byte(),
+        Instruction::AdcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -488,11 +488,11 @@ fn test_adc_hl_carry() {
 
 // Verify adding values from memory with carry and overflow
 #[test]
-fn test_adc_hl_carry_overflow() {
+fn test_adc_mem_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AdcHL().as_byte(),
+        Instruction::AdcFromMem().as_byte(),
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
@@ -510,11 +510,11 @@ fn test_adc_hl_carry_overflow() {
 
 // Verify subtracting values from memory with carry
 #[test]
-fn test_sbc_hl_carry() {
+fn test_sbc_mem_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SbcHL().as_byte(),
+        Instruction::SbcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -533,11 +533,11 @@ fn test_sbc_hl_carry() {
 
 // Verify subtracting values from memory with carry and overflow
 #[test]
-fn test_sbc_hl_carry_overflow() {
+fn test_sbc_mem_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SbcHL().as_byte(),
+        Instruction::SbcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
