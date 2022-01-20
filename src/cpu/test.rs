@@ -206,6 +206,27 @@ fn test_add_immediate_overflow() {
     assert_eq!(cpu.cy, true);
 }
 
+// Verify adding values from memory
+#[test]
+fn test_add_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AddFromMem().as_byte(),
+        0x01,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 1);
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+}
+
 // Verify decrementing registers
 #[test]
 fn test_all_decrements() {
@@ -389,6 +410,27 @@ fn test_sub_immediate_overflow() {
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, true);
     assert_eq!(cpu.cy, true);
+}
+
+// Verify subtracting immediates
+#[test]
+fn test_sub_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::SubFromMem().as_byte(),
+        0x10,
+    ];
+    cpu.set_reg(Register8Bit::A, 0x10);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.load_test_ram(&test_ram);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
+    assert_eq!(cpu.z, true);
+    assert_eq!(cpu.n, true);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
 }
 
 // Verify anding registers
