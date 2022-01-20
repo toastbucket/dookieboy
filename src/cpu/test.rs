@@ -11,25 +11,25 @@ fn test_all_increments() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Inc(ArithmeticOperand::B).as_byte(),
-        Instruction::Inc(ArithmeticOperand::C).as_byte(),
-        Instruction::Inc(ArithmeticOperand::D).as_byte(),
-        Instruction::Inc(ArithmeticOperand::E).as_byte(),
-        Instruction::Inc(ArithmeticOperand::H).as_byte(),
-        Instruction::Inc(ArithmeticOperand::L).as_byte(),
-        Instruction::Inc(ArithmeticOperand::A).as_byte(),
+        Instruction::Inc(Register8Bit::B).as_byte(),
+        Instruction::Inc(Register8Bit::C).as_byte(),
+        Instruction::Inc(Register8Bit::D).as_byte(),
+        Instruction::Inc(Register8Bit::E).as_byte(),
+        Instruction::Inc(Register8Bit::H).as_byte(),
+        Instruction::Inc(Register8Bit::L).as_byte(),
+        Instruction::Inc(Register8Bit::A).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
     for i in 0..test_ram.len() {
         cpu.step();
     }
-    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::C), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::D), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::E), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::H), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::L), 1);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::B), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::C), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::D), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::E), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::H), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::L), 1);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 1);
 }
 
 // Verify overflow when incrementing 0xff
@@ -38,12 +38,12 @@ fn test_increment_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Inc(ArithmeticOperand::B).as_byte(),
+        Instruction::Inc(Register8Bit::B).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::B, 0xff);
+    cpu.set_reg(Register8Bit::B, 0xff);
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
@@ -56,26 +56,26 @@ fn test_add() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Add(ArithmeticOperand::B).as_byte(),
-        Instruction::Add(ArithmeticOperand::C).as_byte(),
-        Instruction::Add(ArithmeticOperand::D).as_byte(),
-        Instruction::Add(ArithmeticOperand::E).as_byte(),
-        Instruction::Add(ArithmeticOperand::H).as_byte(),
-        Instruction::Add(ArithmeticOperand::L).as_byte(),
+        Instruction::Add(Register8Bit::B).as_byte(),
+        Instruction::Add(Register8Bit::C).as_byte(),
+        Instruction::Add(Register8Bit::D).as_byte(),
+        Instruction::Add(Register8Bit::E).as_byte(),
+        Instruction::Add(Register8Bit::H).as_byte(),
+        Instruction::Add(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0);
+        cpu.set_reg(Register8Bit::A, 0);
         cpu.step();
 
         assert_eq!(cpu.z, false);
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 1);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 1);
     }
 }
 
@@ -85,26 +85,26 @@ fn test_add_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Add(ArithmeticOperand::B).as_byte(),
-        Instruction::Add(ArithmeticOperand::C).as_byte(),
-        Instruction::Add(ArithmeticOperand::D).as_byte(),
-        Instruction::Add(ArithmeticOperand::E).as_byte(),
-        Instruction::Add(ArithmeticOperand::H).as_byte(),
-        Instruction::Add(ArithmeticOperand::L).as_byte(),
+        Instruction::Add(Register8Bit::B).as_byte(),
+        Instruction::Add(Register8Bit::C).as_byte(),
+        Instruction::Add(Register8Bit::D).as_byte(),
+        Instruction::Add(Register8Bit::E).as_byte(),
+        Instruction::Add(Register8Bit::H).as_byte(),
+        Instruction::Add(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(0xff);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 1);
+        cpu.set_reg(Register8Bit::A, 1);
         cpu.step();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
 
@@ -114,19 +114,19 @@ fn test_add_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Adc(ArithmeticOperand::B).as_byte(),
-        Instruction::Adc(ArithmeticOperand::C).as_byte(),
-        Instruction::Adc(ArithmeticOperand::D).as_byte(),
-        Instruction::Adc(ArithmeticOperand::E).as_byte(),
-        Instruction::Adc(ArithmeticOperand::H).as_byte(),
-        Instruction::Adc(ArithmeticOperand::L).as_byte(),
+        Instruction::Adc(Register8Bit::B).as_byte(),
+        Instruction::Adc(Register8Bit::C).as_byte(),
+        Instruction::Adc(Register8Bit::D).as_byte(),
+        Instruction::Adc(Register8Bit::E).as_byte(),
+        Instruction::Adc(Register8Bit::H).as_byte(),
+        Instruction::Adc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0);
+        cpu.set_reg(Register8Bit::A, 0);
         cpu.cy = true;
         cpu.step();
 
@@ -134,7 +134,7 @@ fn test_add_carry() {
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 2);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 2);
     }
 }
 
@@ -144,19 +144,19 @@ fn test_add_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Adc(ArithmeticOperand::B).as_byte(),
-        Instruction::Adc(ArithmeticOperand::C).as_byte(),
-        Instruction::Adc(ArithmeticOperand::D).as_byte(),
-        Instruction::Adc(ArithmeticOperand::E).as_byte(),
-        Instruction::Adc(ArithmeticOperand::H).as_byte(),
-        Instruction::Adc(ArithmeticOperand::L).as_byte(),
+        Instruction::Adc(Register8Bit::B).as_byte(),
+        Instruction::Adc(Register8Bit::C).as_byte(),
+        Instruction::Adc(Register8Bit::D).as_byte(),
+        Instruction::Adc(Register8Bit::E).as_byte(),
+        Instruction::Adc(Register8Bit::H).as_byte(),
+        Instruction::Adc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(0xff);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0);
+        cpu.set_reg(Register8Bit::A, 0);
         cpu.cy = true;
         cpu.step();
         cpu.dump();
@@ -165,7 +165,7 @@ fn test_add_carry_overflow() {
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
 
@@ -180,7 +180,7 @@ fn test_add_immediate() {
     ];
     cpu.load_test_ram(&test_ram);
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x10);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x10);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, false);
@@ -197,9 +197,9 @@ fn test_add_immediate_overflow() {
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 1);
+    cpu.set_reg(Register8Bit::A, 1);
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
@@ -212,13 +212,13 @@ fn test_all_decrements() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Dec(ArithmeticOperand::B).as_byte(),
-        Instruction::Dec(ArithmeticOperand::C).as_byte(),
-        Instruction::Dec(ArithmeticOperand::D).as_byte(),
-        Instruction::Dec(ArithmeticOperand::E).as_byte(),
-        Instruction::Dec(ArithmeticOperand::H).as_byte(),
-        Instruction::Dec(ArithmeticOperand::L).as_byte(),
-        Instruction::Dec(ArithmeticOperand::A).as_byte(),
+        Instruction::Dec(Register8Bit::B).as_byte(),
+        Instruction::Dec(Register8Bit::C).as_byte(),
+        Instruction::Dec(Register8Bit::D).as_byte(),
+        Instruction::Dec(Register8Bit::E).as_byte(),
+        Instruction::Dec(Register8Bit::H).as_byte(),
+        Instruction::Dec(Register8Bit::L).as_byte(),
+        Instruction::Dec(Register8Bit::A).as_byte(),
     ];
 
     cpu.set_all_regs(1);
@@ -226,13 +226,13 @@ fn test_all_decrements() {
     for i in 0..test_ram.len() {
         cpu.step();
     }
-    assert_eq!(cpu.get_reg(ArithmeticOperand::B), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::C), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::D), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::E), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::H), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::L), 0);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
 }
 
 // Verify subtracting registers
@@ -241,26 +241,26 @@ fn test_sub() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sub(ArithmeticOperand::B).as_byte(),
-        Instruction::Sub(ArithmeticOperand::C).as_byte(),
-        Instruction::Sub(ArithmeticOperand::D).as_byte(),
-        Instruction::Sub(ArithmeticOperand::E).as_byte(),
-        Instruction::Sub(ArithmeticOperand::H).as_byte(),
-        Instruction::Sub(ArithmeticOperand::L).as_byte(),
+        Instruction::Sub(Register8Bit::B).as_byte(),
+        Instruction::Sub(Register8Bit::C).as_byte(),
+        Instruction::Sub(Register8Bit::D).as_byte(),
+        Instruction::Sub(Register8Bit::E).as_byte(),
+        Instruction::Sub(Register8Bit::H).as_byte(),
+        Instruction::Sub(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 1);
+        cpu.set_reg(Register8Bit::A, 1);
         cpu.step();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
 
@@ -270,26 +270,26 @@ fn test_sub_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sub(ArithmeticOperand::B).as_byte(),
-        Instruction::Sub(ArithmeticOperand::C).as_byte(),
-        Instruction::Sub(ArithmeticOperand::D).as_byte(),
-        Instruction::Sub(ArithmeticOperand::E).as_byte(),
-        Instruction::Sub(ArithmeticOperand::H).as_byte(),
-        Instruction::Sub(ArithmeticOperand::L).as_byte(),
+        Instruction::Sub(Register8Bit::B).as_byte(),
+        Instruction::Sub(Register8Bit::C).as_byte(),
+        Instruction::Sub(Register8Bit::D).as_byte(),
+        Instruction::Sub(Register8Bit::E).as_byte(),
+        Instruction::Sub(Register8Bit::H).as_byte(),
+        Instruction::Sub(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0);
+        cpu.set_reg(Register8Bit::A, 0);
         cpu.step();
 
         assert_eq!(cpu.z, false);
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xff);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
     }
 }
 
@@ -299,19 +299,19 @@ fn test_sub_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sbc(ArithmeticOperand::B).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::C).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::D).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::E).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::H).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::L).as_byte(),
+        Instruction::Sbc(Register8Bit::B).as_byte(),
+        Instruction::Sbc(Register8Bit::C).as_byte(),
+        Instruction::Sbc(Register8Bit::D).as_byte(),
+        Instruction::Sbc(Register8Bit::E).as_byte(),
+        Instruction::Sbc(Register8Bit::H).as_byte(),
+        Instruction::Sbc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 2);
+        cpu.set_reg(Register8Bit::A, 2);
         cpu.cy = true;
         cpu.step();
 
@@ -319,7 +319,7 @@ fn test_sub_carry() {
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, false);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
 
@@ -329,19 +329,19 @@ fn test_sub_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sbc(ArithmeticOperand::B).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::C).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::D).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::E).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::H).as_byte(),
-        Instruction::Sbc(ArithmeticOperand::L).as_byte(),
+        Instruction::Sbc(Register8Bit::B).as_byte(),
+        Instruction::Sbc(Register8Bit::C).as_byte(),
+        Instruction::Sbc(Register8Bit::D).as_byte(),
+        Instruction::Sbc(Register8Bit::E).as_byte(),
+        Instruction::Sbc(Register8Bit::H).as_byte(),
+        Instruction::Sbc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(1);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0);
+        cpu.set_reg(Register8Bit::A, 0);
         cpu.cy = true;
         cpu.step();
 
@@ -349,7 +349,7 @@ fn test_sub_carry_overflow() {
         assert_eq!(cpu.n, true);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, true);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xfe);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0xfe);
     }
 }
 
@@ -362,10 +362,10 @@ fn test_sub_immediate() {
         Instruction::SubImm().as_byte(),
         0x10,
     ];
-    cpu.set_reg(ArithmeticOperand::A, 0x10);
+    cpu.set_reg(Register8Bit::A, 0x10);
     cpu.load_test_ram(&test_ram);
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, false);
@@ -382,9 +382,9 @@ fn test_sub_immediate_overflow() {
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0);
+    cpu.set_reg(Register8Bit::A, 0);
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xff);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, true);
@@ -397,26 +397,26 @@ fn test_and() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::And(ArithmeticOperand::B).as_byte(),
-        Instruction::And(ArithmeticOperand::C).as_byte(),
-        Instruction::And(ArithmeticOperand::D).as_byte(),
-        Instruction::And(ArithmeticOperand::E).as_byte(),
-        Instruction::And(ArithmeticOperand::H).as_byte(),
-        Instruction::And(ArithmeticOperand::L).as_byte(),
+        Instruction::And(Register8Bit::B).as_byte(),
+        Instruction::And(Register8Bit::C).as_byte(),
+        Instruction::And(Register8Bit::D).as_byte(),
+        Instruction::And(Register8Bit::E).as_byte(),
+        Instruction::And(Register8Bit::H).as_byte(),
+        Instruction::And(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
     cpu.set_all_regs(0xaa);
 
     for i in 0..test_ram.len() {
-        cpu.set_reg(ArithmeticOperand::A, 0x55);
+        cpu.set_reg(Register8Bit::A, 0x55);
         cpu.step();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, false);
         assert_eq!(cpu.h, true);
         assert_eq!(cpu.cy, false);
-        assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
 
@@ -431,14 +431,14 @@ fn test_and_imm() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0x07);
+    cpu.set_reg(Register8Bit::A, 0x07);
     cpu.step();
 
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
     assert_eq!(cpu.cy, false);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x05);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x05);
 }
 
 // Verify anding registers and memory
@@ -452,16 +452,16 @@ fn test_and_hl() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0x07);
-    cpu.set_reg(ArithmeticOperand::H, 0x00);
-    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.set_reg(Register8Bit::A, 0x07);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
     cpu.step();
 
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
     assert_eq!(cpu.cy, false);
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0x05);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x05);
 }
 
 // Verify adding values from memory with carry
@@ -474,12 +474,12 @@ fn test_adc_hl_carry() {
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0);
-    cpu.set_reg(ArithmeticOperand::H, 0x00);
-    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.set_reg(Register8Bit::A, 0);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
     cpu.cy = true;
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 2);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 2);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, false);
@@ -496,12 +496,12 @@ fn test_adc_hl_carry_overflow() {
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0);
-    cpu.set_reg(ArithmeticOperand::H, 0x00);
-    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.set_reg(Register8Bit::A, 0);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
     cpu.cy = true;
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, false);
     assert_eq!(cpu.h, true);
@@ -518,13 +518,13 @@ fn test_sbc_hl_carry() {
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 2);
-    cpu.set_reg(ArithmeticOperand::H, 0x00);
-    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.set_reg(Register8Bit::A, 2);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
     cpu.cy = true;
     cpu.step();
     cpu.dump();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, false);
@@ -541,12 +541,12 @@ fn test_sbc_hl_carry_overflow() {
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
-    cpu.set_reg(ArithmeticOperand::A, 0);
-    cpu.set_reg(ArithmeticOperand::H, 0x00);
-    cpu.set_reg(ArithmeticOperand::L, 0x01);
+    cpu.set_reg(Register8Bit::A, 0);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
     cpu.cy = true;
     cpu.step();
-    assert_eq!(cpu.get_reg(ArithmeticOperand::A), 0xfe);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xfe);
     assert_eq!(cpu.z, false);
     assert_eq!(cpu.n, true);
     assert_eq!(cpu.h, true);
