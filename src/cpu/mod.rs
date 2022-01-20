@@ -11,18 +11,18 @@ enum Instruction {
     Inc(Register8Bit),
     Dec(Register8Bit),
     And(Register8Bit),
-    AndHL(),
+    AndFromMem(), // always uses HL
     AndImm(),
     Add(Register8Bit),
     AddImm(),
-    AddHL(),
+    AddFromMem(), // always uses HL
     Adc(Register8Bit),
-    AdcHL(),
+    AdcFromMem(), // always uses HL
     Sub(Register8Bit),
-    Sbc(Register8Bit),
     SubImm(),
-    SubHL(),
-    SbcHL(),
+    SubFromMem(), // always uses HL
+    Sbc(Register8Bit),
+    SbcFromMem(), // always uses HL
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -64,7 +64,7 @@ impl Instruction {
             0xa5 => Some(Instruction::And(Register8Bit::L)),
             0xa7 => Some(Instruction::And(Register8Bit::A)),
             // AND (HL)
-            0xa6 => Some(Instruction::AndHL()),
+            0xa6 => Some(Instruction::AndFromMem()),
             // AND n
             0xe6 => Some(Instruction::AndImm()),
             // ADD A,r
@@ -78,7 +78,7 @@ impl Instruction {
             // ADD A,d8
             0xc6 => Some(Instruction::AddImm()),
             // ADD A,(HL)
-            0x86 => Some(Instruction::AddHL()),
+            0x86 => Some(Instruction::AddFromMem()),
             // ADC A,r
             0x88 => Some(Instruction::Adc(Register8Bit::B)),
             0x89 => Some(Instruction::Adc(Register8Bit::C)),
@@ -88,7 +88,7 @@ impl Instruction {
             0x8d => Some(Instruction::Adc(Register8Bit::L)),
             0x8f => Some(Instruction::Adc(Register8Bit::A)),
             // ADC A,(HL)
-            0x8e => Some(Instruction::AdcHL()),
+            0x8e => Some(Instruction::AdcFromMem()),
             // SUB A,r
             0x90 => Some(Instruction::Sub(Register8Bit::B)),
             0x91 => Some(Instruction::Sub(Register8Bit::C)),
@@ -100,7 +100,7 @@ impl Instruction {
             // SUB A,d8
             0xd6 => Some(Instruction::SubImm()),
             // SUB A,(HL)
-            0x96 => Some(Instruction::SubHL()),
+            0x96 => Some(Instruction::SubFromMem()),
             // SBC A,r
             0x98 => Some(Instruction::Sbc(Register8Bit::B)),
             0x99 => Some(Instruction::Sbc(Register8Bit::C)),
@@ -110,7 +110,7 @@ impl Instruction {
             0x9d => Some(Instruction::Sbc(Register8Bit::L)),
             0x9f => Some(Instruction::Sbc(Register8Bit::A)),
             // SBC A,(HL)
-            0x9e => Some(Instruction::SbcHL()),
+            0x9e => Some(Instruction::SbcFromMem()),
             _ => None
         }
     }
@@ -142,7 +142,7 @@ impl Instruction {
             Instruction::And(Register8Bit::L) => 0xa5,
             Instruction::And(Register8Bit::A) => 0xa7,
             // AND (HL)
-            Instruction::AndHL() => 0xa6,
+            Instruction::AndFromMem() => 0xa6,
             // AND n
             Instruction::AndImm() => 0xe6,
             // ADD A,r
@@ -156,7 +156,7 @@ impl Instruction {
             // ADD A,d8
             Instruction::AddImm() => 0xc6,
             // ADD A,(HL)
-            Instruction::AddHL() => 0x86,
+            Instruction::AddFromMem() => 0x86,
             // ADC A,R
             Instruction::Adc(Register8Bit::B) => 0x88,
             Instruction::Adc(Register8Bit::C) => 0x89,
@@ -166,7 +166,7 @@ impl Instruction {
             Instruction::Adc(Register8Bit::L) => 0x8d,
             Instruction::Adc(Register8Bit::A) => 0x8f,
             // ADC A,(HL)
-            Instruction::AdcHL() => 0x8e,
+            Instruction::AdcFromMem() => 0x8e,
             // SUB A,r
             Instruction::Sub(Register8Bit::B) => 0x90,
             Instruction::Sub(Register8Bit::C) => 0x91,
@@ -178,7 +178,7 @@ impl Instruction {
             // SUB A,d8
             Instruction::SubImm() => 0xd6,
             // SUB A,(HL)
-            Instruction::SubHL() => 0x96,
+            Instruction::SubFromMem() => 0x96,
             // SBC A,r
             Instruction::Sbc(Register8Bit::B) => 0x98,
             Instruction::Sbc(Register8Bit::C) => 0x99,
@@ -188,7 +188,7 @@ impl Instruction {
             Instruction::Sbc(Register8Bit::L) => 0x9d,
             Instruction::Sbc(Register8Bit::A) => 0x9f,
             // SBC A,(HL)
-            Instruction::SbcHL() => 0x9e,
+            Instruction::SbcFromMem() => 0x9e,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -198,18 +198,18 @@ impl Instruction {
             Instruction::Inc(_) => 1,
             Instruction::Dec(_) => 1,
             Instruction::And(_) => 1,
-            Instruction::AndHL() => 1,
+            Instruction::AndFromMem() => 1,
             Instruction::AndImm() => 2,
             Instruction::Add(_) => 1,
             Instruction::AddImm() => 2,
-            Instruction::AddHL() => 1,
+            Instruction::AddFromMem() => 1,
             Instruction::Adc(_) => 1,
-            Instruction::AdcHL() => 1,
+            Instruction::AdcFromMem() => 1,
             Instruction::Sub(_) => 1,
             Instruction::SubImm() => 2,
-            Instruction::SubHL() => 1,
+            Instruction::SubFromMem() => 1,
             Instruction::Sbc(_) => 1,
-            Instruction::SbcHL() => 1,
+            Instruction::SbcFromMem() => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -219,18 +219,18 @@ impl Instruction {
             Instruction::Inc(_) => 1,
             Instruction::Dec(_) => 1,
             Instruction::And(_) => 1,
-            Instruction::AndHL() => 2,
+            Instruction::AndFromMem() => 2,
             Instruction::AndImm() => 2,
             Instruction::Add(_) => 1,
             Instruction::AddImm() => 2,
-            Instruction::AddHL() => 2,
+            Instruction::AddFromMem() => 2,
             Instruction::Adc(_) => 1,
-            Instruction::AdcHL() => 2,
+            Instruction::AdcFromMem() => 2,
             Instruction::Sub(_) => 1,
             Instruction::SubImm() => 2,
-            Instruction::SubHL() => 1,
+            Instruction::SubFromMem() => 1,
             Instruction::Sbc(_) => 1,
-            Instruction::SbcHL() => 2,
+            Instruction::SbcFromMem() => 2,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -376,18 +376,18 @@ impl Cpu {
             Instruction::Inc(regop) => self.add(regop, 1, false),
             Instruction::Dec(regop) => self.subtract(regop, 1, false),
             Instruction::And(regop) => self.and(Register8Bit::A, self.get_reg(regop)),
-            Instruction::AndHL() => self.and(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL))),
+            Instruction::AndFromMem() => self.and(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL))),
             Instruction::AndImm() => self.and(Register8Bit::A, self.read_byte(self.pc + 1)),
             Instruction::Add(regop) => self.add(Register8Bit::A, self.get_reg(regop), false),
             Instruction::Adc(regop) => self.add(Register8Bit::A, self.get_reg(regop), true),
             Instruction::AddImm() => self.add(Register8Bit::A, self.read_byte(self.pc + 1), false),
-            Instruction::AddHL() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
-            Instruction::AdcHL() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
+            Instruction::AddFromMem() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
+            Instruction::AdcFromMem() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
             Instruction::Sub(regop) => self.subtract(Register8Bit::A, self.get_reg(regop), false),
             Instruction::Sbc(regop) => self.subtract(Register8Bit::A, self.get_reg(regop), true),
             Instruction::SubImm() => self.subtract(Register8Bit::A, self.read_byte(self.pc + 1), false),
-            Instruction::SubHL() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
-            Instruction::SbcHL() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
+            Instruction::SubFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
+            Instruction::SbcFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
             _ => panic!("Invalid instruction"),
         };
     }
