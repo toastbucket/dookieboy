@@ -615,7 +615,7 @@ fn test_ld_from_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdToMem(Register8Bit::B).as_byte(),
+        Instruction::LdToMem(Register8Bit::B, Register16Bit::HL).as_byte(),
         0x24,
     ];
 
@@ -633,7 +633,7 @@ fn test_ld_to_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdFromMem(Register8Bit::B).as_byte(),
+        Instruction::LdFromMem(Register8Bit::B, Register16Bit::HL).as_byte(),
         0x69,
     ];
 

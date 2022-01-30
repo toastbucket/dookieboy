@@ -184,8 +184,8 @@ impl Cpu {
             Instruction::SubFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
             Instruction::SbcFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
             Instruction::LdRegister(dest, src) => self.load_register(dest, src),
-            Instruction::LdToMem(regop) => self.ld_to_mem(regop, self.get_reg_16(Register16Bit::HL)),
-            Instruction::LdFromMem(regop) => self.ld_from_mem(regop, self.get_reg_16(Register16Bit::HL)),
+            Instruction::LdToMem(regop, pair) => self.ld_to_mem(regop, self.get_reg_16(pair)),
+            Instruction::LdFromMem(regop, pair) => self.ld_from_mem(regop, self.get_reg_16(pair)),
             _ => panic!("Invalid instruction"),
         };
     }
