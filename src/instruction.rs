@@ -20,6 +20,10 @@ pub enum Instruction {
     LdRegister(Register8Bit, Register8Bit),
     LdToMem(Register8Bit, Register16Bit),
     LdFromMem(Register8Bit, Register16Bit),
+    LdToMemInc(), // Always A and HL
+    LdToMemDec(), // Always A and HL
+    LdFromMemInc(), // Always A and HL
+    LdFromMemDec(), // Always A and HL
 }
 
 impl Instruction {
@@ -174,6 +178,11 @@ impl Instruction {
             0xa2 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::DE)),
             0x02 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC)),
             0x12 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE)),
+            // LD A, HL(x)crement
+            0x22 => Some(Instruction::LdToMemInc()),
+            0x32 => Some(Instruction::LdToMemDec()),
+            0x2a => Some(Instruction::LdFromMemInc()),
+            0x3a => Some(Instruction::LdFromMemDec()),
             _ => None
         }
     }
@@ -329,6 +338,11 @@ impl Instruction {
             Instruction::LdToMem(Register8Bit::A, Register16Bit::DE) => 0x1a,
             Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC) => 0x02,
             Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE) => 0x12,
+            // LD A, HL(x)crement
+            Instruction::LdToMemInc() => 0x22,
+            Instruction::LdToMemDec() => 0x32,
+            Instruction::LdFromMemInc() => 0x2a,
+            Instruction::LdFromMemDec() => 0x3a,
 
             _ => panic!("Invalid instruction"),
         }
@@ -354,6 +368,10 @@ impl Instruction {
             Instruction::LdRegister(_,_) => 1,
             Instruction::LdToMem(_,_) => 1,
             Instruction::LdFromMem(_,_) => 1,
+            Instruction::LdToMemInc() => 1,
+            Instruction::LdToMemDec() => 1,
+            Instruction::LdFromMemInc() => 1,
+            Instruction::LdFromMemDec() => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -378,6 +396,10 @@ impl Instruction {
             Instruction::LdRegister(_,_) => 1,
             Instruction::LdToMem(_,_) => 2,
             Instruction::LdFromMem(_,_) => 2,
+            Instruction::LdToMemInc() => 2,
+            Instruction::LdToMemDec() => 2,
+            Instruction::LdFromMemInc() => 2,
+            Instruction::LdFromMemDec() => 2,
             _ => panic!("Invalid instruction"),
         }
     }
