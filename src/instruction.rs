@@ -18,8 +18,8 @@ pub enum Instruction {
     Sbc(Register8Bit),
     SbcFromMem(), // always uses HL
     LdRegister(Register8Bit, Register8Bit),
-    LdToMem(Register8Bit), // always uses HL
-    LdFromMem(Register8Bit), // always uses HL
+    LdToMem(Register8Bit, Register16Bit),
+    LdFromMem(Register8Bit, Register16Bit),
 }
 
 impl Instruction {
@@ -154,21 +154,26 @@ impl Instruction {
             0x7d => Some(Instruction::LdRegister(Register8Bit::A, Register8Bit::L)),
             0x7f => Some(Instruction::LdRegister(Register8Bit::A, Register8Bit::A)),
             // LD (HL), X
-            0x70 => Some(Instruction::LdToMem(Register8Bit::B)),
-            0x71 => Some(Instruction::LdToMem(Register8Bit::C)),
-            0x72 => Some(Instruction::LdToMem(Register8Bit::D)),
-            0x73 => Some(Instruction::LdToMem(Register8Bit::E)),
-            0x74 => Some(Instruction::LdToMem(Register8Bit::H)),
-            0x75 => Some(Instruction::LdToMem(Register8Bit::L)),
-            0x77 => Some(Instruction::LdToMem(Register8Bit::A)),
+            0x70 => Some(Instruction::LdToMem(Register8Bit::B, Register16Bit::HL)),
+            0x71 => Some(Instruction::LdToMem(Register8Bit::C, Register16Bit::HL)),
+            0x72 => Some(Instruction::LdToMem(Register8Bit::D, Register16Bit::HL)),
+            0x73 => Some(Instruction::LdToMem(Register8Bit::E, Register16Bit::HL)),
+            0x74 => Some(Instruction::LdToMem(Register8Bit::H, Register16Bit::HL)),
+            0x75 => Some(Instruction::LdToMem(Register8Bit::L, Register16Bit::HL)),
+            0x77 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::HL)),
             // LD X, (HL)
-            0x46 => Some(Instruction::LdFromMem(Register8Bit::B)),
-            0x4e => Some(Instruction::LdFromMem(Register8Bit::C)),
-            0x56 => Some(Instruction::LdFromMem(Register8Bit::D)),
-            0x5e => Some(Instruction::LdFromMem(Register8Bit::E)),
-            0x66 => Some(Instruction::LdFromMem(Register8Bit::H)),
-            0x6e => Some(Instruction::LdFromMem(Register8Bit::L)),
-            0x7e => Some(Instruction::LdFromMem(Register8Bit::A)),
+            0x46 => Some(Instruction::LdFromMem(Register8Bit::B, Register16Bit::HL)),
+            0x4e => Some(Instruction::LdFromMem(Register8Bit::C, Register16Bit::HL)),
+            0x56 => Some(Instruction::LdFromMem(Register8Bit::D, Register16Bit::HL)),
+            0x5e => Some(Instruction::LdFromMem(Register8Bit::E, Register16Bit::HL)),
+            0x66 => Some(Instruction::LdFromMem(Register8Bit::H, Register16Bit::HL)),
+            0x6e => Some(Instruction::LdFromMem(Register8Bit::L, Register16Bit::HL)),
+            0x7e => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::HL)),
+            // LD A, (XX)
+            0xa2 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::BC)),
+            0xa2 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::DE)),
+            0x02 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC)),
+            0x12 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE)),
             _ => None
         }
     }
@@ -304,21 +309,26 @@ impl Instruction {
             Instruction::LdRegister(Register8Bit::A, Register8Bit::L) => 0x7d,
             Instruction::LdRegister(Register8Bit::A, Register8Bit::A) => 0x7f,
             // LD (HL), X
-            Instruction::LdToMem(Register8Bit::B) => 0x70,
-            Instruction::LdToMem(Register8Bit::C) => 0x71,
-            Instruction::LdToMem(Register8Bit::D) => 0x72,
-            Instruction::LdToMem(Register8Bit::E) => 0x73,
-            Instruction::LdToMem(Register8Bit::H) => 0x74,
-            Instruction::LdToMem(Register8Bit::L) => 0x75,
-            Instruction::LdToMem(Register8Bit::A) => 0x77,
+            Instruction::LdToMem(Register8Bit::B, Register16Bit::HL) => 0x70,
+            Instruction::LdToMem(Register8Bit::C, Register16Bit::HL) => 0x71,
+            Instruction::LdToMem(Register8Bit::D, Register16Bit::HL) => 0x72,
+            Instruction::LdToMem(Register8Bit::E, Register16Bit::HL) => 0x73,
+            Instruction::LdToMem(Register8Bit::H, Register16Bit::HL) => 0x74,
+            Instruction::LdToMem(Register8Bit::L, Register16Bit::HL) => 0x75,
+            Instruction::LdToMem(Register8Bit::A, Register16Bit::HL) => 0x77,
             // LD X, (HL)
-            Instruction::LdFromMem(Register8Bit::B) => 0x46,
-            Instruction::LdFromMem(Register8Bit::C) => 0x4e,
-            Instruction::LdFromMem(Register8Bit::D) => 0x56,
-            Instruction::LdFromMem(Register8Bit::E) => 0x5e,
-            Instruction::LdFromMem(Register8Bit::H) => 0x66,
-            Instruction::LdFromMem(Register8Bit::L) => 0x6e,
-            Instruction::LdFromMem(Register8Bit::A) => 0x7e,
+            Instruction::LdFromMem(Register8Bit::B, Register16Bit::HL) => 0x46,
+            Instruction::LdFromMem(Register8Bit::C, Register16Bit::HL) => 0x4e,
+            Instruction::LdFromMem(Register8Bit::D, Register16Bit::HL) => 0x56,
+            Instruction::LdFromMem(Register8Bit::E, Register16Bit::HL) => 0x5e,
+            Instruction::LdFromMem(Register8Bit::H, Register16Bit::HL) => 0x66,
+            Instruction::LdFromMem(Register8Bit::L, Register16Bit::HL) => 0x6e,
+            Instruction::LdFromMem(Register8Bit::A, Register16Bit::HL) => 0x7e,
+            // LD A, (XX)
+            Instruction::LdToMem(Register8Bit::A, Register16Bit::BC) => 0x0a,
+            Instruction::LdToMem(Register8Bit::A, Register16Bit::DE) => 0x1a,
+            Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC) => 0x02,
+            Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE) => 0x12,
 
             _ => panic!("Invalid instruction"),
         }
@@ -342,8 +352,8 @@ impl Instruction {
             Instruction::Sbc(_) => 1,
             Instruction::SbcFromMem() => 1,
             Instruction::LdRegister(_,_) => 1,
-            Instruction::LdToMem(_) => 1,
-            Instruction::LdFromMem(_) => 1,
+            Instruction::LdToMem(_,_) => 1,
+            Instruction::LdFromMem(_,_) => 1,
             _ => panic!("Invalid instruction"),
         }
     }
@@ -366,8 +376,8 @@ impl Instruction {
             Instruction::Sbc(_) => 1,
             Instruction::SbcFromMem() => 2,
             Instruction::LdRegister(_,_) => 1,
-            Instruction::LdToMem(_) => 2,
-            Instruction::LdFromMem(_) => 2,
+            Instruction::LdToMem(_,_) => 2,
+            Instruction::LdFromMem(_,_) => 2,
             _ => panic!("Invalid instruction"),
         }
     }
