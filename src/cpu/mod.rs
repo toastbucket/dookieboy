@@ -186,6 +186,22 @@ impl Cpu {
             Instruction::LdRegister(dest, src) => self.load_register(dest, src),
             Instruction::LdToMem(regop, pair) => self.ld_to_mem(regop, self.get_reg_16(pair)),
             Instruction::LdFromMem(regop, pair) => self.ld_from_mem(regop, self.get_reg_16(pair)),
+            Instruction::LdToMemInc() => {
+                self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
+                self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
+            },
+            Instruction::LdToMemDec() => {
+                self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
+                self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
+            },
+            Instruction::LdFromMemInc() => {
+                self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
+                self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
+            },
+            Instruction::LdFromMemDec() => {
+                self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
+                self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
+            },
             _ => panic!("Invalid instruction"),
         };
     }

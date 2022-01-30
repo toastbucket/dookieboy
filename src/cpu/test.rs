@@ -611,7 +611,7 @@ fn test_ld_b_a() {
 
 // Verify loading register B to memory offset @ hl
 #[test]
-fn test_ld_from_mem() {
+fn test_ld_to_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
@@ -629,7 +629,7 @@ fn test_ld_from_mem() {
 
 // Verify loading register B from memory offset @ hl
 #[test]
-fn test_ld_to_mem() {
+fn test_ld_from_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
@@ -643,3 +643,78 @@ fn test_ld_to_mem() {
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::B), 0x69);
 }
+
+// Verify ldToMem inc HL
+#[test]
+fn test_ld_to_mem_inc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToMemInc().as_byte(),
+        0x24,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x69);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x01), 0x69);
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x02);
+}
+
+// Verify ldToMem dec HL
+#[test]
+fn test_ld_to_mem_dec() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToMemDec().as_byte(),
+        0x24,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x69);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x01), 0x69);
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x00);
+}
+
+// Verify ldFromMem inc HL
+#[test]
+fn test_ld_from_mem_inc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdFromMemInc().as_byte(),
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x02);
+}
+
+// Verify ldFromMem dec HL
+#[test]
+fn test_ld_from_mem_dec() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdFromMemDec().as_byte(),
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x00);
+}
+
