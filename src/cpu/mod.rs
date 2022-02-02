@@ -1,10 +1,12 @@
-// src/cpu.rs
+// src/cpu.rs (you know, just in case you don't know what file ur in lmao)
+
+mod instruction;
 
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::memory::Memory;
-use crate::instruction::Instruction;
+use crate::cpu::instruction::Instruction;
 use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
