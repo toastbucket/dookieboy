@@ -174,10 +174,10 @@ impl Instruction {
             0x6e => Some(Instruction::LdFromMem(Register8Bit::L, Register16Bit::HL)),
             0x7e => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::HL)),
             // LD A, (XX)
-            0xa2 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::BC)),
-            0xa2 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::DE)),
-            0x02 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC)),
-            0x12 => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE)),
+            0x02 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::BC)),
+            0x12 => Some(Instruction::LdToMem(Register8Bit::A, Register16Bit::DE)),
+            0x0a => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC)),
+            0x1a => Some(Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE)),
             // LD A, HL(x)crement
             0x22 => Some(Instruction::LdToMemInc()),
             0x32 => Some(Instruction::LdToMemDec()),
@@ -334,10 +334,10 @@ impl Instruction {
             Instruction::LdFromMem(Register8Bit::L, Register16Bit::HL) => 0x6e,
             Instruction::LdFromMem(Register8Bit::A, Register16Bit::HL) => 0x7e,
             // LD A, (XX)
-            Instruction::LdToMem(Register8Bit::A, Register16Bit::BC) => 0x0a,
-            Instruction::LdToMem(Register8Bit::A, Register16Bit::DE) => 0x1a,
-            Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC) => 0x02,
-            Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE) => 0x12,
+            Instruction::LdToMem(Register8Bit::A, Register16Bit::BC) => 0x02,
+            Instruction::LdToMem(Register8Bit::A, Register16Bit::DE) => 0x12,
+            Instruction::LdFromMem(Register8Bit::A, Register16Bit::BC) => 0x0a,
+            Instruction::LdFromMem(Register8Bit::A, Register16Bit::DE) => 0x1a,
             // LD A, HL(x)crement
             Instruction::LdToMemInc() => 0x22,
             Instruction::LdToMemDec() => 0x32,
