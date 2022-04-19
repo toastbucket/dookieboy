@@ -4,6 +4,7 @@ mod gameboy;
 mod joypad;
 mod memory;
 mod mmu;
+mod renderer;
 
 use crate::gameboy::Gameboy;
 
