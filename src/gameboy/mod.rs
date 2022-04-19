@@ -20,7 +20,9 @@ use std::thread::sleep;
 use sdl2::Sdl;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::rect::Rect;
 use sdl2::render::WindowCanvas;
+use sdl2::pixels::Color;
 
 use crate::cpu::Cpu;
 use crate::intc::Interrupt;
@@ -28,10 +30,12 @@ use crate::int_src::InterruptSource;
 use crate::mmu::Mmu;
 use crate::joypad::Button;
 use crate::memory::Memory;
+use crate::renderer::Renderer;
 
 pub struct Gameboy {
     cpu: Cpu,
     mmu: Rc<RefCell<Mmu>>,
+    renderer: Renderer,
 
     sdl_context: Option<Sdl>,
     canvas: Option<WindowCanvas>,
@@ -56,6 +60,7 @@ impl Gameboy {
         Gameboy {
             cpu: Cpu::new(Rc::clone(&mmu)),
             mmu: Rc::clone(&mmu),
+            renderer: Renderer::new(false),
             sdl_context: None,
             canvas: None,
             width: width,
@@ -81,6 +86,69 @@ impl Gameboy {
         self.canvas = Some(sdl_canvas);
 
         Ok(())
+        /*
+        Ok(Gameboy {
+            cpu: Cpu::new(Rc::clone(&mmu)),
+            mmu: Rc::clone(&mmu),
+            renderer: Renderer::new(false),
+            sdl_context: Some(context),
+            canvas: Some(sdl_canvas),
+        })
+        */
+    }
+
+
+    pub fn run(&mut self) -> Result<(), String> {
+
+        // load gameboy tile
+        self.renderer.mem_write_byte(0x8000, 0x3c);
+        self.renderer.mem_write_byte(0x8001, 0x7e);
+        self.renderer.mem_write_byte(0x8002, 0x42);
+        self.renderer.mem_write_byte(0x8003, 0x42);
+        self.renderer.mem_write_byte(0x8004, 0x42);
+        self.renderer.mem_write_byte(0x8005, 0x42);
+        self.renderer.mem_write_byte(0x8006, 0x42);
+        self.renderer.mem_write_byte(0x8007, 0x42);
+        self.renderer.mem_write_byte(0x8008, 0x7e);
+        self.renderer.mem_write_byte(0x8009, 0x5e);
+        self.renderer.mem_write_byte(0x800a, 0x7e);
+        self.renderer.mem_write_byte(0x800b, 0x0a);
+        self.renderer.mem_write_byte(0x800c, 0x7c);
+        self.renderer.mem_write_byte(0x800d, 0x56);
+        self.renderer.mem_write_byte(0x800e, 0x38);
+        self.renderer.mem_write_byte(0x800f, 0x7c);
+
+        // load black tile
+        for i in 0x8010..(0x8010+64) {
+            self.renderer.mem_write_byte(i, 0x00)
+        }
+
+        // load tile_map
+        for i in 0x9800..(0x9800+1024) {
+            self.renderer.mem_write_byte(i, if i % 2 == 0 { 0 } else { 1 });
+            println!("wrote {} into {:#04x}", self.renderer.mem_read_byte(i), i);
+        }
+
+        self.canvas.expect("NO CAN DO NO CANVAS!!!").set_draw_color(Color::WHITE);
+        self.canvas.expect("NO CAN DO NO CANVAS!!!").clear();
+        self.canvas.expect("NO CAN DO NO CANVAS!!!").present();
+
+        'running: loop {
+            for y in 0..144 {
+                for x in 0..160 {
+                    let color = self.renderer.get_rect_color(x, y);
+                    let rect = Rect::new((x as i32)*4, (y as i32)*4, 4, 4);
+                    self.canvas.expect("NO CAN DO NO CANVAS!!!").set_draw_color(color);
+                    self.canvas.expect("NO CAN DO NO CANVAS!!!").fill_rect(rect);
+                }
+            }
+            self.canvas.expect("NO CAN DO NO CANVAS!!!").present();
+
+            self.handle_sdl2_events().unwrap();
+            sleep(Duration::from_millis(100));
+        }
+
+        Ok(())
     }
 
     pub fn load_rom(&mut self, path: String) -> Result<(), io::Error> {
@@ -93,6 +161,7 @@ impl Gameboy {
         self.cpu.reset();
     }
 
+    /*
     pub fn run(&mut self) -> Result<(), io::Error> {
 
         // TODO: handle stop and halt
@@ -115,6 +184,7 @@ impl Gameboy {
             }
         }
     }
+    */
 
     fn check_for_interrupts(&mut self) {
         let mmu = &mut self.mmu.borrow_mut();

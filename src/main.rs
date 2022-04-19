@@ -23,6 +23,7 @@ mod serial;
 mod shell;
 
 use std::env;
+mod renderer;
 
 use crate::gameboy::Gameboy;
 use crate::shell::{Cmd, Shell};
