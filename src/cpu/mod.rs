@@ -226,9 +226,16 @@ impl Cpu {
 
     pub fn step(&mut self) {
         let instruction_byte = self.read_byte(self.pc);
-        if let Some(instruction) = Instruction::from_byte(instruction_byte) {
-            self.execute_instruction(instruction);
-            self.pc += instruction.size() as u16;
+
+        match Instruction::from_byte(instruction_byte) {
+            Some(instruction) => {
+                self.execute_instruction(instruction);
+                self.pc += instruction.size() as u16;
+            },
+            None => {
+                panic!("invalid instruction read from ROM at {:#04x}: {:#02x}\n{}",
+                       self.pc, instruction_byte, self.dump_to_string());
+            },
         }
     }
 }
