@@ -63,7 +63,7 @@ impl Cpu {
     #[cfg(test)]
     fn read_byte(&self, addr: u16) -> u8 {
         if addr > TEST_RAM_SIZE as u16{
-            panic!("Address {:#04x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
         }
 
         self.test_ram[addr as usize]
@@ -77,7 +77,7 @@ impl Cpu {
     #[cfg(test)]
     fn write_byte(&mut self, addr: u16, val: u8) {
         if addr > TEST_RAM_SIZE as u16 {
-            panic!("Address {:#04x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
         }
 
         self.test_ram[addr as usize] = val;
@@ -209,9 +209,9 @@ impl Cpu {
     }
 
     fn dump_to_string(&self) -> String {
-        format!("Registers {:#04x?}\n\
-                 PC: {:#04x}\n\
-                 SP: {:#04x}\n\
+        format!("Registers {:#06x?}\n\
+                 PC: {:#06x}\n\
+                 SP: {:#06x}\n\
                  flags z:{}, n:{}, h:{}, cy:{}",
                 self.rf,
                 self.pc,
@@ -233,7 +233,7 @@ impl Cpu {
                 self.pc += instruction.size() as u16;
             },
             None => {
-                panic!("invalid instruction read from ROM at {:#04x}: {:#02x}\n{}",
+                panic!("invalid instruction read from ROM at {:#06x}: {:#04x}\n{}",
                        self.pc, instruction_byte, self.dump_to_string());
             },
         }
