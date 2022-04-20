@@ -208,10 +208,21 @@ impl Cpu {
         };
     }
 
-    pub fn dump(&self) {
-        println!("Registers {:#04x?}", self.rf);
-        println!("flags z:{}, n:{}, h:{}, cy:{}", self.z, self.n, self.h, self.cy);
+    fn dump_to_string(&self) -> String {
+        format!("Registers {:#04x?}\n\
+                 PC: {:#04x}\n\
+                 SP: {:#04x}\n\
+                 flags z:{}, n:{}, h:{}, cy:{}",
+                self.rf,
+                self.pc,
+                self.sp,
+                self.z, self.n, self.h, self.cy)
     }
+
+    fn dump_the_dookie(&self) {
+        println!("{}", self.dump_to_string());
+    }
+
 
     pub fn step(&mut self) {
         let instruction_byte = self.read_byte(self.pc);
