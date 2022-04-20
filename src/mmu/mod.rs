@@ -1,5 +1,6 @@
 // src/mmu.rs
 
+use crate::cartridge::Cartridge;
 use crate::joypad::Joypad;
 use crate::memory::Memory;
 
@@ -21,6 +22,7 @@ use crate::memory::Memory;
  */
 
 pub struct Mmu {
+    pub cartridge: Cartridge,
     pub joypad: Joypad,
 
 }
@@ -28,6 +30,7 @@ pub struct Mmu {
 impl Memory for Mmu {
     fn mem_read_byte(&self, addr: u16) -> u8 {
         match addr {
+            0x0000..=0x7fff => self.cartridge.mem_read_byte(addr),
             0xff00 => self.joypad.mem_read_byte(addr),
             _ => panic!("not valid address"),
         }
@@ -35,6 +38,7 @@ impl Memory for Mmu {
 
     fn mem_write_byte(&mut self, addr: u16, val: u8) {
         match addr {
+            0x0000..=0x7fff => self.cartridge.mem_write_byte(addr, val),
             0xff00 => self.joypad.mem_write_byte(addr, val),
             _ => panic!("not valid address"),
         }
@@ -44,6 +48,7 @@ impl Memory for Mmu {
 impl Mmu {
     pub fn new() -> Mmu {
         Mmu {
+            cartridge: Cartridge::new(),
             joypad: Joypad::new(),
         }
     }

@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::collections::HashSet;
+use std::io;
 use std::rc::Rc;
 use std::time::Duration;
 use std::thread::sleep;
@@ -45,7 +46,10 @@ impl Gameboy {
     }
 
 
-    pub fn run(&mut self) -> Result<(), String> {
+    pub fn run(&mut self, rom: String) -> Result<(), io::Error> {
+
+        self.mmu.borrow_mut().cartridge.load_rom(rom)?;
+
         'running: loop {
             self.handle_sdl2_events()?;
             sleep(Duration::from_millis(100));
@@ -54,8 +58,8 @@ impl Gameboy {
         Ok(())
     }
 
-    fn handle_sdl2_events(&mut self) -> Result<(), String> {
-        let mut event_pump = self.sdl_context.event_pump()?;
+    fn handle_sdl2_events(&mut self) -> Result<(), io::Error> {
+        let mut event_pump = self.sdl_context.event_pump().unwrap();
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..}
@@ -63,7 +67,7 @@ impl Gameboy {
                     keycode: Some(Keycode::Escape),
                     repeat: false,
                     ..
-                } => return Err("quit requested".to_string()),
+                } => return Err(io::Error::from_raw_os_error(0)),
                 Event::KeyDown { keycode: Some(Keycode::A), repeat: false, .. } => {
                     self.mmu.borrow_mut().joypad.left = true;
                 },
