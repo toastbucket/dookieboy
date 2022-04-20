@@ -168,44 +168,105 @@ impl Cpu {
         self.set_reg(regop, self.read_byte(addr));
     }
 
-    fn execute_instruction(&mut self, instruction: Instruction) {
+    // return next PC
+    fn execute_instruction(&mut self, instruction: Instruction) -> u16 {
+        let pc = self.pc;
+
         match instruction {
-            Instruction::Inc(regop) => self.add(regop, 1, false),
-            Instruction::Dec(regop) => self.subtract(regop, 1, false),
-            Instruction::And(regop) => self.and(Register8Bit::A, self.get_reg(regop)),
-            Instruction::AndFromMem() => self.and(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL))),
-            Instruction::AndImm() => self.and(Register8Bit::A, self.read_byte(self.pc + 1)),
-            Instruction::Add(regop) => self.add(Register8Bit::A, self.get_reg(regop), false),
-            Instruction::Adc(regop) => self.add(Register8Bit::A, self.get_reg(regop), true),
-            Instruction::AddImm() => self.add(Register8Bit::A, self.read_byte(self.pc + 1), false),
-            Instruction::AddFromMem() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
-            Instruction::AdcFromMem() => self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
-            Instruction::Sub(regop) => self.subtract(Register8Bit::A, self.get_reg(regop), false),
-            Instruction::Sbc(regop) => self.subtract(Register8Bit::A, self.get_reg(regop), true),
-            Instruction::SubImm() => self.subtract(Register8Bit::A, self.read_byte(self.pc + 1), false),
-            Instruction::SubFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false),
-            Instruction::SbcFromMem() => self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true),
-            Instruction::LdRegister(dest, src) => self.load_register(dest, src),
-            Instruction::LdToMem(regop, pair) => self.ld_to_mem(regop, self.get_reg_16(pair)),
-            Instruction::LdFromMem(regop, pair) => self.ld_from_mem(regop, self.get_reg_16(pair)),
+            Instruction::Inc(regop) => {
+                self.add(regop, 1, false);
+                pc + 1
+            },
+            Instruction::Dec(regop) => {
+                self.subtract(regop, 1, false);
+                pc + 1
+            },
+            Instruction::And(regop) => {
+                self.and(Register8Bit::A, self.get_reg(regop));
+                pc + 1
+            },
+            Instruction::AndFromMem() => {
+                self.and(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
+                pc + 1
+            },
+            Instruction::AndImm() => {
+                self.and(Register8Bit::A, self.read_byte(pc + 1));
+                pc + 2
+            },
+            Instruction::Add(regop) => {
+                self.add(Register8Bit::A, self.get_reg(regop), false);
+                pc + 1
+            },
+            Instruction::Adc(regop) => {
+                self.add(Register8Bit::A, self.get_reg(regop), true);
+                pc + 1
+            },
+            Instruction::AddImm() => {
+                self.add(Register8Bit::A, self.read_byte(pc + 1), false);
+                pc + 2
+            },
+            Instruction::AddFromMem() => {
+                self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false);
+                pc + 1
+            },
+            Instruction::AdcFromMem() => {
+                self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true);
+                pc + 1
+            },
+            Instruction::Sub(regop) => {
+                self.subtract(Register8Bit::A, self.get_reg(regop), false);
+                pc + 1
+            },
+            Instruction::Sbc(regop) => {
+                self.subtract(Register8Bit::A, self.get_reg(regop), true);
+                pc + 1
+            },
+            Instruction::SubImm() => {
+                self.subtract(Register8Bit::A, self.read_byte(pc + 1), false);
+                pc + 2
+            },
+            Instruction::SubFromMem() => {
+                self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false);
+                pc + 1
+            },
+            Instruction::SbcFromMem() => {
+                self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true);
+                pc + 1
+            },
+            Instruction::LdRegister(dest, src) => {
+                self.load_register(dest, src);
+                pc + 1
+            },
+            Instruction::LdToMem(regop, pair) => {
+                self.ld_to_mem(regop, self.get_reg_16(pair));
+                pc + 1
+            },
+            Instruction::LdFromMem(regop, pair) => {
+                self.ld_from_mem(regop, self.get_reg_16(pair));
+                pc + 1
+            },
             Instruction::LdToMemInc() => {
                 self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
+                pc + 1
             },
             Instruction::LdToMemDec() => {
                 self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
+                pc + 1
             },
             Instruction::LdFromMemInc() => {
                 self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
+                pc + 1
             },
             Instruction::LdFromMemDec() => {
                 self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
+                pc + 1
             },
             _ => panic!("Invalid instruction"),
-        };
+        }
     }
 
     fn dump_to_string(&self) -> String {
@@ -229,8 +290,8 @@ impl Cpu {
 
         match Instruction::from_byte(instruction_byte) {
             Some(instruction) => {
-                self.execute_instruction(instruction);
-                self.pc += instruction.size() as u16;
+                let new_pc = self.execute_instruction(instruction);
+                self.pc = new_pc;
             },
             None => {
                 panic!("invalid instruction read from ROM at {:#06x}: {:#04x}\n{}",
