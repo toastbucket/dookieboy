@@ -716,3 +716,22 @@ fn test_ld_from_mem_dec() {
     assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x00);
 }
 
+// Verify noop
+#[test]
+fn test_noop() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Noop().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.step();
+    for r in cpu.rf {
+        assert_eq!(r, 0x00);
+    }
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+}

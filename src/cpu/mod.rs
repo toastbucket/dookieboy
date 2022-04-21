@@ -173,6 +173,9 @@ impl Cpu {
         let pc = self.pc;
 
         match instruction {
+            Instruction::Noop() => {
+                pc + 1
+            },
             Instruction::Inc(regop) => {
                 self.add(regop, 1, false);
                 pc + 1
