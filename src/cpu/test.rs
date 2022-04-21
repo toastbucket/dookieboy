@@ -735,3 +735,216 @@ fn test_noop() {
     assert_eq!(cpu.h, false);
     assert_eq!(cpu.cy, false);
 }
+
+// Verify jump nz
+#[test]
+fn test_jp_nz() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbs(BranchCondition::NZ).as_byte(),
+        0xa5,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.z = false;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+
+    cpu.pc = 0;
+    cpu.z = true;
+    cpu.step();
+    assert_ne!(cpu.pc, 0xa5a5);
+}
+
+// Verify jump z
+#[test]
+fn test_jp_z() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbs(BranchCondition::Z).as_byte(),
+        0xa5,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.z = true;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+
+    cpu.pc = 0;
+    cpu.z = false;
+    cpu.step();
+    assert_ne!(cpu.pc, 0xa5a5);
+}
+
+// Verify jump nc
+#[test]
+fn test_jp_nc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbs(BranchCondition::NC).as_byte(),
+        0xa5,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.cy = false;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+
+    cpu.pc = 0;
+    cpu.cy = true;
+    cpu.step();
+    assert_ne!(cpu.pc, 0xa5a5);
+}
+
+// Verify jump c
+#[test]
+fn test_jp_c() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbs(BranchCondition::C).as_byte(),
+        0xa5,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.cy = true;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+
+    cpu.pc = 0;
+    cpu.cy = false;
+    cpu.step();
+    assert_ne!(cpu.pc, 0xa5a5);
+}
+
+// Verify jump
+#[test]
+fn test_jp() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbs(BranchCondition::NONE).as_byte(),
+        0xa5,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+}
+
+// Verify jump relative nz
+#[test]
+fn test_jr_nz() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpRel(BranchCondition::NZ).as_byte(),
+        0x01,
+        0xff, // garbage
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.z = false;
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+
+    cpu.pc = 0;
+    cpu.z = true;
+    cpu.step();
+    assert_ne!(cpu.pc, 2);
+}
+
+// Verify jump relative z
+#[test]
+fn test_jr_z() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpRel(BranchCondition::Z).as_byte(),
+        0x01,
+        0xff, // garbage
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.z = true;
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+
+    cpu.pc = 0;
+    cpu.z = false;
+    cpu.step();
+    assert_ne!(cpu.pc, 2);
+}
+
+// Verify jump relative nc
+#[test]
+fn test_jr_nc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpRel(BranchCondition::NC).as_byte(),
+        0x01,
+        0xff, // garbage
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.cy = false;
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+
+    cpu.pc = 0;
+    cpu.cy = true;
+    cpu.step();
+    assert_ne!(cpu.pc, 2);
+}
+
+// Verify jump relative c
+#[test]
+fn test_jr_c() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpRel(BranchCondition::C).as_byte(),
+        0x01,
+        0xff, // garbage
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.cy = true;
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+
+    cpu.pc = 0;
+    cpu.cy = false;
+    cpu.step();
+    assert_ne!(cpu.pc, 2);
+}
+
+// Verify jump relative
+#[test]
+fn test_jr() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpRel(BranchCondition::NONE).as_byte(),
+        0x01,
+        0xff, // garbage
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+}

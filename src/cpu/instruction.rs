@@ -1,6 +1,15 @@
 use crate::cpu::{Register8Bit, Register16Bit};
 
 #[derive(Debug, Copy, Clone)]
+pub enum BranchCondition {
+    NONE,
+    NZ,
+    NC,
+    Z,
+    C,
+}
+
+#[derive(Debug, Copy, Clone)]
 pub enum Instruction {
     Noop(),
     Inc(Register8Bit),
@@ -25,6 +34,8 @@ pub enum Instruction {
     LdToMemDec(), // Always A and HL
     LdFromMemInc(), // Always A and HL
     LdFromMemDec(), // Always A and HL
+    JumpAbs(BranchCondition),
+    JumpRel(BranchCondition),
 }
 
 impl Instruction {
@@ -186,6 +197,18 @@ impl Instruction {
             0x32 => Some(Instruction::LdToMemDec()),
             0x2a => Some(Instruction::LdFromMemInc()),
             0x3a => Some(Instruction::LdFromMemDec()),
+            // JP
+            0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
+            0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
+            0xc3 => Some(Instruction::JumpAbs(BranchCondition::NONE)),
+            0xca => Some(Instruction::JumpAbs(BranchCondition::Z)),
+            0xda => Some(Instruction::JumpAbs(BranchCondition::C)),
+            // JR
+            0x20 => Some(Instruction::JumpRel(BranchCondition::NZ)),
+            0x30 => Some(Instruction::JumpRel(BranchCondition::NC)),
+            0x18 => Some(Instruction::JumpRel(BranchCondition::NONE)),
+            0x28 => Some(Instruction::JumpRel(BranchCondition::Z)),
+            0x38 => Some(Instruction::JumpRel(BranchCondition::C)),
             _ => None
         }
     }
@@ -348,7 +371,18 @@ impl Instruction {
             Instruction::LdToMemDec() => 0x32,
             Instruction::LdFromMemInc() => 0x2a,
             Instruction::LdFromMemDec() => 0x3a,
-
+            // JP
+            Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
+            Instruction::JumpAbs(BranchCondition::NC) => 0xd2,
+            Instruction::JumpAbs(BranchCondition::NONE) => 0xc3,
+            Instruction::JumpAbs(BranchCondition::Z) => 0xca,
+            Instruction::JumpAbs(BranchCondition::C) => 0xda,
+            // JR
+            Instruction::JumpRel(BranchCondition::NZ) => 0x20,
+            Instruction::JumpRel(BranchCondition::NC) => 0x30,
+            Instruction::JumpRel(BranchCondition::NONE) =>0x18,
+            Instruction::JumpRel(BranchCondition::Z) => 0x28,
+            Instruction::JumpRel(BranchCondition::C) => 0x38,
             _ => panic!("Invalid instruction"),
         }
     }
