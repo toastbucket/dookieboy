@@ -2,6 +2,7 @@ use crate::cpu::{Register8Bit, Register16Bit};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Instruction {
+    Noop(),
     Inc(Register8Bit),
     Dec(Register8Bit),
     And(Register8Bit),
@@ -29,6 +30,8 @@ pub enum Instruction {
 impl Instruction {
     pub fn from_byte(byte: u8) -> Option<Instruction> {
         match byte {
+            // NOOP
+            0x00 => Some(Instruction::Noop()),
             // INC r
             0x04 => Some(Instruction::Inc(Register8Bit::B)),
             0x0c => Some(Instruction::Inc(Register8Bit::C)),
@@ -189,6 +192,8 @@ impl Instruction {
 
     pub fn as_byte(self) -> u8 {
         match self {
+            // NOOP
+            Instruction::Noop() => 0x00,
             // INC r
             Instruction::Inc(Register8Bit::B) => 0x04,
             Instruction::Inc(Register8Bit::C) => 0x0c,
