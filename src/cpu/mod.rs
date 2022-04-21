@@ -6,7 +6,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::memory::Memory;
-use crate::cpu::instruction::Instruction;
+use crate::cpu::instruction::{ BranchCondition, Instruction };
 use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
@@ -170,6 +170,16 @@ impl Cpu {
         self.set_reg(regop, self.read_byte(addr));
     }
 
+    fn should_branch(&self, condition: BranchCondition) -> bool {
+        match condition {
+            BranchCondition::NZ => self.z == false,
+            BranchCondition::Z => self.z == true,
+            BranchCondition::NC => self.cy == false,
+            BranchCondition::C => self.cy == true,
+            BranchCondition::NONE => true,
+        }
+    }
+
     // execute instruction
     // return tuple containing (next_pc, # cycles used)
     fn execute_instruction(&mut self, instruction: Instruction) -> (u16, usize) {
@@ -270,6 +280,27 @@ impl Cpu {
                 self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
                 (pc + 1, 2)
+            },
+            Instruction::JumpAbs(condition) => {
+                if self.should_branch(condition) {
+                    let addr = (self.read_byte(pc + 1) as u16)
+                               | ((self.read_byte(pc + 2) as u16) << 8);
+                    (addr, 4)
+                } else {
+                    (pc + 3, 3)
+                }
+            },
+            Instruction::JumpRel(condition) => {
+                if self.should_branch(condition) {
+                    // cast as offset i8 to preserve sign
+                    // cast PC as i32 to ensure unsigned
+                    // cast offset as i32 for arithmetic
+                    let offset = self.read_byte(pc + 1) as i8;
+                    let addr = ((pc as i32) + (offset as i32) + 2) as u16;
+                    (addr, 3)
+                } else {
+                    (pc + 3, 2)
+                }
             },
             _ => panic!("Invalid instruction"),
         }
