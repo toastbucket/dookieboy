@@ -159,7 +159,6 @@ fn test_add_carry_overflow() {
         cpu.set_reg(Register8Bit::A, 0);
         cpu.cy = true;
         cpu.step();
-        cpu.dump();
 
         assert_eq!(cpu.z, true);
         assert_eq!(cpu.n, false);
@@ -565,7 +564,6 @@ fn test_sbc_mem_carry() {
     cpu.set_reg(Register8Bit::L, 0x01);
     cpu.cy = true;
     cpu.step();
-    cpu.dump();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     assert_eq!(cpu.z, true);
     assert_eq!(cpu.n, true);
