@@ -20,6 +20,9 @@ pub enum Instruction {
     Or(Register8Bit),
     OrFromMem(), // always uses HL
     OrImm(),
+    Xor(Register8Bit),
+    XorFromMem(), // always uses HL
+    XorImm(),
     Add(Register8Bit),
     AddImm(),
     AddFromMem(), // always uses HL
@@ -86,6 +89,18 @@ impl Instruction {
             0xb6 => Some(Instruction::OrFromMem()),
             // OR n
             0xf6 => Some(Instruction::OrImm()),
+            // XOR A,r
+            0xa8 => Some(Instruction::Xor(Register8Bit::B)),
+            0xa9 => Some(Instruction::Xor(Register8Bit::C)),
+            0xaa => Some(Instruction::Xor(Register8Bit::D)),
+            0xab => Some(Instruction::Xor(Register8Bit::E)),
+            0xac => Some(Instruction::Xor(Register8Bit::H)),
+            0xad => Some(Instruction::Xor(Register8Bit::L)),
+            0xaf => Some(Instruction::Xor(Register8Bit::A)),
+            // XOR (HL)
+            0xae => Some(Instruction::XorFromMem()),
+            // XOR n
+            0xee => Some(Instruction::XorImm()),
             // ADD A,r
             0x80 => Some(Instruction::Add(Register8Bit::B)),
             0x81 => Some(Instruction::Add(Register8Bit::C)),
@@ -272,6 +287,18 @@ impl Instruction {
             Instruction::OrFromMem() => 0xb6,
             // OR n
             Instruction::OrImm() => 0xf6,
+            // XOR r
+            Instruction::Xor(Register8Bit::B) => 0xa8,
+            Instruction::Xor(Register8Bit::C) => 0xa9,
+            Instruction::Xor(Register8Bit::D) => 0xaa,
+            Instruction::Xor(Register8Bit::E) => 0xab,
+            Instruction::Xor(Register8Bit::H) => 0xac,
+            Instruction::Xor(Register8Bit::L) => 0xad,
+            Instruction::Xor(Register8Bit::A) => 0xaf,
+            // XOR (HL)
+            Instruction::XorFromMem() => 0xae,
+            // XOR n
+            Instruction::XorImm() => 0xee,
             // ADD A,r
             Instruction::Add(Register8Bit::B) => 0x80,
             Instruction::Add(Register8Bit::C) => 0x81,

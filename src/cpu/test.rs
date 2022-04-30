@@ -578,6 +578,79 @@ fn test_or_mem() {
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
 }
 
+// Verify xoring registers
+#[test]
+fn test_xor() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 6;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Xor(Register8Bit::B).as_byte(),
+        Instruction::Xor(Register8Bit::C).as_byte(),
+        Instruction::Xor(Register8Bit::D).as_byte(),
+        Instruction::Xor(Register8Bit::E).as_byte(),
+        Instruction::Xor(Register8Bit::H).as_byte(),
+        Instruction::Xor(Register8Bit::L).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_all_regs(0xa5);
+
+    for i in 0..test_ram.len() {
+        cpu.set_reg(Register8Bit::A, 0x55);
+        cpu.step();
+
+        assert_eq!(cpu.z, false);
+        assert_eq!(cpu.n, false);
+        assert_eq!(cpu.h, false);
+        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
+    }
+}
+
+// Verify xoring registers and immediates
+#[test]
+fn test_xor_imm() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::XorImm().as_byte(),
+        0x55,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0xa5);
+    cpu.step();
+
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
+}
+
+// Verify xoring registers and memory
+#[test]
+fn test_xor_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::XorFromMem().as_byte(),
+        0x55,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0xa5);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x01);
+    cpu.step();
+
+    assert_eq!(cpu.z, false);
+    assert_eq!(cpu.n, false);
+    assert_eq!(cpu.h, false);
+    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
+}
+
 // Verify adding values from memory with carry
 #[test]
 fn test_adc_mem_carry() {
