@@ -122,6 +122,15 @@ impl Cpu {
         self.set_reg(regop, result);
     }
 
+    fn or(&mut self, regop: Register8Bit, operand: u8) {
+        let result = self.get_reg(regop) | operand;
+        self.z = result == 0;
+        self.n = false;
+        self.h = false;
+        self.cy = false;
+        self.set_reg(regop, result);
+    }
+
     fn subtract(&mut self, regop: Register8Bit, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
             let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
@@ -207,6 +216,18 @@ impl Cpu {
             },
             Instruction::AndImm() => {
                 self.and(Register8Bit::A, self.read_byte(pc + 1));
+                (pc + 2, 2)
+            },
+            Instruction::Or(regop) => {
+                self.or(Register8Bit::A, self.get_reg(regop));
+                (pc + 1, 1)
+            },
+            Instruction::OrFromMem() => {
+                self.or(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
+                (pc + 1, 2)
+            },
+            Instruction::OrImm() => {
+                self.or(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
             Instruction::Add(regop) => {

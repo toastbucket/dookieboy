@@ -17,6 +17,9 @@ pub enum Instruction {
     And(Register8Bit),
     AndFromMem(), // always uses HL
     AndImm(),
+    Or(Register8Bit),
+    OrFromMem(), // always uses HL
+    OrImm(),
     Add(Register8Bit),
     AddImm(),
     AddFromMem(), // always uses HL
@@ -71,6 +74,18 @@ impl Instruction {
             0xa6 => Some(Instruction::AndFromMem()),
             // AND n
             0xe6 => Some(Instruction::AndImm()),
+            // OR A,r
+            0xb0 => Some(Instruction::Or(Register8Bit::B)),
+            0xb1 => Some(Instruction::Or(Register8Bit::C)),
+            0xb2 => Some(Instruction::Or(Register8Bit::D)),
+            0xb3 => Some(Instruction::Or(Register8Bit::E)),
+            0xb4 => Some(Instruction::Or(Register8Bit::H)),
+            0xb5 => Some(Instruction::Or(Register8Bit::L)),
+            0xb7 => Some(Instruction::Or(Register8Bit::A)),
+            // OR (HL)
+            0xb6 => Some(Instruction::OrFromMem()),
+            // OR n
+            0xf6 => Some(Instruction::OrImm()),
             // ADD A,r
             0x80 => Some(Instruction::Add(Register8Bit::B)),
             0x81 => Some(Instruction::Add(Register8Bit::C)),
@@ -245,6 +260,18 @@ impl Instruction {
             Instruction::AndFromMem() => 0xa6,
             // AND n
             Instruction::AndImm() => 0xe6,
+            // OR r
+            Instruction::Or(Register8Bit::B) => 0xb0,
+            Instruction::Or(Register8Bit::C) => 0xb1,
+            Instruction::Or(Register8Bit::D) => 0xb2,
+            Instruction::Or(Register8Bit::E) => 0xb3,
+            Instruction::Or(Register8Bit::H) => 0xb4,
+            Instruction::Or(Register8Bit::L) => 0xb5,
+            Instruction::Or(Register8Bit::A) => 0xb7,
+            // OR (HL)
+            Instruction::OrFromMem() => 0xb6,
+            // OR n
+            Instruction::OrImm() => 0xf6,
             // ADD A,r
             Instruction::Add(Register8Bit::B) => 0x80,
             Instruction::Add(Register8Bit::C) => 0x81,
