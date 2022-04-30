@@ -140,6 +140,15 @@ impl Cpu {
         self.set_reg(regop, result);
     }
 
+    fn cp(&mut self, regop: Register8Bit, operand: u8) {
+        // store off old value so we can restore after subtraction. CP
+        // instruction does not affect registers, yet our subtraction
+        // logic does.
+        let old_val = self.get_reg(regop);
+        self.subtract(regop, operand, false);
+        self.set_reg(regop, old_val);
+    }
+
     fn subtract(&mut self, regop: Register8Bit, operand: u8, with_carry: bool) {
         let (result, did_wrap) = if with_carry {
             let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
@@ -249,6 +258,18 @@ impl Cpu {
             },
             Instruction::XorImm() => {
                 self.xor(Register8Bit::A, self.read_byte(pc + 1));
+                (pc + 2, 2)
+            },
+            Instruction::Cp(regop) => {
+                self.cp(Register8Bit::A, self.get_reg(regop));
+                (pc + 1, 1)
+            },
+            Instruction::CpFromMem() => {
+                self.cp(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
+                (pc + 1, 2)
+            },
+            Instruction::CpImm() => {
+                self.cp(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
             Instruction::Add(regop) => {
