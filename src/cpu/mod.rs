@@ -47,6 +47,43 @@ const NUM_GP_REGS: usize = 8;
 #[cfg(test)]
 const TEST_RAM_SIZE: usize = 128;
 
+#[cfg(test)]
+struct TestRam {
+    ram: [u8; TEST_RAM_SIZE],
+}
+
+#[cfg(test)]
+impl TestRam {
+    fn new() -> TestRam {
+        TestRam {
+            ram: [0; TEST_RAM_SIZE],
+        }
+    }
+
+    fn load_from_slice(&mut self, data: &[u8]) {
+        self.ram[..data.len()].clone_from_slice(data);
+    }
+}
+
+#[cfg(test)]
+impl Memory for TestRam {
+    fn mem_read_byte(&self, addr: u16) -> u8 {
+        if addr > TEST_RAM_SIZE as u16{
+            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+        }
+
+        self.ram[addr as usize]
+    }
+
+    fn mem_write_byte(&mut self, addr: u16, val: u8) {
+        if addr > TEST_RAM_SIZE as u16{
+            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
+        }
+
+        self.ram[addr as usize] = val;
+    }
+}
+
 pub struct Cpu {
     rf: [u8; NUM_GP_REGS],
     sp: u16,
@@ -55,7 +92,7 @@ pub struct Cpu {
     cycles: usize,
 
     #[cfg(test)]
-    test_ram: [u8; TEST_RAM_SIZE],
+    test_ram: TestRam,
 }
 
 impl Cpu {
@@ -68,22 +105,33 @@ impl Cpu {
             cycles: 0,
 
             #[cfg(test)]
-            test_ram: [0; TEST_RAM_SIZE],
+            test_ram: TestRam::new(),
         }
     }
 
     #[cfg(test)]
     fn load_test_ram(&mut self, data: &[u8]) {
-        self.test_ram[..data.len()].clone_from_slice(data);
+        self.test_ram.load_from_slice(data);
     }
 
     #[cfg(test)]
     fn read_byte(&self, addr: u16) -> u8 {
-        if addr > TEST_RAM_SIZE as u16{
-            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
-        }
+        self.test_ram.mem_read_byte(addr)
+    }
 
-        self.test_ram[addr as usize]
+    #[cfg(test)]
+    fn write_byte(&mut self, addr: u16, val: u8) {
+        self.test_ram.mem_write_byte(addr, val);
+    }
+
+    #[cfg(test)]
+    fn read_word(&self, addr: u16) -> u16 {
+        self.test_ram.mem_read_word_le(addr)
+    }
+
+    #[cfg(test)]
+    fn write_word(&mut self, addr: u16, val: u16) {
+        self.test_ram.mem_write_word_le(addr, val);
     }
 
     #[cfg(not(test))]
@@ -91,18 +139,19 @@ impl Cpu {
         self.mmu.borrow().mem_read_byte(addr)
     }
 
-    #[cfg(test)]
-    fn write_byte(&mut self, addr: u16, val: u8) {
-        if addr > TEST_RAM_SIZE as u16 {
-            panic!("Address {:#06x} outside of test rom size {}", addr, TEST_RAM_SIZE);
-        }
-
-        self.test_ram[addr as usize] = val;
-    }
-
     #[cfg(not(test))]
     fn write_byte(&mut self, addr: u16, val: u8) {
         self.mmu.borrow_mut().mem_write_byte(addr, val);
+    }
+
+    #[cfg(not(test))]
+    fn read_word(&self, addr: u16) -> u16 {
+        self.mmu.borrow_mut().mem_read_word_le(addr)
+    }
+
+    #[cfg(not(test))]
+    fn write_word(&mut self, addr: u16, val: u16) {
+        self.mmu.borrow_mut().mem_write_word_le(addr, val);
     }
 
     fn get_reg(&self, regop: Register8Bit) -> u8 {
