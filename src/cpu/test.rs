@@ -44,10 +44,10 @@ fn test_increment_overflow() {
     cpu.set_reg(Register8Bit::B, 0xff);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::B), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, true);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
 // Verify adding to registers
@@ -71,10 +71,10 @@ fn test_add() {
         cpu.set_reg(Register8Bit::A, 0);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 1);
     }
 }
@@ -100,10 +100,10 @@ fn test_add_overflow() {
         cpu.set_reg(Register8Bit::A, 1);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, true);
-        assert_eq!(cpu.cy, true);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), true);
+        assert_eq!(cpu.get_flag(Flag::C), true);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
@@ -127,13 +127,13 @@ fn test_add_carry() {
 
     for i in 0..test_ram.len() {
         cpu.set_reg(Register8Bit::A, 0);
-        cpu.cy = true;
+        cpu.set_flag(Flag::C, true);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 2);
     }
 }
@@ -157,13 +157,13 @@ fn test_add_carry_overflow() {
 
     for i in 0..test_ram.len() {
         cpu.set_reg(Register8Bit::A, 0);
-        cpu.cy = true;
+        cpu.set_flag(Flag::C, true);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, true);
-        assert_eq!(cpu.cy, true);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), true);
+        assert_eq!(cpu.get_flag(Flag::C), true);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
@@ -180,10 +180,10 @@ fn test_add_immediate() {
     cpu.load_test_ram(&test_ram);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0x10);
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify adding immediates with overflow
@@ -199,10 +199,10 @@ fn test_add_immediate_overflow() {
     cpu.set_reg(Register8Bit::A, 1);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, true);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
 // Verify adding values from memory
@@ -220,10 +220,10 @@ fn test_add_mem() {
     cpu.set_reg(Register8Bit::L, 0x01);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 1);
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify decrementing registers
@@ -276,10 +276,10 @@ fn test_sub() {
         cpu.set_reg(Register8Bit::A, 1);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, true);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), true);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
@@ -305,10 +305,10 @@ fn test_sub_overflow() {
         cpu.set_reg(Register8Bit::A, 0);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, true);
-        assert_eq!(cpu.h, true);
-        assert_eq!(cpu.cy, true);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), true);
+        assert_eq!(cpu.get_flag(Flag::H), true);
+        assert_eq!(cpu.get_flag(Flag::C), true);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
     }
 }
@@ -332,13 +332,13 @@ fn test_sub_carry() {
 
     for i in 0..test_ram.len() {
         cpu.set_reg(Register8Bit::A, 2);
-        cpu.cy = true;
+        cpu.set_flag(Flag::C, true);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, true);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), true);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
@@ -362,13 +362,13 @@ fn test_sub_carry_overflow() {
 
     for i in 0..test_ram.len() {
         cpu.set_reg(Register8Bit::A, 0);
-        cpu.cy = true;
+        cpu.set_flag(Flag::C, true);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, true);
-        assert_eq!(cpu.h, true);
-        assert_eq!(cpu.cy, true);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), true);
+        assert_eq!(cpu.get_flag(Flag::H), true);
+        assert_eq!(cpu.get_flag(Flag::C), true);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0xfe);
     }
 }
@@ -386,10 +386,10 @@ fn test_sub_immediate() {
     cpu.load_test_ram(&test_ram);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify subtracting immediates with overflow
@@ -405,10 +405,10 @@ fn test_sub_immediate_overflow() {
     cpu.set_reg(Register8Bit::A, 0);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, true);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
 // Verify subtracting immediates
@@ -426,10 +426,10 @@ fn test_sub_mem() {
     cpu.load_test_ram(&test_ram);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify anding registers
@@ -453,10 +453,10 @@ fn test_and() {
         cpu.set_reg(Register8Bit::A, 0x55);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, true);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), true);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0);
     }
 }
@@ -475,10 +475,10 @@ fn test_and_imm() {
     cpu.set_reg(Register8Bit::A, 0x07);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0x05);
 }
 
@@ -498,10 +498,10 @@ fn test_and_mem() {
     cpu.set_reg(Register8Bit::L, 0x01);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0x05);
 }
 
@@ -526,10 +526,10 @@ fn test_or() {
         cpu.set_reg(Register8Bit::A, 0x55);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
     }
 }
@@ -548,10 +548,10 @@ fn test_or_imm() {
     cpu.set_reg(Register8Bit::A, 0xaa);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
 }
 
@@ -571,10 +571,10 @@ fn test_or_mem() {
     cpu.set_reg(Register8Bit::L, 0x01);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xff);
 }
 
@@ -599,10 +599,10 @@ fn test_xor() {
         cpu.set_reg(Register8Bit::A, 0x55);
         cpu.step();
 
-        assert_eq!(cpu.z, false);
-        assert_eq!(cpu.n, false);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), false);
+        assert_eq!(cpu.get_flag(Flag::N), false);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
     }
 }
@@ -621,10 +621,10 @@ fn test_xor_imm() {
     cpu.set_reg(Register8Bit::A, 0xa5);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
 }
 
@@ -644,10 +644,10 @@ fn test_xor_mem() {
     cpu.set_reg(Register8Bit::L, 0x01);
     cpu.step();
 
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
 }
 
@@ -672,10 +672,10 @@ fn test_cp() {
         cpu.set_reg(Register8Bit::A, 1);
         cpu.step();
 
-        assert_eq!(cpu.z, true);
-        assert_eq!(cpu.n, true);
-        assert_eq!(cpu.h, false);
-        assert_eq!(cpu.cy, false);
+        assert_eq!(cpu.get_flag(Flag::Z), true);
+        assert_eq!(cpu.get_flag(Flag::N), true);
+        assert_eq!(cpu.get_flag(Flag::H), false);
+        assert_eq!(cpu.get_flag(Flag::C), false);
         assert_eq!(cpu.get_reg(Register8Bit::A), 1);
     }
 }
@@ -693,10 +693,10 @@ fn test_cp_immediate() {
     cpu.load_test_ram(&test_ram);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 1);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify from memory
@@ -714,10 +714,10 @@ fn test_cp_mem() {
     cpu.load_test_ram(&test_ram);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 1);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify adding values from memory with carry
@@ -733,13 +733,13 @@ fn test_adc_mem_carry() {
     cpu.set_reg(Register8Bit::A, 0);
     cpu.set_reg(Register8Bit::H, 0x00);
     cpu.set_reg(Register8Bit::L, 0x01);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 2);
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify adding values from memory with carry and overflow
@@ -755,13 +755,13 @@ fn test_adc_mem_carry_overflow() {
     cpu.set_reg(Register8Bit::A, 0);
     cpu.set_reg(Register8Bit::H, 0x00);
     cpu.set_reg(Register8Bit::L, 0x01);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, true);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
 // Verify subtracting values from memory with carry
@@ -777,13 +777,13 @@ fn test_sbc_mem_carry() {
     cpu.set_reg(Register8Bit::A, 2);
     cpu.set_reg(Register8Bit::H, 0x00);
     cpu.set_reg(Register8Bit::L, 0x01);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0);
-    assert_eq!(cpu.z, true);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify subtracting values from memory with carry and overflow
@@ -799,13 +799,13 @@ fn test_sbc_mem_carry_overflow() {
     cpu.set_reg(Register8Bit::A, 0);
     cpu.set_reg(Register8Bit::H, 0x00);
     cpu.set_reg(Register8Bit::L, 0x01);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0xfe);
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, true);
-    assert_eq!(cpu.h, true);
-    assert_eq!(cpu.cy, true);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
 // Verify loading register B
@@ -945,10 +945,10 @@ fn test_noop() {
     for r in cpu.rf {
         assert_eq!(r, 0x00);
     }
-    assert_eq!(cpu.z, false);
-    assert_eq!(cpu.n, false);
-    assert_eq!(cpu.h, false);
-    assert_eq!(cpu.cy, false);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
 // Verify jump nz
@@ -963,12 +963,12 @@ fn test_jp_nz() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.z = false;
+    cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa5a5);
 
     cpu.pc = 0;
-    cpu.z = true;
+    cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_ne!(cpu.pc, 0xa5a5);
 }
@@ -985,12 +985,12 @@ fn test_jp_z() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.z = true;
+    cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa5a5);
 
     cpu.pc = 0;
-    cpu.z = false;
+    cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_ne!(cpu.pc, 0xa5a5);
 }
@@ -1007,12 +1007,12 @@ fn test_jp_nc() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.cy = false;
+    cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa5a5);
 
     cpu.pc = 0;
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_ne!(cpu.pc, 0xa5a5);
 }
@@ -1029,12 +1029,12 @@ fn test_jp_c() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa5a5);
 
     cpu.pc = 0;
-    cpu.cy = false;
+    cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_ne!(cpu.pc, 0xa5a5);
 }
@@ -1068,12 +1068,12 @@ fn test_jr_nz() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.z = false;
+    cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 3);
 
     cpu.pc = 0;
-    cpu.z = true;
+    cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_ne!(cpu.pc, 2);
 }
@@ -1091,12 +1091,12 @@ fn test_jr_z() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.z = true;
+    cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 3);
 
     cpu.pc = 0;
-    cpu.z = false;
+    cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_ne!(cpu.pc, 2);
 }
@@ -1114,12 +1114,12 @@ fn test_jr_nc() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.cy = false;
+    cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 3);
 
     cpu.pc = 0;
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_ne!(cpu.pc, 2);
 }
@@ -1137,12 +1137,12 @@ fn test_jr_c() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.cy = true;
+    cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 3);
 
     cpu.pc = 0;
-    cpu.cy = false;
+    cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_ne!(cpu.pc, 2);
 }

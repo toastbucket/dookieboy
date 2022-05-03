@@ -11,15 +11,26 @@ use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Register8Bit {
-    A = 0, B, C, D, E, H, L
+    A = 0, F, B, C, D, E, H, L,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum Register16Bit {
-    BC = 1, DE = 3, HL = 5
+    AF= 0,
+    BC = 2,
+    DE = 4,
+    HL = 6,
 }
 
-const NUM_GP_REGS: usize = 7;
+#[derive(Debug, Copy, Clone)]
+pub enum Flag {
+    Z = 7,
+    N = 6,
+    H = 5,
+    C = 4,
+}
+
+const NUM_GP_REGS: usize = 8;
 
 #[cfg(test)]
 const TEST_RAM_SIZE: usize = 128;
@@ -28,10 +39,6 @@ pub struct Cpu {
     rf: [u8; NUM_GP_REGS],
     sp: u16,
     pc: u16,
-    z: bool,
-    n: bool,
-    h: bool,
-    cy: bool,
     mmu: Rc<RefCell<Mmu>>,
     cycles: usize,
 
@@ -45,10 +52,6 @@ impl Cpu {
             rf: [0; NUM_GP_REGS],
             sp: 0,
             pc: 0,
-            z: false,
-            n: false,
-            h: false,
-            cy: false,
             mmu: mmu,
             cycles: 0,
 
@@ -113,30 +116,46 @@ impl Cpu {
         self.rf.iter_mut().for_each(|x| *x = val);
     }
 
+    fn set_flag(&mut self, flag: Flag, val: bool) {
+        let mut flags = self.get_reg(Register8Bit::F);
+
+        if (val) {
+            flags |= (1 << (flag as u8));
+        } else {
+            flags &= !(1 << (flag as u8));
+        }
+        self.set_reg(Register8Bit::F, flags);
+    }
+
+    fn get_flag(&self, flag: Flag) -> bool {
+        let bit = (self.get_reg(Register8Bit::F) >> (flag as u8)) & 1;
+        bit == 1
+    }
+
     fn and(&mut self, regop: Register8Bit, operand: u8) {
         let result = self.get_reg(regop) & operand;
-        self.z = result == 0;
-        self.n = false;
-        self.h = true;
-        self.cy = false;
+        self.set_flag(Flag::Z, result == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, true);
+        self.set_flag(Flag::C, false);
         self.set_reg(regop, result);
     }
 
     fn or(&mut self, regop: Register8Bit, operand: u8) {
         let result = self.get_reg(regop) | operand;
-        self.z = result == 0;
-        self.n = false;
-        self.h = false;
-        self.cy = false;
+        self.set_flag(Flag::Z, result == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, false);
         self.set_reg(regop, result);
     }
 
     fn xor(&mut self, regop: Register8Bit, operand: u8) {
         let result = self.get_reg(regop) ^ operand;
-        self.z = result == 0;
-        self.n = false;
-        self.h = false;
-        self.cy = false;
+        self.set_flag(Flag::Z, result == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, false);
         self.set_reg(regop, result);
     }
 
@@ -150,38 +169,44 @@ impl Cpu {
     }
 
     fn subtract(&mut self, regop: Register8Bit, operand: u8, with_carry: bool) {
+        let cy = self.get_flag(Flag::C);
         let (result, did_wrap) = if with_carry {
-            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(self.cy as u8);
+            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_sub(cy as u8);
             let (operand_result, operand_did_wrap) = carry_result.overflowing_sub(operand);
             (operand_result, carry_did_wrap | operand_did_wrap)
         } else {
             self.get_reg(regop).overflowing_sub(operand)
         };
 
-        self.z = result == 0;
-        self.n = true;
-        self.h = ((self.get_reg(regop) as i8) & 0xf)
+        self.set_flag(Flag::Z, result == 0);
+        self.set_flag(Flag::N, true);
+
+        let h = ((self.get_reg(regop) as i8) & 0xf)
             .wrapping_sub((operand as i8) & 0xf)
-            .wrapping_sub(if with_carry { self.cy as i8 } else { 0 }) < 0;
-        self.cy = did_wrap;
+            .wrapping_sub(if with_carry { cy as i8 } else { 0 }) < 0;
+        self.set_flag(Flag::H, h);
+        self.set_flag(Flag::C, did_wrap);
         self.set_reg(regop, result);
     }
 
     fn add(&mut self, regop: Register8Bit, operand: u8, with_carry: bool) {
+        let cy = self.get_flag(Flag::C);
         let (result, did_wrap) = if with_carry {
-            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_add(self.cy as u8);
+            let (carry_result, carry_did_wrap) = self.get_reg(regop).overflowing_add(cy as u8);
             let (operand_result, operand_did_wrap) = carry_result.overflowing_add(operand);
             (operand_result, carry_did_wrap | operand_did_wrap)
         } else {
             self.get_reg(regop).overflowing_add(operand)
         };
 
-        self.z = result == 0;
-        self.n = false;
-        self.h = (self.get_reg(regop) & 0xf)
+        self.set_flag(Flag::Z, result == 0);
+        self.set_flag(Flag::N, false);
+
+        let h = (self.get_reg(regop) & 0xf)
             .wrapping_add(operand & 0xf)
-            .wrapping_add(if with_carry { self.cy as u8 } else { 0 }) > 0xf;
-        self.cy = did_wrap;
+            .wrapping_add(if with_carry { cy as u8 } else { 0 }) > 0xf;
+        self.set_flag(Flag::H, h);
+        self.set_flag(Flag::C, did_wrap);
         self.set_reg(regop, result);
     }
 
@@ -199,10 +224,10 @@ impl Cpu {
 
     fn should_branch(&self, condition: BranchCondition) -> bool {
         match condition {
-            BranchCondition::NZ => self.z == false,
-            BranchCondition::Z => self.z == true,
-            BranchCondition::NC => self.cy == false,
-            BranchCondition::C => self.cy == true,
+            BranchCondition::NZ => self.get_flag(Flag::Z) == false,
+            BranchCondition::Z => self.get_flag(Flag::Z) == true,
+            BranchCondition::NC => self.get_flag(Flag::C) == false,
+            BranchCondition::C => self.get_flag(Flag::C) == true,
             BranchCondition::NONE => true,
         }
     }
@@ -377,7 +402,10 @@ impl Cpu {
                 self.rf,
                 self.pc,
                 self.sp,
-                self.z, self.n, self.h, self.cy)
+                self.get_flag(Flag::Z),
+                self.get_flag(Flag::N),
+                self.get_flag(Flag::H),
+                self.get_flag(Flag::C))
     }
 
     fn dump_the_dookie(&self) {
