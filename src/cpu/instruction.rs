@@ -45,6 +45,8 @@ pub enum Instruction {
     LdFromMemDec(), // Always A and HL
     JumpAbs(BranchCondition),
     JumpRel(BranchCondition),
+    Push(Register16Bit),
+    Pop(Register16Bit),
 }
 
 impl Instruction {
@@ -254,6 +256,16 @@ impl Instruction {
             0x18 => Some(Instruction::JumpRel(BranchCondition::NONE)),
             0x28 => Some(Instruction::JumpRel(BranchCondition::Z)),
             0x38 => Some(Instruction::JumpRel(BranchCondition::C)),
+            // PUSH (XX)
+            0xc5 => Some(Instruction::Push(Register16Bit::BC)),
+            0xd5 => Some(Instruction::Push(Register16Bit::DE)),
+            0xe5 => Some(Instruction::Push(Register16Bit::HL)),
+            0xf5 => Some(Instruction::Push(Register16Bit::AF)),
+            // POP (XX)
+            0xc1 => Some(Instruction::Pop(Register16Bit::BC)),
+            0xd1 => Some(Instruction::Pop(Register16Bit::DE)),
+            0xe1 => Some(Instruction::Pop(Register16Bit::HL)),
+            0xf1 => Some(Instruction::Pop(Register16Bit::AF)),
             _ => None
         }
     }
@@ -464,6 +476,16 @@ impl Instruction {
             Instruction::JumpRel(BranchCondition::NONE) =>0x18,
             Instruction::JumpRel(BranchCondition::Z) => 0x28,
             Instruction::JumpRel(BranchCondition::C) => 0x38,
+            // PUSH (XX)
+            Instruction::Push(Register16Bit::BC) => 0xc5,
+            Instruction::Push(Register16Bit::DE) => 0xd5,
+            Instruction::Push(Register16Bit::HL) => 0xe5,
+            Instruction::Push(Register16Bit::AF) => 0xf5,
+            // POP (XX)
+            Instruction::Pop(Register16Bit::BC) => 0xc1,
+            Instruction::Pop(Register16Bit::DE) => 0xd1,
+            Instruction::Pop(Register16Bit::HL) => 0xe1,
+            Instruction::Pop(Register16Bit::AF) => 0xf1,
             _ => panic!("Invalid instruction"),
         }
     }
