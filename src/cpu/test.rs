@@ -1231,3 +1231,117 @@ fn test_pop() {
     cpu.step();
     assert_eq!(cpu.get_reg_16(Register16Bit::AF), 0xa55a);
 }
+
+// Verify ret nz
+#[test]
+fn test_ret_nz() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Ret(BranchCondition::NZ).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::Z, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::Z, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 1);
+}
+
+// Verify ret z
+#[test]
+fn test_ret_z() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Ret(BranchCondition::Z).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::Z, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::Z, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 1);
+}
+
+
+// Verify ret nc
+#[test]
+fn test_ret_nc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Ret(BranchCondition::NC).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 1);
+}
+
+// Verify ret c
+#[test]
+fn test_ret_c() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Ret(BranchCondition::C).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 1);
+}
+
+// Verify ret
+#[test]
+fn test_ret() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Ret(BranchCondition::NONE).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+}

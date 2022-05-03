@@ -415,6 +415,13 @@ impl Cpu {
                 self.set_reg_16(pair, val);
                 (pc + 1, 3)
             },
+            Instruction::Ret(condition) => {
+                if self.should_branch(condition) {
+                    (self.pop(), if matches!(condition, BranchCondition::NONE) { 4 } else { 5 })
+                } else {
+                    (pc + 1, 2)
+                }
+            },
             _ => panic!("Invalid instruction"),
         }
     }

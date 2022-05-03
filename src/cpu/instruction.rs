@@ -47,6 +47,7 @@ pub enum Instruction {
     JumpRel(BranchCondition),
     Push(Register16Bit),
     Pop(Register16Bit),
+    Ret(BranchCondition),
 }
 
 impl Instruction {
@@ -266,6 +267,12 @@ impl Instruction {
             0xd1 => Some(Instruction::Pop(Register16Bit::DE)),
             0xe1 => Some(Instruction::Pop(Register16Bit::HL)),
             0xf1 => Some(Instruction::Pop(Register16Bit::AF)),
+            // RET
+            0xc0 => Some(Instruction::Ret(BranchCondition::NZ)),
+            0xd0 => Some(Instruction::Ret(BranchCondition::NC)),
+            0xc8 => Some(Instruction::Ret(BranchCondition::Z)),
+            0xd8 => Some(Instruction::Ret(BranchCondition::C)),
+            0xc9 => Some(Instruction::Ret(BranchCondition::NONE)),
             _ => None
         }
     }
@@ -486,6 +493,12 @@ impl Instruction {
             Instruction::Pop(Register16Bit::DE) => 0xd1,
             Instruction::Pop(Register16Bit::HL) => 0xe1,
             Instruction::Pop(Register16Bit::AF) => 0xf1,
+            // RET
+            Instruction::Ret(BranchCondition::NZ) => 0xc0,
+            Instruction::Ret(BranchCondition::NC) => 0xd0,
+            Instruction::Ret(BranchCondition::Z) => 0xc8,
+            Instruction::Ret(BranchCondition::C) => 0xd8,
+            Instruction::Ret(BranchCondition::NONE) => 0xc9,
             _ => panic!("Invalid instruction"),
         }
     }
