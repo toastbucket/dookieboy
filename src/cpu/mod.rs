@@ -405,6 +405,9 @@ impl Cpu {
                     (pc + 3, 3)
                 }
             },
+            Instruction::JumpAbsFromReg() => {
+                (self.get_reg_16(Register16Bit::HL), 1)
+            },
             Instruction::JumpRel(condition) => {
                 if self.should_branch(condition) {
                     // cast as offset i8 to preserve sign

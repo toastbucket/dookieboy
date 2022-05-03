@@ -1055,6 +1055,21 @@ fn test_jp() {
     assert_eq!(cpu.pc, 0xa5a5);
 }
 
+// Verify jump HL
+#[test]
+fn test_jp_hl() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::JumpAbsFromReg().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0xa5a5);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa5a5);
+}
+
 // Verify jump relative nz
 #[test]
 fn test_jr_nz() {
