@@ -222,6 +222,21 @@ impl Cpu {
         self.set_reg(regop, self.read_byte(addr));
     }
 
+    fn push(&mut self, val: u16) {
+        self.sp -= 1;
+        self.write_byte(self.sp, ((val >> 8) & 0xff) as u8);
+        self.sp -= 1;
+        self.write_byte(self.sp, (val & 0xff) as u8);
+    }
+
+    fn pop(&mut self) -> u16 {
+        let lower = self.read_byte(self.sp) as u16;
+        self.sp += 1;
+        let higher = self.read_byte(self.sp) as u16;
+        self.sp += 1;
+        (higher << 8) | lower
+    }
+
     fn should_branch(&self, condition: BranchCondition) -> bool {
         match condition {
             BranchCondition::NZ => self.get_flag(Flag::Z) == false,
@@ -389,6 +404,16 @@ impl Cpu {
                 } else {
                     (pc + 3, 2)
                 }
+            },
+            Instruction::Push(pair) => {
+                let val = self.get_reg_16(pair);
+                self.push(val);
+                (pc + 1, 4)
+            },
+            Instruction::Pop(pair) => {
+                let val = self.pop();
+                self.set_reg_16(pair, val);
+                (pc + 1, 3)
             },
             _ => panic!("Invalid instruction"),
         }

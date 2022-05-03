@@ -1163,3 +1163,71 @@ fn test_jr() {
     cpu.step();
     assert_eq!(cpu.pc, 3);
 }
+
+// Verify push
+#[test]
+fn test_push() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 6;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Push(Register16Bit::BC).as_byte(),
+        Instruction::Push(Register16Bit::DE).as_byte(),
+        Instruction::Push(Register16Bit::HL).as_byte(),
+        Instruction::Push(Register16Bit::AF).as_byte(),
+        0x00,
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::BC, 0xa55a);
+    cpu.set_reg_16(Register16Bit::DE, 0xa55a);
+    cpu.set_reg_16(Register16Bit::HL, 0xa55a);
+    cpu.set_reg_16(Register16Bit::AF, 0xa55a);
+
+    for i in 0..test_ram.len()-2 {
+        cpu.sp = INSTRUCTIONS_LEN as u16;
+        cpu.write_byte((INSTRUCTIONS_LEN - 2) as u16, 0x00);
+        cpu.write_byte((INSTRUCTIONS_LEN - 1) as u16, 0x00);
+
+        cpu.step();
+        assert_eq!(cpu.read_byte((INSTRUCTIONS_LEN - 2) as u16), 0x5a);
+        assert_eq!(cpu.read_byte((INSTRUCTIONS_LEN - 1) as u16), 0xa5);
+    }
+}
+
+// Verify pop
+#[test]
+fn test_pop() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 6;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Pop(Register16Bit::BC).as_byte(),
+        Instruction::Pop(Register16Bit::DE).as_byte(),
+        Instruction::Pop(Register16Bit::HL).as_byte(),
+        Instruction::Pop(Register16Bit::AF).as_byte(),
+        0x5a,
+        0xa5,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_reg_16(Register16Bit::BC, 0x0000);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::BC), 0xa55a);
+
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_reg_16(Register16Bit::DE, 0x0000);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::DE), 0xa55a);
+
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_reg_16(Register16Bit::HL, 0x0000);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0xa55a);
+
+    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_reg_16(Register16Bit::AF, 0x0000);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::AF), 0xa55a);
+}
