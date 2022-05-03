@@ -1345,3 +1345,82 @@ fn test_ret() {
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 }
+
+// Verify rst
+#[test]
+fn test_rst() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 10;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Rst(RstVec::ZERO).as_byte(),
+        Instruction::Rst(RstVec::ONE).as_byte(),
+        Instruction::Rst(RstVec::TWO).as_byte(),
+        Instruction::Rst(RstVec::THREE).as_byte(),
+        Instruction::Rst(RstVec::FOUR).as_byte(),
+        Instruction::Rst(RstVec::FIVE).as_byte(),
+        Instruction::Rst(RstVec::SIX).as_byte(),
+        Instruction::Rst(RstVec::SEVEN).as_byte(),
+        0xff,
+        0xff,
+    ];
+
+    let sp_top = INSTRUCTIONS_LEN as u16;
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.pc = 0;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::ZERO as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x00);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 1;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::ONE as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x01);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 2;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::TWO as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x02);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 3;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::THREE as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x03);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 4;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::FOUR as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x04);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 5;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::FIVE as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x05);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 6;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::SIX as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x06);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+
+    cpu.pc = 7;
+    cpu.sp = sp_top;
+    cpu.step();
+    assert_eq!(cpu.pc, RstVec::SEVEN as u16);
+    assert_eq!(cpu.read_byte(sp_top - 2), 0x07);
+    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+}

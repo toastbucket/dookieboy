@@ -1,4 +1,4 @@
-use crate::cpu::{Register8Bit, Register16Bit};
+use crate::cpu::{Register8Bit, Register16Bit, RstVec};
 
 #[derive(Debug, Copy, Clone)]
 pub enum BranchCondition {
@@ -48,6 +48,7 @@ pub enum Instruction {
     Push(Register16Bit),
     Pop(Register16Bit),
     Ret(BranchCondition),
+    Rst(RstVec),
 }
 
 impl Instruction {
@@ -273,6 +274,15 @@ impl Instruction {
             0xc8 => Some(Instruction::Ret(BranchCondition::Z)),
             0xd8 => Some(Instruction::Ret(BranchCondition::C)),
             0xc9 => Some(Instruction::Ret(BranchCondition::NONE)),
+            // RST
+            0xc7 => Some(Instruction::Rst(RstVec::ZERO)),
+            0xcf => Some(Instruction::Rst(RstVec::ONE)),
+            0xd7 => Some(Instruction::Rst(RstVec::TWO)),
+            0xdf => Some(Instruction::Rst(RstVec::THREE)),
+            0xe7 => Some(Instruction::Rst(RstVec::FOUR)),
+            0xef => Some(Instruction::Rst(RstVec::FIVE)),
+            0xf7 => Some(Instruction::Rst(RstVec::SIX)),
+            0xff => Some(Instruction::Rst(RstVec::SEVEN)),
             _ => None
         }
     }
@@ -499,6 +509,15 @@ impl Instruction {
             Instruction::Ret(BranchCondition::Z) => 0xc8,
             Instruction::Ret(BranchCondition::C) => 0xd8,
             Instruction::Ret(BranchCondition::NONE) => 0xc9,
+            // RST
+            Instruction::Rst(RstVec::ZERO) => 0xc7,
+            Instruction::Rst(RstVec::ONE) => 0xcf,
+            Instruction::Rst(RstVec::TWO) => 0xd7,
+            Instruction::Rst(RstVec::THREE) => 0xdf,
+            Instruction::Rst(RstVec::FOUR) => 0xe7,
+            Instruction::Rst(RstVec::FIVE) => 0xef,
+            Instruction::Rst(RstVec::SIX) => 0xf7,
+            Instruction::Rst(RstVec::SEVEN) => 0xff,
             _ => panic!("Invalid instruction"),
         }
     }
