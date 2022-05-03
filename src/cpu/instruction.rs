@@ -44,6 +44,7 @@ pub enum Instruction {
     LdFromMemInc(), // Always A and HL
     LdFromMemDec(), // Always A and HL
     JumpAbs(BranchCondition),
+    JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
     Push(Register16Bit),
     Pop(Register16Bit),
@@ -252,6 +253,8 @@ impl Instruction {
             0xc3 => Some(Instruction::JumpAbs(BranchCondition::NONE)),
             0xca => Some(Instruction::JumpAbs(BranchCondition::Z)),
             0xda => Some(Instruction::JumpAbs(BranchCondition::C)),
+            // JP (HL)
+            0xe9 => Some(Instruction::JumpAbsFromReg()),
             // JR
             0x20 => Some(Instruction::JumpRel(BranchCondition::NZ)),
             0x30 => Some(Instruction::JumpRel(BranchCondition::NC)),
@@ -487,6 +490,8 @@ impl Instruction {
             Instruction::JumpAbs(BranchCondition::NONE) => 0xc3,
             Instruction::JumpAbs(BranchCondition::Z) => 0xca,
             Instruction::JumpAbs(BranchCondition::C) => 0xda,
+            // JP (HL)
+            Instruction::JumpAbsFromReg() => 0xe9,
             // JR
             Instruction::JumpRel(BranchCondition::NZ) => 0x20,
             Instruction::JumpRel(BranchCondition::NC) => 0x30,
