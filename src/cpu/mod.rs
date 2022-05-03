@@ -30,6 +30,18 @@ pub enum Flag {
     C = 4,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum RstVec {
+    ZERO = 0x0000,
+    ONE = 0x0008,
+    TWO = 0x0010,
+    THREE = 0x0018,
+    FOUR = 0x0020,
+    FIVE = 0x0028,
+    SIX = 0x0030,
+    SEVEN = 0x0038,
+}
+
 const NUM_GP_REGS: usize = 8;
 
 #[cfg(test)]
@@ -421,6 +433,10 @@ impl Cpu {
                 } else {
                     (pc + 1, 2)
                 }
+            },
+            Instruction::Rst(vec) => {
+                self.push(pc);
+                (vec as u16, 4)
             },
             _ => panic!("Invalid instruction"),
         }
