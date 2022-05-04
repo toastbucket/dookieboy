@@ -490,6 +490,14 @@ impl Cpu {
                 self.push(pc);
                 (vec as u16, 4)
             },
+            Instruction::Call(condition) => {
+                if self.should_branch(condition) {
+                    self.push(pc + 2);
+                    (self.read_word(pc + 1), 6)
+                } else {
+                    (pc + 3, 3)
+                }
+            },
             _ => panic!("Invalid instruction"),
         }
     }
