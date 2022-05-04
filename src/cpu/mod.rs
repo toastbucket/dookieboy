@@ -20,6 +20,7 @@ pub enum Register16Bit {
     BC = 2,
     DE = 4,
     HL = 6,
+    SP = 8,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -42,7 +43,7 @@ pub enum RstVec {
     SEVEN = 0x0038,
 }
 
-const NUM_GP_REGS: usize = 8;
+const NUM_GP_REGS: usize = 10;
 
 #[cfg(test)]
 const TEST_RAM_SIZE: usize = 128;
@@ -86,7 +87,6 @@ impl Memory for TestRam {
 
 pub struct Cpu {
     rf: [u8; NUM_GP_REGS],
-    sp: u16,
     pc: u16,
     mmu: Rc<RefCell<Mmu>>,
     cycles: usize,
@@ -99,7 +99,6 @@ impl Cpu {
     pub fn new(mmu: Rc<RefCell<Mmu>>) -> Cpu {
         Cpu {
             rf: [0; NUM_GP_REGS],
-            sp: 0,
             pc: 0,
             mmu: mmu,
             cycles: 0,
@@ -193,6 +192,14 @@ impl Cpu {
         bit == 1
     }
 
+    fn set_sp(&mut self, val: u16) {
+        self.set_reg_16(Register16Bit::SP, val);
+    }
+
+    fn get_sp(&self) -> u16 {
+        self.get_reg_16(Register16Bit::SP)
+    }
+
     fn and(&mut self, regop: Register8Bit, operand: u8) {
         let result = self.get_reg(regop) & operand;
         self.set_flag(Flag::Z, result == 0);
@@ -284,13 +291,13 @@ impl Cpu {
     }
 
     fn push(&mut self, val: u16) {
-        self.sp -= 2;
-        self.write_word(self.sp, val);
+        self.set_sp(self.get_sp() - 2);
+        self.write_word(self.get_sp(), val);
     }
 
     fn pop(&mut self) -> u16 {
-        let val = self.read_word(self.sp);
-        self.sp += 1;
+        let val = self.read_word(self.get_sp());
+        self.set_sp(self.get_sp() + 2);
         val
     }
 
@@ -505,7 +512,7 @@ impl Cpu {
                  flags z:{}, n:{}, h:{}, cy:{}",
                 self.rf,
                 self.pc,
-                self.sp,
+                self.get_sp(),
                 self.get_flag(Flag::Z),
                 self.get_flag(Flag::N),
                 self.get_flag(Flag::H),

@@ -1200,7 +1200,7 @@ fn test_push() {
     cpu.set_reg_16(Register16Bit::AF, 0xa55a);
 
     for i in 0..test_ram.len()-2 {
-        cpu.sp = INSTRUCTIONS_LEN as u16;
+        cpu.set_sp(INSTRUCTIONS_LEN as u16);
         cpu.write_word((INSTRUCTIONS_LEN - 2) as u16, 0x0000);
 
         cpu.step();
@@ -1224,22 +1224,22 @@ fn test_pop() {
 
     cpu.load_test_ram(&test_ram);
 
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_reg_16(Register16Bit::BC, 0x0000);
     cpu.step();
     assert_eq!(cpu.get_reg_16(Register16Bit::BC), 0xa55a);
 
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_reg_16(Register16Bit::DE, 0x0000);
     cpu.step();
     assert_eq!(cpu.get_reg_16(Register16Bit::DE), 0xa55a);
 
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_reg_16(Register16Bit::HL, 0x0000);
     cpu.step();
     assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0xa55a);
 
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_reg_16(Register16Bit::AF, 0x0000);
     cpu.step();
     assert_eq!(cpu.get_reg_16(Register16Bit::AF), 0xa55a);
@@ -1257,13 +1257,13 @@ fn test_ret_nz() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 1);
@@ -1281,13 +1281,13 @@ fn test_ret_z() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 1);
@@ -1306,13 +1306,13 @@ fn test_ret_nc() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 1);
@@ -1330,13 +1330,13 @@ fn test_ret_c() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 1);
@@ -1354,7 +1354,7 @@ fn test_ret() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = (INSTRUCTIONS_LEN - 2) as u16;
+    cpu.set_sp((INSTRUCTIONS_LEN - 2) as u16);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 }
@@ -1382,49 +1382,49 @@ fn test_rst() {
     cpu.load_test_ram(&test_ram);
 
     cpu.pc = 0;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::ZERO as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0000);
 
     cpu.pc = 1;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::ONE as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0001);
 
     cpu.pc = 2;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::TWO as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0002);
 
     cpu.pc = 3;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::THREE as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0003);
 
     cpu.pc = 4;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::FOUR as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0004);
 
     cpu.pc = 5;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::FIVE as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0005);
 
     cpu.pc = 6;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::SIX as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0006);
 
     cpu.pc = 7;
-    cpu.sp = sp_top;
+    cpu.set_sp(sp_top);
     cpu.step();
     assert_eq!(cpu.pc, RstVec::SEVEN as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0007);
@@ -1444,13 +1444,13 @@ fn test_call_nz() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 3);
@@ -1470,13 +1470,13 @@ fn test_call_z() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::Z, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::Z, false);
     cpu.step();
     assert_eq!(cpu.pc, 3);
@@ -1497,13 +1497,13 @@ fn test_call_nc() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 3);
@@ -1523,13 +1523,13 @@ fn test_call_c() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::C, true);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 
     cpu.pc = 0;
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.set_flag(Flag::C, false);
     cpu.step();
     assert_eq!(cpu.pc, 3);
@@ -1549,7 +1549,7 @@ fn test_call() {
     ];
 
     cpu.load_test_ram(&test_ram);
-    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_sp(INSTRUCTIONS_LEN as u16);
     cpu.step();
     assert_eq!(cpu.pc, 0xa55a);
 }
