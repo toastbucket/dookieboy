@@ -822,6 +822,52 @@ fn test_ld_b_a() {
     assert_eq!(cpu.get_reg(Register8Bit::B), 0x69);
 }
 
+// Verify loading immediate to register
+#[test]
+fn test_ld_imm() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 14;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdImm(Register8Bit::B).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::D).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::H).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::C).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::E).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::L).as_byte(),
+        0x69,
+        Instruction::LdImm(Register8Bit::A).as_byte(),
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
+}
+
 // Verify loading register B to memory offset @ hl
 #[test]
 fn test_ld_to_mem() {

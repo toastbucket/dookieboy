@@ -37,6 +37,7 @@ pub enum Instruction {
     Sbc(Register8Bit),
     SbcFromMem(), // always uses HL
     LdRegister(Register8Bit, Register8Bit),
+    LdImm(Register8Bit),
     LdToMem(Register8Bit, Register16Bit),
     LdFromMem(Register8Bit, Register16Bit),
     LdToMemInc(), // Always A and HL
@@ -223,6 +224,14 @@ impl Instruction {
             0x7c => Some(Instruction::LdRegister(Register8Bit::A, Register8Bit::H)),
             0x7d => Some(Instruction::LdRegister(Register8Bit::A, Register8Bit::L)),
             0x7f => Some(Instruction::LdRegister(Register8Bit::A, Register8Bit::A)),
+            // LD X, nn
+            0x06 => Some(Instruction::LdImm(Register8Bit::B)),
+            0x16 => Some(Instruction::LdImm(Register8Bit::D)),
+            0x26 => Some(Instruction::LdImm(Register8Bit::H)),
+            0x0e => Some(Instruction::LdImm(Register8Bit::C)),
+            0x1e => Some(Instruction::LdImm(Register8Bit::E)),
+            0x2e => Some(Instruction::LdImm(Register8Bit::L)),
+            0x3e => Some(Instruction::LdImm(Register8Bit::A)),
             // LD (HL), X
             0x70 => Some(Instruction::LdToMem(Register8Bit::B, Register16Bit::HL)),
             0x71 => Some(Instruction::LdToMem(Register8Bit::C, Register16Bit::HL)),
@@ -471,6 +480,14 @@ impl Instruction {
             Instruction::LdRegister(Register8Bit::A, Register8Bit::H) => 0x7c,
             Instruction::LdRegister(Register8Bit::A, Register8Bit::L) => 0x7d,
             Instruction::LdRegister(Register8Bit::A, Register8Bit::A) => 0x7f,
+            // LD X, nn
+            Instruction::LdImm(Register8Bit::B) => 0x06,
+            Instruction::LdImm(Register8Bit::D) => 0x16,
+            Instruction::LdImm(Register8Bit::H) => 0x26,
+            Instruction::LdImm(Register8Bit::C) => 0x0e,
+            Instruction::LdImm(Register8Bit::E) => 0x1e,
+            Instruction::LdImm(Register8Bit::L) => 0x2e,
+            Instruction::LdImm(Register8Bit::A) => 0x3e,
             // LD (HL), X
             Instruction::LdToMem(Register8Bit::B, Register16Bit::HL) => 0x70,
             Instruction::LdToMem(Register8Bit::C, Register16Bit::HL) => 0x71,
