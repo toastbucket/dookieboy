@@ -1201,12 +1201,10 @@ fn test_push() {
 
     for i in 0..test_ram.len()-2 {
         cpu.sp = INSTRUCTIONS_LEN as u16;
-        cpu.write_byte((INSTRUCTIONS_LEN - 2) as u16, 0x00);
-        cpu.write_byte((INSTRUCTIONS_LEN - 1) as u16, 0x00);
+        cpu.write_word((INSTRUCTIONS_LEN - 2) as u16, 0x0000);
 
         cpu.step();
-        assert_eq!(cpu.read_byte((INSTRUCTIONS_LEN - 2) as u16), 0x5a);
-        assert_eq!(cpu.read_byte((INSTRUCTIONS_LEN - 1) as u16), 0xa5);
+        assert_eq!(cpu.read_word((INSTRUCTIONS_LEN - 2) as u16), 0xa55a);
     }
 }
 
@@ -1387,55 +1385,47 @@ fn test_rst() {
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::ZERO as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x00);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0000);
 
     cpu.pc = 1;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::ONE as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x01);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0001);
 
     cpu.pc = 2;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::TWO as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x02);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0002);
 
     cpu.pc = 3;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::THREE as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x03);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0003);
 
     cpu.pc = 4;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::FOUR as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x04);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0004);
 
     cpu.pc = 5;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::FIVE as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x05);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0005);
 
     cpu.pc = 6;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::SIX as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x06);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0006);
 
     cpu.pc = 7;
     cpu.sp = sp_top;
     cpu.step();
     assert_eq!(cpu.pc, RstVec::SEVEN as u16);
-    assert_eq!(cpu.read_byte(sp_top - 2), 0x07);
-    assert_eq!(cpu.read_byte(sp_top - 1), 0x00);
+    assert_eq!(cpu.read_word(sp_top - 2), 0x0007);
 }
