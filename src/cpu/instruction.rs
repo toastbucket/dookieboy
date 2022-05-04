@@ -53,6 +53,7 @@ pub enum Instruction8Bit {
     Ret(BranchCondition),
     Rst(RstVec),
     Call(BranchCondition),
+    Call16BitInstruction(), // Special dummy instruction for 16 bit instruction calls
 }
 
 impl Instruction8Bit {
@@ -308,6 +309,8 @@ impl Instruction8Bit {
             0xcc => Some(Instruction8Bit::Call(BranchCondition::Z)),
             0xdc => Some(Instruction8Bit::Call(BranchCondition::C)),
             0xcd => Some(Instruction8Bit::Call(BranchCondition::NONE)),
+            // Special dummy instruction for 16 bit instruction calls
+            0xcb => Some(Instruction8Bit::Call16BitInstruction()),
             _ => None
         }
     }
@@ -564,6 +567,8 @@ impl Instruction8Bit {
             Instruction8Bit::Call(BranchCondition::Z) => 0xcc,
             Instruction8Bit::Call(BranchCondition::C) => 0xdc,
             Instruction8Bit::Call(BranchCondition::NONE) => 0xcd,
+            // Special dummy instruction for 16 bit instruction calls
+            Instruction8Bit::Call16BitInstruction() => 0xcb,
             _ => panic!("Invalid instruction"),
         }
     }

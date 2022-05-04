@@ -6,7 +6,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::memory::Memory;
-use crate::cpu::instruction::{ BranchCondition, Instruction8Bit };
+use crate::cpu::instruction::{ BranchCondition, Instruction8Bit, Instruction16Bit };
 use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
@@ -311,6 +311,13 @@ impl Cpu {
         }
     }
 
+    fn set_bit(&mut self, regop: Register8Bit, offset: u32, state: bool) {
+        match state {
+            true => self.set_reg(regop, self.get_reg(regop) | (1 << offset)),
+            false => self.set_reg(regop, self.get_reg(regop) & !(1 << offset)),
+        }
+    }
+
     // execute instruction
     // return tuple containing (next_pc, # cycles used)
     fn execute_instruction(&mut self, instruction: Instruction8Bit) -> (u16, usize) {
@@ -509,7 +516,21 @@ impl Cpu {
                     (pc + 3, 3)
                 }
             },
-            _ => panic!("Invalid instruction"),
+            Instruction8Bit::Call16BitInstruction() => {
+                self.execute_16_bit_instruction(Instruction16Bit::from_byte(self.read_byte(pc + 1)).unwrap())
+            }
+            _ => panic!("Invalid 8 bit instruction"),
+        }
+    }
+
+    fn execute_16_bit_instruction(&mut self, instruction: Instruction16Bit) -> (u16, usize) {
+        let pc = self.pc;
+        match instruction {
+            Instruction16Bit::Res(regop, offset) => {
+                self.set_bit(regop, offset, false);
+                (pc + 2, 2)
+            }
+            _ => panic!("Invalid 16 bit instruction"),
         }
     }
 
