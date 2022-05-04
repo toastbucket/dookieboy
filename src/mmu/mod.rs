@@ -4,6 +4,12 @@ use crate::cartridge::Cartridge;
 use crate::joypad::Joypad;
 use crate::memory::Memory;
 
+const WRAM_BASE: usize = 0xc000;
+const WRAM_SIZE: usize = 4096;
+const HRAM_BASE: usize = 0xff80;
+const HRAM_SIZE: usize = 127;
+const NUM_WRAM_BANKS: usize = 8;
+
 /*
  * Memory Map
  *
@@ -24,23 +30,53 @@ use crate::memory::Memory;
 pub struct Mmu {
     pub cartridge: Cartridge,
     pub joypad: Joypad,
-
+    wram: [[u8; WRAM_SIZE]; NUM_WRAM_BANKS],
+    svbk: usize,
+    hram: [u8; HRAM_SIZE],
 }
 
 impl Memory for Mmu {
     fn mem_read_byte(&self, addr: u16) -> u8 {
         match addr {
             0x0000..=0x7fff => self.cartridge.mem_read_byte(addr),
+            0xc000..=0xcfff => {
+                let idx = (addr as usize) - WRAM_BASE;
+                self.wram[0][idx]
+            },
+            0xd000..=0xdfff => {
+                let idx = (addr as usize) - WRAM_BASE;
+                let bank = if self.svbk == 0 { 1 } else { self.svbk };
+                self.wram[bank][idx]
+            },
             0xff00 => self.joypad.mem_read_byte(addr),
-            _ => panic!("not valid address"),
+            0xff70 => self.svbk as u8,
+            0xff80..=0xfffe => {
+                let idx = (addr as usize) - HRAM_BASE;
+                self.hram[idx]
+            },
+            _ => panic!("read from unmapped address {:#06x}", addr),
         }
     }
 
     fn mem_write_byte(&mut self, addr: u16, val: u8) {
         match addr {
             0x0000..=0x7fff => self.cartridge.mem_write_byte(addr, val),
+            0xc000..=0xcfff => {
+                let idx = (addr as usize) - WRAM_BASE;
+                self.wram[0][idx] = val;
+            },
+            0xd000..=0xdfff => {
+                let idx = (addr as usize) - WRAM_BASE;
+                let bank = if self.svbk == 0 { 1 } else { self.svbk };
+                self.wram[bank][idx] = val;
+            },
             0xff00 => self.joypad.mem_write_byte(addr, val),
-            _ => panic!("not valid address"),
+            0xff70 => self.svbk = (val & 0x7) as usize,
+            0xff80..=0xfffe => {
+                let idx = (addr as usize) - HRAM_BASE;
+                self.hram[idx] = val;
+            },
+            _ => panic!("write to unmapped address {:#06x}", addr),
         }
     }
 }
@@ -50,6 +86,9 @@ impl Mmu {
         Mmu {
             cartridge: Cartridge::new(),
             joypad: Joypad::new(),
+            wram: [[0; WRAM_SIZE]; NUM_WRAM_BANKS],
+            svbk: 0,
+            hram: [0; HRAM_SIZE],
         }
     }
 }
