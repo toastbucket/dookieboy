@@ -448,6 +448,10 @@ impl Cpu {
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
                 (pc + 1, 2)
             },
+            Instruction::LdRegister16Imm(pair) => {
+                self.set_reg_16(pair, self.read_word(pc + 1));
+                (pc + 3, 3)
+            },
             Instruction::JumpAbs(condition) => {
                 if self.should_branch(condition) {
                     let addr = (self.read_byte(pc + 1) as u16)
