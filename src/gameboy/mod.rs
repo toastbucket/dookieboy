@@ -49,6 +49,7 @@ impl Gameboy {
     pub fn run(&mut self, rom: String) -> Result<(), io::Error> {
 
         self.mmu.borrow_mut().cartridge.load_rom(rom)?;
+        self.cpu.reset();
 
         'running: loop {
             self.handle_sdl2_events()?;

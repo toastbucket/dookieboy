@@ -554,6 +554,29 @@ impl Cpu {
             },
         }
     }
+
+    /*
+     * default DMG powerup state according to
+     * https://gbdev.io/pandocs/Power_Up_Sequence.html#cpu-registers
+     */
+    pub fn reset(&mut self) {
+        self.set_reg(Register8Bit::A, 0x01);
+        self.set_reg(Register8Bit::F, 0x00);
+        self.set_reg(Register8Bit::B, 0x00);
+        self.set_reg(Register8Bit::C, 0x13);
+        self.set_reg(Register8Bit::D, 0x00);
+        self.set_reg(Register8Bit::E, 0xd8);
+        self.set_reg(Register8Bit::H, 0x01);
+        self.set_reg(Register8Bit::L, 0x4d);
+
+        self.set_flag(Flag::Z, true);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, false);
+
+        self.pc = 0x0100;
+        self.set_sp(0xfffe);
+    }
 }
 
 #[cfg(test)]
