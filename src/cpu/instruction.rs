@@ -50,6 +50,7 @@ pub enum Instruction {
     Pop(Register16Bit),
     Ret(BranchCondition),
     Rst(RstVec),
+    Call(BranchCondition),
 }
 
 impl Instruction {
@@ -286,6 +287,12 @@ impl Instruction {
             0xef => Some(Instruction::Rst(RstVec::FIVE)),
             0xf7 => Some(Instruction::Rst(RstVec::SIX)),
             0xff => Some(Instruction::Rst(RstVec::SEVEN)),
+            // CALL
+            0xc4 => Some(Instruction::Call(BranchCondition::NZ)),
+            0xd4 => Some(Instruction::Call(BranchCondition::NC)),
+            0xcc => Some(Instruction::Call(BranchCondition::Z)),
+            0xdc => Some(Instruction::Call(BranchCondition::C)),
+            0xcd => Some(Instruction::Call(BranchCondition::NONE)),
             _ => None
         }
     }
@@ -523,6 +530,12 @@ impl Instruction {
             Instruction::Rst(RstVec::FIVE) => 0xef,
             Instruction::Rst(RstVec::SIX) => 0xf7,
             Instruction::Rst(RstVec::SEVEN) => 0xff,
+            // CALL
+            Instruction::Call(BranchCondition::NZ) => 0xc4,
+            Instruction::Call(BranchCondition::NC) => 0xd4,
+            Instruction::Call(BranchCondition::Z) => 0xcc,
+            Instruction::Call(BranchCondition::C) => 0xdc,
+            Instruction::Call(BranchCondition::NONE) => 0xcd,
             _ => panic!("Invalid instruction"),
         }
     }

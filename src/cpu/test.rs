@@ -1429,3 +1429,127 @@ fn test_rst() {
     assert_eq!(cpu.pc, RstVec::SEVEN as u16);
     assert_eq!(cpu.read_word(sp_top - 2), 0x0007);
 }
+
+// Verify call nz
+#[test]
+fn test_call_nz() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 5;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Call(BranchCondition::NZ).as_byte(),
+        0x5a,
+        0xa5,
+        0xff, // garbage
+        0xff, // garbage
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::Z, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::Z, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+}
+
+// Verify call z
+#[test]
+fn test_call_z() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 5;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Call(BranchCondition::Z).as_byte(),
+        0x5a,
+        0xa5,
+        0xff, // garbage
+        0xff, // garbage
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::Z, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::Z, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+}
+
+
+// Verify call nc
+#[test]
+fn test_call_nc() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 5;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Call(BranchCondition::NC).as_byte(),
+        0x5a,
+        0xa5,
+        0xff, // garbage
+        0xff, // garbage
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+}
+
+// Verify call c
+#[test]
+fn test_call_c() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 5;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Call(BranchCondition::C).as_byte(),
+        0x5a,
+        0xa5,
+        0xff, // garbage
+        0xff, // garbage
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+
+    cpu.pc = 0;
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.pc, 3);
+}
+
+// Verify call
+#[test]
+fn test_call() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 5;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Call(BranchCondition::NONE).as_byte(),
+        0x5a,
+        0xa5,
+        0xff, // garbage
+        0xff, // garbage
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.sp = INSTRUCTIONS_LEN as u16;
+    cpu.step();
+    assert_eq!(cpu.pc, 0xa55a);
+}
