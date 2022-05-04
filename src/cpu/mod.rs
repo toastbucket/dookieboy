@@ -284,18 +284,14 @@ impl Cpu {
     }
 
     fn push(&mut self, val: u16) {
-        self.sp -= 1;
-        self.write_byte(self.sp, ((val >> 8) & 0xff) as u8);
-        self.sp -= 1;
-        self.write_byte(self.sp, (val & 0xff) as u8);
+        self.sp -= 2;
+        self.write_word(self.sp, val);
     }
 
     fn pop(&mut self) -> u16 {
-        let lower = self.read_byte(self.sp) as u16;
+        let val = self.read_word(self.sp);
         self.sp += 1;
-        let higher = self.read_byte(self.sp) as u16;
-        self.sp += 1;
-        (higher << 8) | lower
+        val
     }
 
     fn should_branch(&self, condition: BranchCondition) -> bool {
