@@ -568,3 +568,150 @@ impl Instruction8Bit {
         }
     }
 }
+
+#[derive(Debug, Copy, Clone)]
+pub enum Instruction16Bit {
+    Res(Register8Bit, u32),
+}
+
+impl Instruction16Bit {
+    pub fn from_byte(byte: u8) -> Option<Instruction16Bit> {
+        match byte {
+            // 0 bit
+            0x80 => Some(Instruction16Bit::Res(Register8Bit::B, 0)),
+            0x81 => Some(Instruction16Bit::Res(Register8Bit::C, 0)),
+            0x82 => Some(Instruction16Bit::Res(Register8Bit::D, 0)),
+            0x83 => Some(Instruction16Bit::Res(Register8Bit::E, 0)),
+            0x84 => Some(Instruction16Bit::Res(Register8Bit::H, 0)),
+            0x85 => Some(Instruction16Bit::Res(Register8Bit::L, 0)),
+            0x87 => Some(Instruction16Bit::Res(Register8Bit::A, 0)),
+            // 1 bit
+            0x88 => Some(Instruction16Bit::Res(Register8Bit::B, 1)),
+            0x89 => Some(Instruction16Bit::Res(Register8Bit::C, 1)),
+            0x8a => Some(Instruction16Bit::Res(Register8Bit::D, 1)),
+            0x8b => Some(Instruction16Bit::Res(Register8Bit::E, 1)),
+            0x8c => Some(Instruction16Bit::Res(Register8Bit::H, 1)),
+            0x8d => Some(Instruction16Bit::Res(Register8Bit::L, 1)),
+            0x8f => Some(Instruction16Bit::Res(Register8Bit::A, 1)),
+            // 2 bit
+            0x90 => Some(Instruction16Bit::Res(Register8Bit::B, 2)),
+            0x91 => Some(Instruction16Bit::Res(Register8Bit::C, 2)),
+            0x92 => Some(Instruction16Bit::Res(Register8Bit::D, 2)),
+            0x93 => Some(Instruction16Bit::Res(Register8Bit::E, 2)),
+            0x94 => Some(Instruction16Bit::Res(Register8Bit::H, 2)),
+            0x95 => Some(Instruction16Bit::Res(Register8Bit::L, 2)),
+            0x97 => Some(Instruction16Bit::Res(Register8Bit::A, 2)),
+            // 3 bit
+            0x98 => Some(Instruction16Bit::Res(Register8Bit::B, 3)),
+            0x99 => Some(Instruction16Bit::Res(Register8Bit::C, 3)),
+            0x9a => Some(Instruction16Bit::Res(Register8Bit::D, 3)),
+            0x9b => Some(Instruction16Bit::Res(Register8Bit::E, 3)),
+            0x9c => Some(Instruction16Bit::Res(Register8Bit::H, 3)),
+            0x9d => Some(Instruction16Bit::Res(Register8Bit::L, 3)),
+            0x9f => Some(Instruction16Bit::Res(Register8Bit::A, 3)),
+            // 4 bit
+            0xa0 => Some(Instruction16Bit::Res(Register8Bit::B, 4)),
+            0xa1 => Some(Instruction16Bit::Res(Register8Bit::C, 4)),
+            0xa2 => Some(Instruction16Bit::Res(Register8Bit::D, 4)),
+            0xa3 => Some(Instruction16Bit::Res(Register8Bit::E, 4)),
+            0xa4 => Some(Instruction16Bit::Res(Register8Bit::H, 4)),
+            0xa5 => Some(Instruction16Bit::Res(Register8Bit::L, 4)),
+            0xa7 => Some(Instruction16Bit::Res(Register8Bit::A, 4)),
+            // 5 bit
+            0xa8 => Some(Instruction16Bit::Res(Register8Bit::B, 5)),
+            0xa9 => Some(Instruction16Bit::Res(Register8Bit::C, 5)),
+            0xaa => Some(Instruction16Bit::Res(Register8Bit::D, 5)),
+            0xab => Some(Instruction16Bit::Res(Register8Bit::E, 5)),
+            0xac => Some(Instruction16Bit::Res(Register8Bit::H, 5)),
+            0xad => Some(Instruction16Bit::Res(Register8Bit::L, 5)),
+            0xaf => Some(Instruction16Bit::Res(Register8Bit::A, 5)),
+            // 6 bit
+            0xb0 => Some(Instruction16Bit::Res(Register8Bit::B, 6)),
+            0xb1 => Some(Instruction16Bit::Res(Register8Bit::C, 6)),
+            0xb2 => Some(Instruction16Bit::Res(Register8Bit::D, 6)),
+            0xb3 => Some(Instruction16Bit::Res(Register8Bit::E, 6)),
+            0xb4 => Some(Instruction16Bit::Res(Register8Bit::H, 6)),
+            0xb5 => Some(Instruction16Bit::Res(Register8Bit::L, 6)),
+            0xb7 => Some(Instruction16Bit::Res(Register8Bit::A, 6)),
+            // 7 bit
+            0xb8 => Some(Instruction16Bit::Res(Register8Bit::B, 7)),
+            0xb9 => Some(Instruction16Bit::Res(Register8Bit::C, 7)),
+            0xba => Some(Instruction16Bit::Res(Register8Bit::D, 7)),
+            0xbb => Some(Instruction16Bit::Res(Register8Bit::E, 7)),
+            0xbc => Some(Instruction16Bit::Res(Register8Bit::H, 7)),
+            0xbd => Some(Instruction16Bit::Res(Register8Bit::L, 7)),
+            0xbf => Some(Instruction16Bit::Res(Register8Bit::A, 7)),
+            _ => panic!("Invalid instruction"),
+        }
+    }
+    pub fn as_byte(self) -> u8 {
+        match self {
+            // 0 bit
+            Instruction16Bit::Res(Register8Bit::B, 0) => 0x80,
+            Instruction16Bit::Res(Register8Bit::C, 0) => 0x81,
+            Instruction16Bit::Res(Register8Bit::D, 0) => 0x82,
+            Instruction16Bit::Res(Register8Bit::E, 0) => 0x83,
+            Instruction16Bit::Res(Register8Bit::H, 0) => 0x84,
+            Instruction16Bit::Res(Register8Bit::L, 0) => 0x85,
+            Instruction16Bit::Res(Register8Bit::A, 0) => 0x87,
+            // 1 bit
+            Instruction16Bit::Res(Register8Bit::B, 1) => 0x88,
+            Instruction16Bit::Res(Register8Bit::C, 1) => 0x89,
+            Instruction16Bit::Res(Register8Bit::D, 1) => 0x8a,
+            Instruction16Bit::Res(Register8Bit::E, 1) => 0x8b,
+            Instruction16Bit::Res(Register8Bit::H, 1) => 0x8c,
+            Instruction16Bit::Res(Register8Bit::L, 1) => 0x8d,
+            Instruction16Bit::Res(Register8Bit::A, 1) => 0x8f,
+            // 2 bit
+            Instruction16Bit::Res(Register8Bit::B, 2) => 0x90,
+            Instruction16Bit::Res(Register8Bit::C, 2) => 0x91,
+            Instruction16Bit::Res(Register8Bit::D, 2) => 0x92,
+            Instruction16Bit::Res(Register8Bit::E, 2) => 0x93,
+            Instruction16Bit::Res(Register8Bit::H, 2) => 0x94,
+            Instruction16Bit::Res(Register8Bit::L, 2) => 0x95,
+            Instruction16Bit::Res(Register8Bit::A, 2) => 0x97,
+            // 3 bit
+            Instruction16Bit::Res(Register8Bit::B, 3) => 0x98,
+            Instruction16Bit::Res(Register8Bit::C, 3) => 0x99,
+            Instruction16Bit::Res(Register8Bit::D, 3) => 0x9a,
+            Instruction16Bit::Res(Register8Bit::E, 3) => 0x9b,
+            Instruction16Bit::Res(Register8Bit::H, 3) => 0x9c,
+            Instruction16Bit::Res(Register8Bit::L, 3) => 0x9d,
+            Instruction16Bit::Res(Register8Bit::A, 3) => 0x9f,
+            // 4 bit
+            Instruction16Bit::Res(Register8Bit::B, 4) => 0xa0,
+            Instruction16Bit::Res(Register8Bit::C, 4) => 0xa1,
+            Instruction16Bit::Res(Register8Bit::D, 4) => 0xa2,
+            Instruction16Bit::Res(Register8Bit::E, 4) => 0xa3,
+            Instruction16Bit::Res(Register8Bit::H, 4) => 0xa4,
+            Instruction16Bit::Res(Register8Bit::L, 4) => 0xa5,
+            Instruction16Bit::Res(Register8Bit::A, 4) => 0xa7,
+            // 5 bit
+            Instruction16Bit::Res(Register8Bit::B, 5) => 0xa8,
+            Instruction16Bit::Res(Register8Bit::C, 5) => 0xa9,
+            Instruction16Bit::Res(Register8Bit::D, 5) => 0xaa,
+            Instruction16Bit::Res(Register8Bit::E, 5) => 0xab,
+            Instruction16Bit::Res(Register8Bit::H, 5) => 0xac,
+            Instruction16Bit::Res(Register8Bit::L, 5) => 0xad,
+            Instruction16Bit::Res(Register8Bit::A, 5) => 0xaf,
+            // 6 bit
+            Instruction16Bit::Res(Register8Bit::B, 6) => 0xb0,
+            Instruction16Bit::Res(Register8Bit::C, 6) => 0xb1,
+            Instruction16Bit::Res(Register8Bit::D, 6) => 0xb2,
+            Instruction16Bit::Res(Register8Bit::E, 6) => 0xb3,
+            Instruction16Bit::Res(Register8Bit::H, 6) => 0xb4,
+            Instruction16Bit::Res(Register8Bit::L, 6) => 0xb5,
+            Instruction16Bit::Res(Register8Bit::A, 6) => 0xb7,
+            // 7 bit
+            Instruction16Bit::Res(Register8Bit::B, 7) => 0xb8,
+            Instruction16Bit::Res(Register8Bit::C, 7) => 0xb9,
+            Instruction16Bit::Res(Register8Bit::D, 7) => 0xba,
+            Instruction16Bit::Res(Register8Bit::E, 7) => 0xbb,
+            Instruction16Bit::Res(Register8Bit::H, 7) => 0xbc,
+            Instruction16Bit::Res(Register8Bit::L, 7) => 0xbd,
+            Instruction16Bit::Res(Register8Bit::A, 7) => 0xbf,
+
+            _ => panic!("Invalid instruction"),
+        }
+    }
+}
