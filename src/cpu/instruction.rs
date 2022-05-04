@@ -43,6 +43,7 @@ pub enum Instruction {
     LdToMemDec(), // Always A and HL
     LdFromMemInc(), // Always A and HL
     LdFromMemDec(), // Always A and HL
+    LdRegister16Imm(Register16Bit),
     JumpAbs(BranchCondition),
     JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
@@ -248,6 +249,11 @@ impl Instruction {
             0x32 => Some(Instruction::LdToMemDec()),
             0x2a => Some(Instruction::LdFromMemInc()),
             0x3a => Some(Instruction::LdFromMemDec()),
+            // LD XX, nn
+            0x01 => Some(Instruction::LdRegister16Imm(Register16Bit::BC)),
+            0x11 => Some(Instruction::LdRegister16Imm(Register16Bit::DE)),
+            0x21 => Some(Instruction::LdRegister16Imm(Register16Bit::HL)),
+            0x31 => Some(Instruction::LdRegister16Imm(Register16Bit::SP)),
             // JP
             0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
             0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
@@ -491,6 +497,11 @@ impl Instruction {
             Instruction::LdToMemDec() => 0x32,
             Instruction::LdFromMemInc() => 0x2a,
             Instruction::LdFromMemDec() => 0x3a,
+            // LD XX, nn
+            Instruction::LdRegister16Imm(Register16Bit::BC) => 0x01,
+            Instruction::LdRegister16Imm(Register16Bit::DE) => 0x11,
+            Instruction::LdRegister16Imm(Register16Bit::HL) => 0x21,
+            Instruction::LdRegister16Imm(Register16Bit::SP) => 0x31,
             // JP
             Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
             Instruction::JumpAbs(BranchCondition::NC) => 0xd2,

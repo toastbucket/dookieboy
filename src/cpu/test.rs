@@ -931,6 +931,41 @@ fn test_ld_from_mem_dec() {
     assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x00);
 }
 
+// Verify loading 16 bit immediates
+#[test]
+fn test_ld_reg16_imm() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 12;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdRegister16Imm(Register16Bit::BC).as_byte(),
+        0x08,
+        0x80,
+        Instruction::LdRegister16Imm(Register16Bit::DE).as_byte(),
+        0x08,
+        0x80,
+        Instruction::LdRegister16Imm(Register16Bit::HL).as_byte(),
+        0x08,
+        0x80,
+        Instruction::LdRegister16Imm(Register16Bit::SP).as_byte(),
+        0x08,
+        0x80,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::BC), 0x8008);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::DE), 0x8008);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x8008);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0x8008);
+}
+
 // Verify noop
 #[test]
 fn test_noop() {
