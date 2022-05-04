@@ -514,11 +514,18 @@ impl Cpu {
     }
 
     fn dump_to_string(&self) -> String {
-        format!("Registers {:#06x?}\n\
+        format!("Registers\n\
+                 AF: {:#04x} {:#04x}\n\
+                 BC: {:#04x} {:#04x}\n\
+                 DC: {:#04x} {:#04x}\n\
+                 HL: {:#04x} {:#04x}\n\
                  PC: {:#06x}\n\
                  SP: {:#06x}\n\
                  flags z:{}, n:{}, h:{}, cy:{}",
-                self.rf,
+                self.get_reg(Register8Bit::A), self.get_reg(Register8Bit::F),
+                self.get_reg(Register8Bit::B), self.get_reg(Register8Bit::C),
+                self.get_reg(Register8Bit::D), self.get_reg(Register8Bit::E),
+                self.get_reg(Register8Bit::H), self.get_reg(Register8Bit::L),
                 self.pc,
                 self.get_sp(),
                 self.get_flag(Flag::Z),
