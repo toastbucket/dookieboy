@@ -420,6 +420,10 @@ impl Cpu {
                 self.load_register(dest, src);
                 (pc + 1, 1)
             },
+            Instruction::LdImm(regop) => {
+                self.set_reg(regop, self.read_byte(pc + 1));
+                (pc + 2, 2)
+            },
             Instruction::LdToMem(regop, pair) => {
                 self.ld_to_mem(regop, self.get_reg_16(pair));
                 (pc + 1, 2)
