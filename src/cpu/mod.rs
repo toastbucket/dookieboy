@@ -6,7 +6,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::memory::Memory;
-use crate::cpu::instruction::{ BranchCondition, Instruction };
+use crate::cpu::instruction::{ BranchCondition, Instruction8Bit };
 use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
@@ -313,150 +313,150 @@ impl Cpu {
 
     // execute instruction
     // return tuple containing (next_pc, # cycles used)
-    fn execute_instruction(&mut self, instruction: Instruction) -> (u16, usize) {
+    fn execute_instruction(&mut self, instruction: Instruction8Bit) -> (u16, usize) {
         let pc = self.pc;
 
         match instruction {
-            Instruction::Noop() => {
+            Instruction8Bit::Noop() => {
                 (pc + 1, 1)
             },
-            Instruction::Inc(regop) => {
+            Instruction8Bit::Inc(regop) => {
                 self.add(regop, 1, false);
                 (pc + 1, 1)
             },
-            Instruction::Dec(regop) => {
+            Instruction8Bit::Dec(regop) => {
                 self.subtract(regop, 1, false);
                 (pc + 1, 1)
             },
-            Instruction::And(regop) => {
+            Instruction8Bit::And(regop) => {
                 self.and(Register8Bit::A, self.get_reg(regop));
                 (pc + 1, 1)
             },
-            Instruction::AndFromMem() => {
+            Instruction8Bit::AndFromMem() => {
                 self.and(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
                 (pc + 1, 2)
             },
-            Instruction::AndImm() => {
+            Instruction8Bit::AndImm() => {
                 self.and(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
-            Instruction::Or(regop) => {
+            Instruction8Bit::Or(regop) => {
                 self.or(Register8Bit::A, self.get_reg(regop));
                 (pc + 1, 1)
             },
-            Instruction::OrFromMem() => {
+            Instruction8Bit::OrFromMem() => {
                 self.or(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
                 (pc + 1, 2)
             },
-            Instruction::OrImm() => {
+            Instruction8Bit::OrImm() => {
                 self.or(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
-            Instruction::Xor(regop) => {
+            Instruction8Bit::Xor(regop) => {
                 self.xor(Register8Bit::A, self.get_reg(regop));
                 (pc + 1, 1)
             },
-            Instruction::XorFromMem() => {
+            Instruction8Bit::XorFromMem() => {
                 self.xor(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
                 (pc + 1, 2)
             },
-            Instruction::XorImm() => {
+            Instruction8Bit::XorImm() => {
                 self.xor(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
-            Instruction::Cp(regop) => {
+            Instruction8Bit::Cp(regop) => {
                 self.cp(Register8Bit::A, self.get_reg(regop));
                 (pc + 1, 1)
             },
-            Instruction::CpFromMem() => {
+            Instruction8Bit::CpFromMem() => {
                 self.cp(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)));
                 (pc + 1, 2)
             },
-            Instruction::CpImm() => {
+            Instruction8Bit::CpImm() => {
                 self.cp(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
-            Instruction::Add(regop) => {
+            Instruction8Bit::Add(regop) => {
                 self.add(Register8Bit::A, self.get_reg(regop), false);
                 (pc + 1, 1)
             },
-            Instruction::Adc(regop) => {
+            Instruction8Bit::Adc(regop) => {
                 self.add(Register8Bit::A, self.get_reg(regop), true);
                 (pc + 1, 1)
             },
-            Instruction::AddImm() => {
+            Instruction8Bit::AddImm() => {
                 self.add(Register8Bit::A, self.read_byte(pc + 1), false);
                 (pc + 2, 2)
             },
-            Instruction::AddFromMem() => {
+            Instruction8Bit::AddFromMem() => {
                 self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false);
                 (pc + 1, 2)
             },
-            Instruction::AdcFromMem() => {
+            Instruction8Bit::AdcFromMem() => {
                 self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true);
                 (pc + 1, 2)
             },
-            Instruction::Sub(regop) => {
+            Instruction8Bit::Sub(regop) => {
                 self.subtract(Register8Bit::A, self.get_reg(regop), false);
                 (pc + 1, 1)
             },
-            Instruction::Sbc(regop) => {
+            Instruction8Bit::Sbc(regop) => {
                 self.subtract(Register8Bit::A, self.get_reg(regop), true);
                 (pc + 1, 1)
             },
-            Instruction::SubImm() => {
+            Instruction8Bit::SubImm() => {
                 self.subtract(Register8Bit::A, self.read_byte(pc + 1), false);
                 (pc + 2, 2)
             },
-            Instruction::SubFromMem() => {
+            Instruction8Bit::SubFromMem() => {
                 self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false);
                 (pc + 1, 2)
             },
-            Instruction::SbcFromMem() => {
+            Instruction8Bit::SbcFromMem() => {
                 self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true);
                 (pc + 1, 2)
             },
-            Instruction::LdRegister(dest, src) => {
+            Instruction8Bit::LdRegister(dest, src) => {
                 self.load_register(dest, src);
                 (pc + 1, 1)
             },
-            Instruction::LdImm(regop) => {
+            Instruction8Bit::LdImm(regop) => {
                 self.set_reg(regop, self.read_byte(pc + 1));
                 (pc + 2, 2)
             },
-            Instruction::LdToMem(regop, pair) => {
+            Instruction8Bit::LdToMem(regop, pair) => {
                 self.ld_to_mem(regop, self.get_reg_16(pair));
                 (pc + 1, 2)
             },
-            Instruction::LdFromMem(regop, pair) => {
+            Instruction8Bit::LdFromMem(regop, pair) => {
                 self.ld_from_mem(regop, self.get_reg_16(pair));
                 (pc + 1, 2)
             },
-            Instruction::LdToMemInc() => {
+            Instruction8Bit::LdToMemInc() => {
                 self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
                 (pc + 1, 2)
             },
-            Instruction::LdToMemDec() => {
+            Instruction8Bit::LdToMemDec() => {
                 self.ld_to_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
                 (pc + 1, 2)
             },
-            Instruction::LdFromMemInc() => {
+            Instruction8Bit::LdFromMemInc() => {
                 self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_add(1));
                 (pc + 1, 2)
             },
-            Instruction::LdFromMemDec() => {
+            Instruction8Bit::LdFromMemDec() => {
                 self.ld_from_mem(Register8Bit::A, self.get_reg_16(Register16Bit::HL));
                 self.set_reg_16(Register16Bit::HL, self.get_reg_16(Register16Bit::HL).wrapping_sub(1));
                 (pc + 1, 2)
             },
-            Instruction::LdRegister16Imm(pair) => {
+            Instruction8Bit::LdRegister16Imm(pair) => {
                 self.set_reg_16(pair, self.read_word(pc + 1));
                 (pc + 3, 3)
             },
-            Instruction::JumpAbs(condition) => {
+            Instruction8Bit::JumpAbs(condition) => {
                 if self.should_branch(condition) {
                     let addr = (self.read_byte(pc + 1) as u16)
                                | ((self.read_byte(pc + 2) as u16) << 8);
@@ -465,10 +465,10 @@ impl Cpu {
                     (pc + 3, 3)
                 }
             },
-            Instruction::JumpAbsFromReg() => {
+            Instruction8Bit::JumpAbsFromReg() => {
                 (self.get_reg_16(Register16Bit::HL), 1)
             },
-            Instruction::JumpRel(condition) => {
+            Instruction8Bit::JumpRel(condition) => {
                 if self.should_branch(condition) {
                     // cast as offset i8 to preserve sign
                     // cast PC as i32 to ensure unsigned
@@ -480,28 +480,28 @@ impl Cpu {
                     (pc + 3, 2)
                 }
             },
-            Instruction::Push(pair) => {
+            Instruction8Bit::Push(pair) => {
                 let val = self.get_reg_16(pair);
                 self.push(val);
                 (pc + 1, 4)
             },
-            Instruction::Pop(pair) => {
+            Instruction8Bit::Pop(pair) => {
                 let val = self.pop();
                 self.set_reg_16(pair, val);
                 (pc + 1, 3)
             },
-            Instruction::Ret(condition) => {
+            Instruction8Bit::Ret(condition) => {
                 if self.should_branch(condition) {
                     (self.pop(), if matches!(condition, BranchCondition::NONE) { 4 } else { 5 })
                 } else {
                     (pc + 1, 2)
                 }
             },
-            Instruction::Rst(vec) => {
+            Instruction8Bit::Rst(vec) => {
                 self.push(pc);
                 (vec as u16, 4)
             },
-            Instruction::Call(condition) => {
+            Instruction8Bit::Call(condition) => {
                 if self.should_branch(condition) {
                     self.push(pc + 2);
                     (self.read_word(pc + 1), 6)
@@ -535,7 +535,7 @@ impl Cpu {
     pub fn step(&mut self) {
         let instruction_byte = self.read_byte(self.pc);
 
-        match Instruction::from_byte(instruction_byte) {
+        match Instruction8Bit::from_byte(instruction_byte) {
             Some(instruction) => {
                 let (new_pc, cycles) = self.execute_instruction(instruction);
                 self.pc = new_pc;

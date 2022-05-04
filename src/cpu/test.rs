@@ -11,13 +11,13 @@ fn test_all_increments() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Inc(Register8Bit::B).as_byte(),
-        Instruction::Inc(Register8Bit::C).as_byte(),
-        Instruction::Inc(Register8Bit::D).as_byte(),
-        Instruction::Inc(Register8Bit::E).as_byte(),
-        Instruction::Inc(Register8Bit::H).as_byte(),
-        Instruction::Inc(Register8Bit::L).as_byte(),
-        Instruction::Inc(Register8Bit::A).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::C).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::D).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::E).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::H).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::L).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::A).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
     for i in 0..test_ram.len() {
@@ -38,7 +38,7 @@ fn test_increment_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Inc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Inc(Register8Bit::B).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
     cpu.set_reg(Register8Bit::B, 0xff);
@@ -56,12 +56,12 @@ fn test_add() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Add(Register8Bit::B).as_byte(),
-        Instruction::Add(Register8Bit::C).as_byte(),
-        Instruction::Add(Register8Bit::D).as_byte(),
-        Instruction::Add(Register8Bit::E).as_byte(),
-        Instruction::Add(Register8Bit::H).as_byte(),
-        Instruction::Add(Register8Bit::L).as_byte(),
+        Instruction8Bit::Add(Register8Bit::B).as_byte(),
+        Instruction8Bit::Add(Register8Bit::C).as_byte(),
+        Instruction8Bit::Add(Register8Bit::D).as_byte(),
+        Instruction8Bit::Add(Register8Bit::E).as_byte(),
+        Instruction8Bit::Add(Register8Bit::H).as_byte(),
+        Instruction8Bit::Add(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -85,12 +85,12 @@ fn test_add_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Add(Register8Bit::B).as_byte(),
-        Instruction::Add(Register8Bit::C).as_byte(),
-        Instruction::Add(Register8Bit::D).as_byte(),
-        Instruction::Add(Register8Bit::E).as_byte(),
-        Instruction::Add(Register8Bit::H).as_byte(),
-        Instruction::Add(Register8Bit::L).as_byte(),
+        Instruction8Bit::Add(Register8Bit::B).as_byte(),
+        Instruction8Bit::Add(Register8Bit::C).as_byte(),
+        Instruction8Bit::Add(Register8Bit::D).as_byte(),
+        Instruction8Bit::Add(Register8Bit::E).as_byte(),
+        Instruction8Bit::Add(Register8Bit::H).as_byte(),
+        Instruction8Bit::Add(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -114,12 +114,12 @@ fn test_add_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Adc(Register8Bit::B).as_byte(),
-        Instruction::Adc(Register8Bit::C).as_byte(),
-        Instruction::Adc(Register8Bit::D).as_byte(),
-        Instruction::Adc(Register8Bit::E).as_byte(),
-        Instruction::Adc(Register8Bit::H).as_byte(),
-        Instruction::Adc(Register8Bit::L).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::C).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::D).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::E).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::H).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -144,12 +144,12 @@ fn test_add_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Adc(Register8Bit::B).as_byte(),
-        Instruction::Adc(Register8Bit::C).as_byte(),
-        Instruction::Adc(Register8Bit::D).as_byte(),
-        Instruction::Adc(Register8Bit::E).as_byte(),
-        Instruction::Adc(Register8Bit::H).as_byte(),
-        Instruction::Adc(Register8Bit::L).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::C).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::D).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::E).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::H).as_byte(),
+        Instruction8Bit::Adc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -174,7 +174,7 @@ fn test_add_immediate() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AddImm().as_byte(),
+        Instruction8Bit::AddImm().as_byte(),
         0x10,
     ];
     cpu.load_test_ram(&test_ram);
@@ -192,7 +192,7 @@ fn test_add_immediate_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AddImm().as_byte(),
+        Instruction8Bit::AddImm().as_byte(),
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
@@ -211,7 +211,7 @@ fn test_add_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AddFromMem().as_byte(),
+        Instruction8Bit::AddFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -232,13 +232,13 @@ fn test_all_decrements() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 7;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Dec(Register8Bit::B).as_byte(),
-        Instruction::Dec(Register8Bit::C).as_byte(),
-        Instruction::Dec(Register8Bit::D).as_byte(),
-        Instruction::Dec(Register8Bit::E).as_byte(),
-        Instruction::Dec(Register8Bit::H).as_byte(),
-        Instruction::Dec(Register8Bit::L).as_byte(),
-        Instruction::Dec(Register8Bit::A).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::B).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::C).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::D).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::E).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::H).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::L).as_byte(),
+        Instruction8Bit::Dec(Register8Bit::A).as_byte(),
     ];
 
     cpu.set_all_regs(1);
@@ -261,12 +261,12 @@ fn test_sub() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sub(Register8Bit::B).as_byte(),
-        Instruction::Sub(Register8Bit::C).as_byte(),
-        Instruction::Sub(Register8Bit::D).as_byte(),
-        Instruction::Sub(Register8Bit::E).as_byte(),
-        Instruction::Sub(Register8Bit::H).as_byte(),
-        Instruction::Sub(Register8Bit::L).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::B).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::C).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::D).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::E).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::H).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -290,12 +290,12 @@ fn test_sub_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sub(Register8Bit::B).as_byte(),
-        Instruction::Sub(Register8Bit::C).as_byte(),
-        Instruction::Sub(Register8Bit::D).as_byte(),
-        Instruction::Sub(Register8Bit::E).as_byte(),
-        Instruction::Sub(Register8Bit::H).as_byte(),
-        Instruction::Sub(Register8Bit::L).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::B).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::C).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::D).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::E).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::H).as_byte(),
+        Instruction8Bit::Sub(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -319,12 +319,12 @@ fn test_sub_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sbc(Register8Bit::B).as_byte(),
-        Instruction::Sbc(Register8Bit::C).as_byte(),
-        Instruction::Sbc(Register8Bit::D).as_byte(),
-        Instruction::Sbc(Register8Bit::E).as_byte(),
-        Instruction::Sbc(Register8Bit::H).as_byte(),
-        Instruction::Sbc(Register8Bit::L).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::C).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::D).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::E).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::H).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -349,12 +349,12 @@ fn test_sub_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Sbc(Register8Bit::B).as_byte(),
-        Instruction::Sbc(Register8Bit::C).as_byte(),
-        Instruction::Sbc(Register8Bit::D).as_byte(),
-        Instruction::Sbc(Register8Bit::E).as_byte(),
-        Instruction::Sbc(Register8Bit::H).as_byte(),
-        Instruction::Sbc(Register8Bit::L).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::B).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::C).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::D).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::E).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::H).as_byte(),
+        Instruction8Bit::Sbc(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -379,7 +379,7 @@ fn test_sub_immediate() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SubImm().as_byte(),
+        Instruction8Bit::SubImm().as_byte(),
         0x10,
     ];
     cpu.set_reg(Register8Bit::A, 0x10);
@@ -398,7 +398,7 @@ fn test_sub_immediate_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SubImm().as_byte(),
+        Instruction8Bit::SubImm().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -417,7 +417,7 @@ fn test_sub_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SubFromMem().as_byte(),
+        Instruction8Bit::SubFromMem().as_byte(),
         0x10,
     ];
     cpu.set_reg(Register8Bit::A, 0x10);
@@ -438,12 +438,12 @@ fn test_and() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::And(Register8Bit::B).as_byte(),
-        Instruction::And(Register8Bit::C).as_byte(),
-        Instruction::And(Register8Bit::D).as_byte(),
-        Instruction::And(Register8Bit::E).as_byte(),
-        Instruction::And(Register8Bit::H).as_byte(),
-        Instruction::And(Register8Bit::L).as_byte(),
+        Instruction8Bit::And(Register8Bit::B).as_byte(),
+        Instruction8Bit::And(Register8Bit::C).as_byte(),
+        Instruction8Bit::And(Register8Bit::D).as_byte(),
+        Instruction8Bit::And(Register8Bit::E).as_byte(),
+        Instruction8Bit::And(Register8Bit::H).as_byte(),
+        Instruction8Bit::And(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -467,7 +467,7 @@ fn test_and_imm() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AndImm().as_byte(),
+        Instruction8Bit::AndImm().as_byte(),
         0x05,
     ];
 
@@ -488,7 +488,7 @@ fn test_and_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AndFromMem().as_byte(),
+        Instruction8Bit::AndFromMem().as_byte(),
         0x05,
     ];
 
@@ -511,12 +511,12 @@ fn test_or() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Or(Register8Bit::B).as_byte(),
-        Instruction::Or(Register8Bit::C).as_byte(),
-        Instruction::Or(Register8Bit::D).as_byte(),
-        Instruction::Or(Register8Bit::E).as_byte(),
-        Instruction::Or(Register8Bit::H).as_byte(),
-        Instruction::Or(Register8Bit::L).as_byte(),
+        Instruction8Bit::Or(Register8Bit::B).as_byte(),
+        Instruction8Bit::Or(Register8Bit::C).as_byte(),
+        Instruction8Bit::Or(Register8Bit::D).as_byte(),
+        Instruction8Bit::Or(Register8Bit::E).as_byte(),
+        Instruction8Bit::Or(Register8Bit::H).as_byte(),
+        Instruction8Bit::Or(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -540,7 +540,7 @@ fn test_or_imm() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::OrImm().as_byte(),
+        Instruction8Bit::OrImm().as_byte(),
         0x55,
     ];
 
@@ -561,7 +561,7 @@ fn test_or_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::OrFromMem().as_byte(),
+        Instruction8Bit::OrFromMem().as_byte(),
         0x55,
     ];
 
@@ -584,12 +584,12 @@ fn test_xor() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Xor(Register8Bit::B).as_byte(),
-        Instruction::Xor(Register8Bit::C).as_byte(),
-        Instruction::Xor(Register8Bit::D).as_byte(),
-        Instruction::Xor(Register8Bit::E).as_byte(),
-        Instruction::Xor(Register8Bit::H).as_byte(),
-        Instruction::Xor(Register8Bit::L).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::B).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::C).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::D).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::E).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::H).as_byte(),
+        Instruction8Bit::Xor(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -613,7 +613,7 @@ fn test_xor_imm() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::XorImm().as_byte(),
+        Instruction8Bit::XorImm().as_byte(),
         0x55,
     ];
 
@@ -634,7 +634,7 @@ fn test_xor_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::XorFromMem().as_byte(),
+        Instruction8Bit::XorFromMem().as_byte(),
         0x55,
     ];
 
@@ -657,12 +657,12 @@ fn test_cp() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Cp(Register8Bit::B).as_byte(),
-        Instruction::Cp(Register8Bit::C).as_byte(),
-        Instruction::Cp(Register8Bit::D).as_byte(),
-        Instruction::Cp(Register8Bit::E).as_byte(),
-        Instruction::Cp(Register8Bit::H).as_byte(),
-        Instruction::Cp(Register8Bit::L).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::B).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::C).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::D).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::E).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::H).as_byte(),
+        Instruction8Bit::Cp(Register8Bit::L).as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -686,7 +686,7 @@ fn test_cp_immediate() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::CpImm().as_byte(),
+        Instruction8Bit::CpImm().as_byte(),
         0x01,
     ];
     cpu.set_reg(Register8Bit::A, 1);
@@ -705,7 +705,7 @@ fn test_cp_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::CpFromMem().as_byte(),
+        Instruction8Bit::CpFromMem().as_byte(),
         0x01,
     ];
     cpu.set_reg(Register8Bit::A, 1);
@@ -726,7 +726,7 @@ fn test_adc_mem_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AdcFromMem().as_byte(),
+        Instruction8Bit::AdcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -748,7 +748,7 @@ fn test_adc_mem_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::AdcFromMem().as_byte(),
+        Instruction8Bit::AdcFromMem().as_byte(),
         0xff,
     ];
     cpu.load_test_ram(&test_ram);
@@ -770,7 +770,7 @@ fn test_sbc_mem_carry() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SbcFromMem().as_byte(),
+        Instruction8Bit::SbcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -792,7 +792,7 @@ fn test_sbc_mem_carry_overflow() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::SbcFromMem().as_byte(),
+        Instruction8Bit::SbcFromMem().as_byte(),
         0x01,
     ];
     cpu.load_test_ram(&test_ram);
@@ -814,7 +814,7 @@ fn test_ld_b_a() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdRegister(Register8Bit::B, Register8Bit::A).as_byte(),
+        Instruction8Bit::LdRegister(Register8Bit::B, Register8Bit::A).as_byte(),
     ];
     cpu.load_test_ram(&test_ram);
     cpu.set_reg(Register8Bit::A, 0x69);
@@ -828,19 +828,19 @@ fn test_ld_imm() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 14;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdImm(Register8Bit::B).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::B).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::D).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::D).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::H).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::H).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::C).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::C).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::E).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::E).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::L).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::L).as_byte(),
         0x69,
-        Instruction::LdImm(Register8Bit::A).as_byte(),
+        Instruction8Bit::LdImm(Register8Bit::A).as_byte(),
         0x69,
     ];
 
@@ -874,7 +874,7 @@ fn test_ld_to_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdToMem(Register8Bit::B, Register16Bit::HL).as_byte(),
+        Instruction8Bit::LdToMem(Register8Bit::B, Register16Bit::HL).as_byte(),
         0x24,
     ];
 
@@ -892,7 +892,7 @@ fn test_ld_from_mem() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdFromMem(Register8Bit::B, Register16Bit::HL).as_byte(),
+        Instruction8Bit::LdFromMem(Register8Bit::B, Register16Bit::HL).as_byte(),
         0x69,
     ];
 
@@ -909,7 +909,7 @@ fn test_ld_to_mem_inc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdToMemInc().as_byte(),
+        Instruction8Bit::LdToMemInc().as_byte(),
         0x24,
     ];
 
@@ -928,7 +928,7 @@ fn test_ld_to_mem_dec() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdToMemDec().as_byte(),
+        Instruction8Bit::LdToMemDec().as_byte(),
         0x24,
     ];
 
@@ -947,7 +947,7 @@ fn test_ld_from_mem_inc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdFromMemInc().as_byte(),
+        Instruction8Bit::LdFromMemInc().as_byte(),
         0x69,
     ];
 
@@ -965,7 +965,7 @@ fn test_ld_from_mem_dec() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdFromMemDec().as_byte(),
+        Instruction8Bit::LdFromMemDec().as_byte(),
         0x69,
     ];
 
@@ -983,16 +983,16 @@ fn test_ld_reg16_imm() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 12;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdRegister16Imm(Register16Bit::BC).as_byte(),
+        Instruction8Bit::LdRegister16Imm(Register16Bit::BC).as_byte(),
         0x08,
         0x80,
-        Instruction::LdRegister16Imm(Register16Bit::DE).as_byte(),
+        Instruction8Bit::LdRegister16Imm(Register16Bit::DE).as_byte(),
         0x08,
         0x80,
-        Instruction::LdRegister16Imm(Register16Bit::HL).as_byte(),
+        Instruction8Bit::LdRegister16Imm(Register16Bit::HL).as_byte(),
         0x08,
         0x80,
-        Instruction::LdRegister16Imm(Register16Bit::SP).as_byte(),
+        Instruction8Bit::LdRegister16Imm(Register16Bit::SP).as_byte(),
         0x08,
         0x80,
     ];
@@ -1018,7 +1018,7 @@ fn test_noop() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Noop().as_byte(),
+        Instruction8Bit::Noop().as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -1038,7 +1038,7 @@ fn test_jp_nz() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbs(BranchCondition::NZ).as_byte(),
+        Instruction8Bit::JumpAbs(BranchCondition::NZ).as_byte(),
         0xa5,
         0xa5,
     ];
@@ -1060,7 +1060,7 @@ fn test_jp_z() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbs(BranchCondition::Z).as_byte(),
+        Instruction8Bit::JumpAbs(BranchCondition::Z).as_byte(),
         0xa5,
         0xa5,
     ];
@@ -1082,7 +1082,7 @@ fn test_jp_nc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbs(BranchCondition::NC).as_byte(),
+        Instruction8Bit::JumpAbs(BranchCondition::NC).as_byte(),
         0xa5,
         0xa5,
     ];
@@ -1104,7 +1104,7 @@ fn test_jp_c() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbs(BranchCondition::C).as_byte(),
+        Instruction8Bit::JumpAbs(BranchCondition::C).as_byte(),
         0xa5,
         0xa5,
     ];
@@ -1126,7 +1126,7 @@ fn test_jp() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbs(BranchCondition::NONE).as_byte(),
+        Instruction8Bit::JumpAbs(BranchCondition::NONE).as_byte(),
         0xa5,
         0xa5,
     ];
@@ -1142,7 +1142,7 @@ fn test_jp_hl() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 1;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpAbsFromReg().as_byte(),
+        Instruction8Bit::JumpAbsFromReg().as_byte(),
     ];
 
     cpu.load_test_ram(&test_ram);
@@ -1157,7 +1157,7 @@ fn test_jr_nz() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 4;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpRel(BranchCondition::NZ).as_byte(),
+        Instruction8Bit::JumpRel(BranchCondition::NZ).as_byte(),
         0x01,
         0xff, // garbage
         0x00,
@@ -1180,7 +1180,7 @@ fn test_jr_z() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 4;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpRel(BranchCondition::Z).as_byte(),
+        Instruction8Bit::JumpRel(BranchCondition::Z).as_byte(),
         0x01,
         0xff, // garbage
         0x00,
@@ -1203,7 +1203,7 @@ fn test_jr_nc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 4;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpRel(BranchCondition::NC).as_byte(),
+        Instruction8Bit::JumpRel(BranchCondition::NC).as_byte(),
         0x01,
         0xff, // garbage
         0x00,
@@ -1226,7 +1226,7 @@ fn test_jr_c() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 4;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpRel(BranchCondition::C).as_byte(),
+        Instruction8Bit::JumpRel(BranchCondition::C).as_byte(),
         0x01,
         0xff, // garbage
         0x00,
@@ -1249,7 +1249,7 @@ fn test_jr() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 4;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::JumpRel(BranchCondition::NONE).as_byte(),
+        Instruction8Bit::JumpRel(BranchCondition::NONE).as_byte(),
         0x01,
         0xff, // garbage
         0x00,
@@ -1266,10 +1266,10 @@ fn test_push() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Push(Register16Bit::BC).as_byte(),
-        Instruction::Push(Register16Bit::DE).as_byte(),
-        Instruction::Push(Register16Bit::HL).as_byte(),
-        Instruction::Push(Register16Bit::AF).as_byte(),
+        Instruction8Bit::Push(Register16Bit::BC).as_byte(),
+        Instruction8Bit::Push(Register16Bit::DE).as_byte(),
+        Instruction8Bit::Push(Register16Bit::HL).as_byte(),
+        Instruction8Bit::Push(Register16Bit::AF).as_byte(),
         0x00,
         0x00,
     ];
@@ -1295,10 +1295,10 @@ fn test_pop() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 6;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Pop(Register16Bit::BC).as_byte(),
-        Instruction::Pop(Register16Bit::DE).as_byte(),
-        Instruction::Pop(Register16Bit::HL).as_byte(),
-        Instruction::Pop(Register16Bit::AF).as_byte(),
+        Instruction8Bit::Pop(Register16Bit::BC).as_byte(),
+        Instruction8Bit::Pop(Register16Bit::DE).as_byte(),
+        Instruction8Bit::Pop(Register16Bit::HL).as_byte(),
+        Instruction8Bit::Pop(Register16Bit::AF).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1332,7 +1332,7 @@ fn test_ret_nz() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Ret(BranchCondition::NZ).as_byte(),
+        Instruction8Bit::Ret(BranchCondition::NZ).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1356,7 +1356,7 @@ fn test_ret_z() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Ret(BranchCondition::Z).as_byte(),
+        Instruction8Bit::Ret(BranchCondition::Z).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1381,7 +1381,7 @@ fn test_ret_nc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Ret(BranchCondition::NC).as_byte(),
+        Instruction8Bit::Ret(BranchCondition::NC).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1405,7 +1405,7 @@ fn test_ret_c() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Ret(BranchCondition::C).as_byte(),
+        Instruction8Bit::Ret(BranchCondition::C).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1429,7 +1429,7 @@ fn test_ret() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 3;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Ret(BranchCondition::NONE).as_byte(),
+        Instruction8Bit::Ret(BranchCondition::NONE).as_byte(),
         0x5a,
         0xa5,
     ];
@@ -1446,14 +1446,14 @@ fn test_rst() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 10;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Rst(RstVec::ZERO).as_byte(),
-        Instruction::Rst(RstVec::ONE).as_byte(),
-        Instruction::Rst(RstVec::TWO).as_byte(),
-        Instruction::Rst(RstVec::THREE).as_byte(),
-        Instruction::Rst(RstVec::FOUR).as_byte(),
-        Instruction::Rst(RstVec::FIVE).as_byte(),
-        Instruction::Rst(RstVec::SIX).as_byte(),
-        Instruction::Rst(RstVec::SEVEN).as_byte(),
+        Instruction8Bit::Rst(RstVec::ZERO).as_byte(),
+        Instruction8Bit::Rst(RstVec::ONE).as_byte(),
+        Instruction8Bit::Rst(RstVec::TWO).as_byte(),
+        Instruction8Bit::Rst(RstVec::THREE).as_byte(),
+        Instruction8Bit::Rst(RstVec::FOUR).as_byte(),
+        Instruction8Bit::Rst(RstVec::FIVE).as_byte(),
+        Instruction8Bit::Rst(RstVec::SIX).as_byte(),
+        Instruction8Bit::Rst(RstVec::SEVEN).as_byte(),
         0xff,
         0xff,
     ];
@@ -1517,7 +1517,7 @@ fn test_call_nz() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 5;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Call(BranchCondition::NZ).as_byte(),
+        Instruction8Bit::Call(BranchCondition::NZ).as_byte(),
         0x5a,
         0xa5,
         0xff, // garbage
@@ -1543,7 +1543,7 @@ fn test_call_z() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 5;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Call(BranchCondition::Z).as_byte(),
+        Instruction8Bit::Call(BranchCondition::Z).as_byte(),
         0x5a,
         0xa5,
         0xff, // garbage
@@ -1570,7 +1570,7 @@ fn test_call_nc() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 5;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Call(BranchCondition::NC).as_byte(),
+        Instruction8Bit::Call(BranchCondition::NC).as_byte(),
         0x5a,
         0xa5,
         0xff, // garbage
@@ -1596,7 +1596,7 @@ fn test_call_c() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 5;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Call(BranchCondition::C).as_byte(),
+        Instruction8Bit::Call(BranchCondition::C).as_byte(),
         0x5a,
         0xa5,
         0xff, // garbage
@@ -1622,7 +1622,7 @@ fn test_call() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 5;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::Call(BranchCondition::NONE).as_byte(),
+        Instruction8Bit::Call(BranchCondition::NONE).as_byte(),
         0x5a,
         0xa5,
         0xff, // garbage
