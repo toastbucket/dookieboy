@@ -699,6 +699,61 @@ fn test_cp_immediate() {
     assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
+// Verify shifting
+#[test]
+fn test_shift() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Rla().as_byte(),
+        Instruction::Rlca().as_byte(),
+        Instruction::Rra().as_byte(),
+        Instruction::Rrca().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.set_reg(Register8Bit::A, 0x95);
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x2b);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    cpu.set_reg(Register8Bit::A, 0x85);
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    // note, gameboy manual example for this
+    // instruction is incorrect
+    // https://hax.iimarckus.org/topic/1617/
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x0b);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    cpu.set_reg(Register8Bit::A, 0x81);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x40);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    cpu.set_reg(Register8Bit::A, 0x3b);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x9d);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+}
+
 // Verify from memory
 #[test]
 fn test_cp_mem() {

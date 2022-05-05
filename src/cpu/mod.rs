@@ -236,6 +236,66 @@ impl Cpu {
         self.set_reg(regop, old_val);
     }
 
+    /*
+     * Handle left rotation and left circular rotation.
+     * If RLC (circular), shift left one bit and rotate around
+     * bit 7 to bit 0. Carry flag still holds value of bit 7 prior
+     * to rotation.
+     * If RL, shift left one bit with bit 7 shifting into the carry
+     * flag and the carry flag shifting into bit 0.
+     */
+    fn shift_left(&mut self, regop: Register8Bit, is_rlc: bool) {
+        let mut r = self.get_reg(regop);
+        let bit7 = (r >> 7) & 1;
+
+        // If RLC, bit 7 goes to C flag and bit 0
+        // If RL, bit 7 goes to C flag and C flag
+        // goes to bit 0
+        let bit0 = if is_rlc {
+            bit7
+        } else {
+            u8::from(self.get_flag(Flag::C))
+        };
+
+        r = (r << 1) | bit0;
+        self.set_reg(regop, r);
+
+        self.set_flag(Flag::Z, if matches!(regop, Register8Bit::A) { false } else { r == 0 });
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit7 == 1);
+    }
+
+    /*
+     * Handle right rotation and right circular rotation.
+     * If RRC (circular), shift right one bit and rotate around
+     * bit 0 to bit 7. Carry flag holds value of bit 0 prior
+     * to rotation.
+     * If RR, shift right one bit with bit 0 shifting into the carry
+     * flag and the carry flag shifting into bit 7.
+     */
+    fn shift_right(&mut self, regop: Register8Bit, is_rrc: bool) {
+        let mut r = self.get_reg(regop);
+        let bit0 = r & 1;
+
+        // If RRC, bit 0 goes to C flag and bit 7
+        // If RR, bit 0 goes to C flag and C flag
+        // goes to bit 7
+        let bit7 = if is_rrc {
+            bit0
+        } else {
+            u8::from(self.get_flag(Flag::C))
+        };
+
+        r = (r >> 1) | (bit7 << 7);
+        self.set_reg(regop, r);
+
+        self.set_flag(Flag::Z, if matches!(regop, Register8Bit::A) { false } else { r == 0 });
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit0 == 1);
+    }
+
     fn subtract(&mut self, regop: Register8Bit, operand: u8, with_carry: bool) {
         let cy = self.get_flag(Flag::C);
         let (result, did_wrap) = if with_carry {
@@ -375,6 +435,22 @@ impl Cpu {
             Instruction::CpImm() => {
                 self.cp(Register8Bit::A, self.read_byte(pc + 1));
                 (pc + 2, 2)
+            },
+            Instruction::Rla() => {
+                self.shift_left(Register8Bit::A, false);
+                (pc + 1, 1)
+            },
+            Instruction::Rlca() => {
+                self.shift_left(Register8Bit::A, true);
+                (pc + 1, 1)
+            },
+            Instruction::Rra() => {
+                self.shift_right(Register8Bit::A, false);
+                (pc + 1, 1)
+            },
+            Instruction::Rrca() => {
+                self.shift_right(Register8Bit::A, true);
+                (pc + 1, 1)
             },
             Instruction::Add(regop) => {
                 self.add(Register8Bit::A, self.get_reg(regop), false);
