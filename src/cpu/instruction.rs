@@ -26,6 +26,10 @@ pub enum Instruction {
     Cp(Register8Bit),
     CpFromMem(), // always uses HL
     CpImm(),
+    Rra(),
+    Rrca(),
+    Rla(),
+    Rlca(),
     Add(Register8Bit),
     AddImm(),
     AddFromMem(), // always uses HL
@@ -124,6 +128,14 @@ impl Instruction {
             0xbe => Some(Instruction::CpFromMem()),
             // CP n
             0xfe => Some(Instruction::CpImm()),
+            // RLA
+            0x17 => Some(Instruction::Rla()),
+            // RLCA
+            0x07 => Some(Instruction::Rlca()),
+            // RRA
+            0x1f => Some(Instruction::Rra()),
+            // RRCA
+            0x0f => Some(Instruction::Rrca()),
             // ADD A,r
             0x80 => Some(Instruction::Add(Register8Bit::B)),
             0x81 => Some(Instruction::Add(Register8Bit::C)),
@@ -380,6 +392,14 @@ impl Instruction {
             Instruction::CpFromMem() => 0xbe,
             // CP n
             Instruction::CpImm() => 0xfe,
+            // RLA
+            Instruction::Rla() => 0x17,
+            // RLCA
+            Instruction::Rlca() => 0x07,
+            // RRA
+            Instruction::Rra() => 0x1f,
+            // RRCA
+            Instruction::Rrca() => 0x0f,
             // ADD A,r
             Instruction::Add(Register8Bit::B) => 0x80,
             Instruction::Add(Register8Bit::C) => 0x81,
