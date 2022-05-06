@@ -620,9 +620,17 @@ impl Cpu {
 
         match Instruction::from_byte(instruction_byte) {
             Some(instruction) => {
+                #[cfg(debug_assertions)]
+                println!("executing {:?} [{:#04x}]",
+                         instruction,
+                         instruction_byte);
+
                 let (new_pc, cycles) = self.execute_instruction(instruction);
                 self.pc = new_pc;
                 self.cycles += cycles;
+
+                #[cfg(debug_assertions)]
+                self.dump_the_dookie();
             },
             None => {
                 panic!("invalid instruction read from ROM at {:#06x}: {:#04x}\n{}",

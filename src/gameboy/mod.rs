@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io;
+use std::io::prelude::*;
 use std::rc::Rc;
 use std::time::Duration;
 use std::thread::sleep;
@@ -45,15 +46,32 @@ impl Gameboy {
         })
     }
 
-
-    pub fn run(&mut self, rom: String) -> Result<(), io::Error> {
+    pub fn run(&mut self, rom: String, debug: bool) -> Result<(), io::Error> {
 
         self.mmu.borrow_mut().cartridge.load_rom(rom)?;
         self.cpu.reset();
 
         'running: loop {
             self.handle_sdl2_events()?;
-            sleep(Duration::from_millis(100));
+
+            if debug {
+                print!("dookie>");
+                io::stdout().flush().expect("couldn't flush??");
+                let cmd = io::stdin().lock().lines().next().unwrap();
+                match cmd.expect("uh oh").as_ref() {
+                    "step" => {
+                        self.cpu.step();
+                    },
+                    "q" | "e" | "quit" | "exit" => {
+                        std::process::exit(0);
+                    },
+                    _ => {
+                        println!("invalid command!");
+                    },
+                }
+            } else {
+                self.cpu.step();
+            }
         }
 
         Ok(())
