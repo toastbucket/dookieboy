@@ -5,6 +5,7 @@ use crate::joypad::Joypad;
 use crate::memory::Memory;
 
 const WRAM_BASE: usize = 0xc000;
+const WRAM_BANK_BASE: usize = 0xd000;
 const WRAM_SIZE: usize = 4096;
 const HRAM_BASE: usize = 0xff80;
 const HRAM_SIZE: usize = 127;
@@ -44,7 +45,7 @@ impl Memory for Mmu {
                 self.wram[0][idx]
             },
             0xd000..=0xdfff => {
-                let idx = (addr as usize) - WRAM_BASE;
+                let idx = (addr as usize) - WRAM_BANK_BASE;
                 let bank = if self.svbk == 0 { 1 } else { self.svbk };
                 self.wram[bank][idx]
             },
