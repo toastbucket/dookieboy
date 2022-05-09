@@ -4,6 +4,7 @@ mod gameboy;
 mod joypad;
 mod memory;
 mod mmu;
+mod shell;
 
 use std::env;
 use std::io;
