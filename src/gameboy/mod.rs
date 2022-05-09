@@ -122,6 +122,10 @@ impl Gameboy {
 
                         true
                     },
+                    "dump" => {
+                        self.cpu.dump_the_dookie();
+                        true
+                    },
                     "" => {
                         false
                     },
