@@ -2,6 +2,7 @@
 
 mod instruction;
 
+use std::fmt;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -93,6 +94,12 @@ pub struct Cpu {
 
     #[cfg(test)]
     test_ram: TestRam,
+}
+
+impl fmt::Display for Cpu {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.dump_to_string())
+    }
 }
 
 impl Cpu {
@@ -590,8 +597,7 @@ impl Cpu {
     }
 
     fn dump_to_string(&self) -> String {
-        format!("Registers\n\
-                 AF: {:#04x} {:#04x}\n\
+        format!("AF: {:#04x} {:#04x}\n\
                  BC: {:#04x} {:#04x}\n\
                  DC: {:#04x} {:#04x}\n\
                  HL: {:#04x} {:#04x}\n\
@@ -609,11 +615,6 @@ impl Cpu {
                 self.get_flag(Flag::H),
                 self.get_flag(Flag::C))
     }
-
-    fn dump_the_dookie(&self) {
-        println!("{}", self.dump_to_string());
-    }
-
 
     pub fn step(&mut self) {
         let instruction_byte = self.read_byte(self.pc);
