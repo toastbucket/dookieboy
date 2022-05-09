@@ -610,7 +610,7 @@ impl Cpu {
                 self.get_flag(Flag::C))
     }
 
-    fn dump_the_dookie(&self) {
+    pub fn dump_the_dookie(&self) {
         println!("{}", self.dump_to_string());
     }
 
@@ -628,9 +628,6 @@ impl Cpu {
                 let (new_pc, cycles) = self.execute_instruction(instruction);
                 self.pc = new_pc;
                 self.cycles += cycles;
-
-                #[cfg(debug_assertions)]
-                self.dump_the_dookie();
             },
             None => {
                 panic!("invalid instruction read from ROM at {:#06x}: {:#04x}\n{}",
