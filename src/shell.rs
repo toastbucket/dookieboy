@@ -4,6 +4,8 @@ use std::io::{
     Write,
 };
 
+use crate::gameboy::Gameboy;
+
 const PROMPT: &str = "dookie>";
 
 #[derive(Debug)]
@@ -33,6 +35,37 @@ impl Shell {
             None => {
                 None
             },
+        }
+    }
+
+    pub fn run_cmd(gb: &mut Gameboy, cmd: &Option<Cmd>) -> bool {
+        match cmd {
+            Some(cmd) => {
+                match cmd.cmd.as_ref() {
+                    "step" => {
+                        let mut num_steps = 1;
+                        if cmd.args.len() > 0 {
+                            num_steps = cmd.args[0].parse::<usize>().unwrap_or(1);
+                        }
+
+                        for _ in 0..num_steps {
+                            gb.cpu().step();
+                        }
+                    },
+                    "dump" => {
+                        println!("CPU:\n{}", gb.cpu());
+                    },
+                    "q" | "e" | "quit" | "exit" => {
+                        std::process::exit(0);
+                    },
+                    _ => {
+                        println!("invalid command: {}", cmd.cmd);
+                    },
+                }
+
+                true
+            },
+            None => false
         }
     }
 

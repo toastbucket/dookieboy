@@ -10,6 +10,7 @@ use std::env;
 use std::io;
 
 use crate::gameboy::Gameboy;
+use crate::shell::{Cmd, Shell};
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
@@ -63,13 +64,47 @@ fn main() {
         }
     }
 
-    let mut gameboy = Gameboy::init(WIDTH, HEIGHT).unwrap();
-    match gameboy.run(rom, debug) {
-        Ok(v) => {},
+    let mut gameboy = Gameboy::new(WIDTH, HEIGHT);
+    match gameboy.load_rom(rom) {
+        Ok(_) => {},
         Err(e) => {
-            println!("dookieboy encountered big error: {}\n", e);
+            println!("unable to load rom file");
             print_usage();
             std::process::exit(1);
         },
+    }
+    gameboy.reset();
+
+    if debug {
+        let mut last_cmd: Option<Cmd> = None;
+        let mut cmd: Option<Cmd> = None;
+
+        'debug: loop {
+            cmd = Shell::get_cmd();
+            let ret = Shell::run_cmd(&mut gameboy, &cmd);
+            if !ret {
+                Shell::run_cmd(&mut gameboy, &last_cmd);
+            } else {
+                last_cmd = cmd.take();
+            }
+        }
+    } else {
+        match gameboy.init_sdl() {
+            Ok(_) => {},
+            Err(e) => {
+                println!("dookieboy couldn't initialize SDL :'(");
+                print_usage();
+                std::process::exit(1);
+            },
+        }
+
+        match gameboy.run() {
+            Ok(_) => {},
+            Err(e) => {
+                println!("dookieboy encountered big error: {}\n", e);
+                print_usage();
+                std::process::exit(1);
+            },
+        }
     }
 }
