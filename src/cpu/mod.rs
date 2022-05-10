@@ -19,6 +19,7 @@ use std::cell::RefCell;
 
 use crate::memory::Memory;
 use crate::cpu::instruction::{ BranchCondition, Instruction, CbInstruction };
+use crate::intc::Interrupt;
 use crate::mmu::Mmu;
 
 #[derive(Debug, Copy, Clone)]
@@ -1141,6 +1142,20 @@ impl Cpu {
 
     pub fn exit_halt(&mut self) {
         self.halted = false;
+    }
+
+    pub fn trigger_interrupt(&mut self, interrupt: Interrupt) {
+        self.push(self.pc);
+        self.pc = interrupt.vector();
+
+        // The following occurs when control is being transferred to an interrupt handler:
+        //
+        // - Two wait states are executed (2 M-cycles pass while nothing occurs, presumably
+        //   the CPU is executing nops during this time).
+        // - The current PC is pushed to the stack, consuming 2 more M-cycles.
+        // - The PC register is set to the address of the handler ($40, $48, $50, $58, $60).
+        //   This consumes one last M-cycle.
+        self.cycles += 5;
     }
 }
 

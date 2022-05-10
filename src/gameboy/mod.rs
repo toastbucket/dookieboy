@@ -26,6 +26,7 @@ use sdl2::render::WindowCanvas;
 
 use crate::shell::{Shell, Cmd};
 use crate::cpu::Cpu;
+use crate::intc::Interrupt;
 use crate::mmu::Mmu;
 use crate::joypad::Joypad;
 use crate::memory::Memory;
@@ -94,10 +95,34 @@ impl Gameboy {
         //  pushed to the stack and control jumps to the starting address of the interrupt.
         'running: loop {
             self.handle_sdl2_events()?;
+            self.handle_interrupts();
             self.cpu.step();
         }
 
         Ok(())
+    }
+
+    fn handle_interrupts(&mut self) {
+        for interrupt in Interrupt::iterator() {
+            let mut should_trigger = false;
+
+            {
+                let intc = &mut self.mmu.borrow_mut().intc;
+                should_trigger = intc.should_trigger(interrupt);
+                if should_trigger {
+                    intc.set_ime(false);
+                    intc.clear_request(interrupt);
+                }
+            }
+
+            if should_trigger {
+                self.cpu.trigger_interrupt(interrupt);
+
+                // break from loop, we only handle one interrupt at
+                // a time
+                break;
+            }
+        }
     }
 
     fn handle_sdl2_events(&mut self) -> Result<(), io::Error> {
