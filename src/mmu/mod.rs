@@ -12,6 +12,7 @@
 // ░░░▀▀░▄TSM▄░░░▐▄▄▄▀░░░
 
 use crate::cartridge::Cartridge;
+use crate::intc::InterruptController;
 use crate::joypad::Joypad;
 use crate::memory::Memory;
 
@@ -41,6 +42,7 @@ const NUM_WRAM_BANKS: usize = 8;
 
 pub struct Mmu {
     pub cartridge: Cartridge,
+    pub intc: InterruptController,
     pub joypad: Joypad,
     wram: [[u8; WRAM_SIZE]; NUM_WRAM_BANKS],
     svbk: usize,
@@ -66,6 +68,7 @@ impl Memory for Mmu {
                 let idx = (addr as usize) - HRAM_BASE;
                 self.hram[idx]
             },
+            0xff0f | 0xffff => self.intc.mem_read_byte(addr),
             _ => panic!("read from unmapped address {:#06x}", addr),
         }
     }
@@ -88,6 +91,7 @@ impl Memory for Mmu {
                 let idx = (addr as usize) - HRAM_BASE;
                 self.hram[idx] = val;
             },
+            0xff0f | 0xffff => self.intc.mem_write_byte(addr, val),
             _ => panic!("write to unmapped address {:#06x}", addr),
         }
     }
@@ -97,6 +101,7 @@ impl Mmu {
     pub fn new() -> Mmu {
         Mmu {
             cartridge: Cartridge::new(),
+            intc: InterruptController::new(),
             joypad: Joypad::new(),
             wram: [[0; WRAM_SIZE]; NUM_WRAM_BANKS],
             svbk: 0,

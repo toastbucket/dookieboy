@@ -14,6 +14,7 @@
 mod cartridge;
 mod cpu;
 mod gameboy;
+mod intc;
 mod joypad;
 mod memory;
 mod mmu;
