@@ -91,6 +91,8 @@ pub enum Instruction {
     Invert(),
     Stop(),
     Halt(),
+    Ei(),
+    Di(),
     CbInstruction(), // Special dummy instruction for 16 bit instruction calls
 }
 
@@ -406,6 +408,10 @@ impl Instruction {
             0x10 => Some(Instruction::Stop()),
             // HALT
             0x76 => Some(Instruction::Halt()),
+            // EI
+            0xfb => Some(Instruction::Ei()),
+            // DI
+            0xf3 => Some(Instruction::Di()),
             // Special dummy instruction for 16 bit instruction calls
             0xcb => Some(Instruction::CbInstruction()),
             _ => None
@@ -723,6 +729,10 @@ impl Instruction {
             Instruction::Stop() => 0x10,
             // HALT
             Instruction::Halt() => 0x76,
+            // EI
+            Instruction::Ei() => 0xfb,
+            // DI
+            Instruction::Di() => 0xf3,
             // Special dummy instruction for 16 bit instruction calls
             Instruction::CbInstruction() => 0xcb,
             _ => panic!("Invalid instruction"),

@@ -958,6 +958,16 @@ impl Cpu {
                 self.halted = true;
                 (pc + 1, 1)
             },
+            // there is no good way to write a unit test for these,
+            // skip them in testing
+            Instruction::Ei() => {
+                self.mmu.borrow_mut().intc.set_ime(true);
+                (pc + 1, 1)
+            },
+            Instruction::Di() => {
+                self.mmu.borrow_mut().intc.set_ime(false);
+                (pc + 1, 1)
+            },
             Instruction::CbInstruction() => {
                 let cb_instruction_byte = self.read_byte(self.pc + 1);
 
