@@ -13,7 +13,9 @@ pub enum BranchCondition {
 pub enum Instruction {
     Noop(),
     Inc(Register8Bit),
+    Inc16(Register16Bit),
     Dec(Register8Bit),
+    Dec16(Register16Bit),
     And(Register8Bit),
     AndFromMem(), // always uses HL
     AndImm(),
@@ -76,6 +78,11 @@ impl Instruction {
             0x24 => Some(Instruction::Inc(Register8Bit::H)),
             0x2c => Some(Instruction::Inc(Register8Bit::L)),
             0x3c => Some(Instruction::Inc(Register8Bit::A)),
+            // INC r16
+            0x03 => Some(Instruction::Inc16(Register16Bit::BC)),
+            0x13 => Some(Instruction::Inc16(Register16Bit::DE)),
+            0x23 => Some(Instruction::Inc16(Register16Bit::HL)),
+            0x33 => Some(Instruction::Inc16(Register16Bit::SP)),
             // DEC r
             0x05 => Some(Instruction::Dec(Register8Bit::B)),
             0x0d => Some(Instruction::Dec(Register8Bit::C)),
@@ -84,6 +91,11 @@ impl Instruction {
             0x25 => Some(Instruction::Dec(Register8Bit::H)),
             0x2d => Some(Instruction::Dec(Register8Bit::L)),
             0x3d => Some(Instruction::Dec(Register8Bit::A)),
+            // DEC r16
+            0x0b => Some(Instruction::Dec16(Register16Bit::BC)),
+            0x1b => Some(Instruction::Dec16(Register16Bit::DE)),
+            0x2b => Some(Instruction::Dec16(Register16Bit::HL)),
+            0x3b => Some(Instruction::Dec16(Register16Bit::SP)),
             // AND r
             0xa0 => Some(Instruction::And(Register8Bit::B)),
             0xa1 => Some(Instruction::And(Register8Bit::C)),
@@ -348,6 +360,11 @@ impl Instruction {
             Instruction::Inc(Register8Bit::H) => 0x24,
             Instruction::Inc(Register8Bit::L) => 0x2c,
             Instruction::Inc(Register8Bit::A) => 0x3c,
+            // INC r16
+            Instruction::Inc16(Register16Bit::BC) => 0x03,
+            Instruction::Inc16(Register16Bit::DE) => 0x13,
+            Instruction::Inc16(Register16Bit::HL) => 0x23,
+            Instruction::Inc16(Register16Bit::SP) => 0x33,
             // DEC r
             Instruction::Dec(Register8Bit::B) => 0x05,
             Instruction::Dec(Register8Bit::C) => 0x0d,
@@ -356,6 +373,11 @@ impl Instruction {
             Instruction::Dec(Register8Bit::H) => 0x25,
             Instruction::Dec(Register8Bit::L) => 0x2d,
             Instruction::Dec(Register8Bit::A) => 0x3d,
+            // DEC r16
+            Instruction::Dec16(Register16Bit::BC) => 0x0b,
+            Instruction::Dec16(Register16Bit::DE) => 0x1b,
+            Instruction::Dec16(Register16Bit::HL) => 0x2b,
+            Instruction::Dec16(Register16Bit::SP) => 0x3b,
             // AND r
             Instruction::And(Register8Bit::B) => 0xa0,
             Instruction::And(Register8Bit::C) => 0xa1,

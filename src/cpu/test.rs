@@ -50,6 +50,68 @@ fn test_increment_overflow() {
     assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
+// Verify incrementing 16bit registers
+#[test]
+fn test_increment_16() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Inc16(Register16Bit::BC).as_byte(),
+        Instruction::Inc16(Register16Bit::DE).as_byte(),
+        Instruction::Inc16(Register16Bit::HL).as_byte(),
+        Instruction::Inc16(Register16Bit::SP).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::BC, 0);
+    cpu.set_reg_16(Register16Bit::DE, 0);
+    cpu.set_reg_16(Register16Bit::HL, 0);
+    cpu.set_reg_16(Register16Bit::SP, 0);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::BC), 1);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::DE), 1);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 1);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 1);
+}
+
+// Verify decrementing 16bit registers
+#[test]
+fn test_decrement_16() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Dec16(Register16Bit::BC).as_byte(),
+        Instruction::Dec16(Register16Bit::DE).as_byte(),
+        Instruction::Dec16(Register16Bit::HL).as_byte(),
+        Instruction::Dec16(Register16Bit::SP).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::BC, 0);
+    cpu.set_reg_16(Register16Bit::DE, 0);
+    cpu.set_reg_16(Register16Bit::HL, 0);
+    cpu.set_reg_16(Register16Bit::SP, 0);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::BC), 0xffff);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::DE), 0xffff);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0xffff);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0xffff);
+}
+
 // Verify adding to registers
 #[test]
 fn test_add() {
