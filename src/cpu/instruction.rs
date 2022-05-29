@@ -59,6 +59,7 @@ pub enum Instruction {
     Call(BranchCondition),
     ToggleCarryFlag(),
     SetCarryFlag(),
+    Invert(),
     CbInstruction(), // Special dummy instruction for 16 bit instruction calls
 }
 
@@ -327,6 +328,8 @@ impl Instruction {
             0x3f => Some(Instruction::ToggleCarryFlag()),
             // SCF
             0x37 => Some(Instruction::SetCarryFlag()),
+            // CPL
+            0x2f => Some(Instruction::Invert()),
             // Special dummy instruction for 16 bit instruction calls
             0xcb => Some(Instruction::CbInstruction()),
             _ => None
@@ -597,6 +600,8 @@ impl Instruction {
             Instruction::ToggleCarryFlag() => 0x3f,
             // SCF
             Instruction::SetCarryFlag() => 0x37,
+            // CPL
+            Instruction::Invert() => 0x2f,
             // Special dummy instruction for 16 bit instruction calls
             Instruction::CbInstruction() => 0xcb,
             _ => panic!("Invalid instruction"),
