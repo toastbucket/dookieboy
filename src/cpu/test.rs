@@ -1724,6 +1724,24 @@ fn test_ccf() {
     assert_eq!(cpu.get_flag(Flag::C), false);
 }
 
+// Verify CPL
+#[test]
+fn test_cpl() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Invert().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0xa5);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x5a);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+}
+
 // Verify Res
 #[test]
 fn test_res() {

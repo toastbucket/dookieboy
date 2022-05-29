@@ -382,6 +382,14 @@ impl Cpu {
         self.set_flag(Flag::H, false);
     }
 
+    fn invert(&mut self, regop: Register8Bit) {
+        let r = self.get_reg(regop);
+        self.set_reg(regop, !r);
+
+        self.set_flag(Flag::N, true);
+        self.set_flag(Flag::H, true);
+    }
+
     fn should_branch(&self, condition: BranchCondition) -> bool {
         match condition {
             BranchCondition::NZ => self.get_flag(Flag::Z) == false,
@@ -620,6 +628,10 @@ impl Cpu {
             },
             Instruction::SetCarryFlag() => {
                 self.set_carry();
+                (pc + 1, 1)
+            },
+            Instruction::Invert() => {
+                self.invert(Register8Bit::A);
                 (pc + 1, 1)
             },
             Instruction::CbInstruction() => {
