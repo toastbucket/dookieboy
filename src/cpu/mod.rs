@@ -368,6 +368,20 @@ impl Cpu {
         val
     }
 
+    fn toggle_carry(&mut self) {
+        self.set_flag(Flag::C, !self.get_flag(Flag::C));
+
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+    }
+
+    fn set_carry(&mut self) {
+        self.set_flag(Flag::C, true);
+
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+    }
+
     fn should_branch(&self, condition: BranchCondition) -> bool {
         match condition {
             BranchCondition::NZ => self.get_flag(Flag::Z) == false,
@@ -599,6 +613,14 @@ impl Cpu {
                 } else {
                     (pc + 3, 3)
                 }
+            },
+            Instruction::ToggleCarryFlag() => {
+                self.toggle_carry();
+                (pc + 1, 1)
+            },
+            Instruction::SetCarryFlag() => {
+                self.set_carry();
+                (pc + 1, 1)
             },
             Instruction::CbInstruction() => {
                 let cb_instruction_byte = self.read_byte(self.pc + 1);
