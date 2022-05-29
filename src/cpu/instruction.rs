@@ -596,7 +596,8 @@ impl Instruction {
 
 #[derive(Debug, Copy, Clone)]
 pub enum CbInstruction {
-    Res(Register8Bit, usize)
+    Res(Register8Bit, usize),
+    Set(Register8Bit, usize),
 }
 
 impl CbInstruction {
@@ -666,6 +667,70 @@ impl CbInstruction {
             0xbc => Some(CbInstruction::Res(Register8Bit::H, 7)),
             0xbd => Some(CbInstruction::Res(Register8Bit::L, 7)),
             0xbf => Some(CbInstruction::Res(Register8Bit::A, 7)),
+            // 0 bit
+            0xc0 => Some(CbInstruction::Set(Register8Bit::B, 0)),
+            0xc1 => Some(CbInstruction::Set(Register8Bit::C, 0)),
+            0xc2 => Some(CbInstruction::Set(Register8Bit::D, 0)),
+            0xc3 => Some(CbInstruction::Set(Register8Bit::E, 0)),
+            0xc4 => Some(CbInstruction::Set(Register8Bit::H, 0)),
+            0xc5 => Some(CbInstruction::Set(Register8Bit::L, 0)),
+            0xc7 => Some(CbInstruction::Set(Register8Bit::A, 0)),
+            // 1 bit
+            0xc8 => Some(CbInstruction::Set(Register8Bit::B, 1)),
+            0xc9 => Some(CbInstruction::Set(Register8Bit::C, 1)),
+            0xca => Some(CbInstruction::Set(Register8Bit::D, 1)),
+            0xcb => Some(CbInstruction::Set(Register8Bit::E, 1)),
+            0xcc => Some(CbInstruction::Set(Register8Bit::H, 1)),
+            0xcd => Some(CbInstruction::Set(Register8Bit::L, 1)),
+            0xcf => Some(CbInstruction::Set(Register8Bit::A, 1)),
+            // 2 bit
+            0xd0 => Some(CbInstruction::Set(Register8Bit::B, 2)),
+            0xd1 => Some(CbInstruction::Set(Register8Bit::C, 2)),
+            0xd2 => Some(CbInstruction::Set(Register8Bit::D, 2)),
+            0xd3 => Some(CbInstruction::Set(Register8Bit::E, 2)),
+            0xd4 => Some(CbInstruction::Set(Register8Bit::H, 2)),
+            0xd5 => Some(CbInstruction::Set(Register8Bit::L, 2)),
+            0xd7 => Some(CbInstruction::Set(Register8Bit::A, 2)),
+            // 3 bit
+            0xd8 => Some(CbInstruction::Set(Register8Bit::B, 3)),
+            0xd9 => Some(CbInstruction::Set(Register8Bit::C, 3)),
+            0xda => Some(CbInstruction::Set(Register8Bit::D, 3)),
+            0xdb => Some(CbInstruction::Set(Register8Bit::E, 3)),
+            0xdc => Some(CbInstruction::Set(Register8Bit::H, 3)),
+            0xdd => Some(CbInstruction::Set(Register8Bit::L, 3)),
+            0xdf => Some(CbInstruction::Set(Register8Bit::A, 3)),
+            // 4 bit
+            0xe0 => Some(CbInstruction::Set(Register8Bit::B, 4)),
+            0xe1 => Some(CbInstruction::Set(Register8Bit::C, 4)),
+            0xe2 => Some(CbInstruction::Set(Register8Bit::D, 4)),
+            0xe3 => Some(CbInstruction::Set(Register8Bit::E, 4)),
+            0xe4 => Some(CbInstruction::Set(Register8Bit::H, 4)),
+            0xe5 => Some(CbInstruction::Set(Register8Bit::L, 4)),
+            0xe7 => Some(CbInstruction::Set(Register8Bit::A, 4)),
+            // 5 bit
+            0xe8 => Some(CbInstruction::Set(Register8Bit::B, 5)),
+            0xe9 => Some(CbInstruction::Set(Register8Bit::C, 5)),
+            0xea => Some(CbInstruction::Set(Register8Bit::D, 5)),
+            0xeb => Some(CbInstruction::Set(Register8Bit::E, 5)),
+            0xec => Some(CbInstruction::Set(Register8Bit::H, 5)),
+            0xed => Some(CbInstruction::Set(Register8Bit::L, 5)),
+            0xef => Some(CbInstruction::Set(Register8Bit::A, 5)),
+            // 6 bit
+            0xf0 => Some(CbInstruction::Set(Register8Bit::B, 6)),
+            0xf1 => Some(CbInstruction::Set(Register8Bit::C, 6)),
+            0xf2 => Some(CbInstruction::Set(Register8Bit::D, 6)),
+            0xf3 => Some(CbInstruction::Set(Register8Bit::E, 6)),
+            0xf4 => Some(CbInstruction::Set(Register8Bit::H, 6)),
+            0xf5 => Some(CbInstruction::Set(Register8Bit::L, 6)),
+            0xf7 => Some(CbInstruction::Set(Register8Bit::A, 6)),
+            // 7 bit
+            0xf8 => Some(CbInstruction::Set(Register8Bit::B, 7)),
+            0xf9 => Some(CbInstruction::Set(Register8Bit::C, 7)),
+            0xfa => Some(CbInstruction::Set(Register8Bit::D, 7)),
+            0xfb => Some(CbInstruction::Set(Register8Bit::E, 7)),
+            0xfc => Some(CbInstruction::Set(Register8Bit::H, 7)),
+            0xfd => Some(CbInstruction::Set(Register8Bit::L, 7)),
+            0xff => Some(CbInstruction::Set(Register8Bit::A, 7)),
             _ => panic!("Invalid instruction"),
         }
     }
@@ -735,7 +800,70 @@ impl CbInstruction {
             CbInstruction::Res(Register8Bit::H, 7) => 0xbc,
             CbInstruction::Res(Register8Bit::L, 7) => 0xbd,
             CbInstruction::Res(Register8Bit::A, 7) => 0xbf,
-
+            // 0 bit
+            CbInstruction::Set(Register8Bit::B, 0) => 0xc0,
+            CbInstruction::Set(Register8Bit::C, 0) => 0xc1,
+            CbInstruction::Set(Register8Bit::D, 0) => 0xc2,
+            CbInstruction::Set(Register8Bit::E, 0) => 0xc3,
+            CbInstruction::Set(Register8Bit::H, 0) => 0xc4,
+            CbInstruction::Set(Register8Bit::L, 0) => 0xc5,
+            CbInstruction::Set(Register8Bit::A, 0) => 0xc7,
+            // 1 bit
+            CbInstruction::Set(Register8Bit::B, 1) => 0xc8,
+            CbInstruction::Set(Register8Bit::C, 1) => 0xc9,
+            CbInstruction::Set(Register8Bit::D, 1) => 0xca,
+            CbInstruction::Set(Register8Bit::E, 1) => 0xcb,
+            CbInstruction::Set(Register8Bit::H, 1) => 0xcc,
+            CbInstruction::Set(Register8Bit::L, 1) => 0xcd,
+            CbInstruction::Set(Register8Bit::A, 1) => 0xcf,
+            // 2 bit
+            CbInstruction::Set(Register8Bit::B, 2) => 0xd0,
+            CbInstruction::Set(Register8Bit::C, 2) => 0xd1,
+            CbInstruction::Set(Register8Bit::D, 2) => 0xd2,
+            CbInstruction::Set(Register8Bit::E, 2) => 0xd3,
+            CbInstruction::Set(Register8Bit::H, 2) => 0xd4,
+            CbInstruction::Set(Register8Bit::L, 2) => 0xd5,
+            CbInstruction::Set(Register8Bit::A, 2) => 0xd7,
+            // 3 bit
+            CbInstruction::Set(Register8Bit::B, 3) => 0xd8,
+            CbInstruction::Set(Register8Bit::C, 3) => 0xd9,
+            CbInstruction::Set(Register8Bit::D, 3) => 0xda,
+            CbInstruction::Set(Register8Bit::E, 3) => 0xdb,
+            CbInstruction::Set(Register8Bit::H, 3) => 0xdc,
+            CbInstruction::Set(Register8Bit::L, 3) => 0xdd,
+            CbInstruction::Set(Register8Bit::A, 3) => 0xdf,
+            // 4 bit
+            CbInstruction::Set(Register8Bit::B, 4) => 0xe0,
+            CbInstruction::Set(Register8Bit::C, 4) => 0xe1,
+            CbInstruction::Set(Register8Bit::D, 4) => 0xe2,
+            CbInstruction::Set(Register8Bit::E, 4) => 0xe3,
+            CbInstruction::Set(Register8Bit::H, 4) => 0xe4,
+            CbInstruction::Set(Register8Bit::L, 4) => 0xe5,
+            CbInstruction::Set(Register8Bit::A, 4) => 0xe7,
+            // 5 bit
+            CbInstruction::Set(Register8Bit::B, 5) => 0xe8,
+            CbInstruction::Set(Register8Bit::C, 5) => 0xe9,
+            CbInstruction::Set(Register8Bit::D, 5) => 0xea,
+            CbInstruction::Set(Register8Bit::E, 5) => 0xeb,
+            CbInstruction::Set(Register8Bit::H, 5) => 0xec,
+            CbInstruction::Set(Register8Bit::L, 5) => 0xed,
+            CbInstruction::Set(Register8Bit::A, 5) => 0xef,
+            // 6 bit
+            CbInstruction::Set(Register8Bit::B, 6) => 0xf0,
+            CbInstruction::Set(Register8Bit::C, 6) => 0xf1,
+            CbInstruction::Set(Register8Bit::D, 6) => 0xf2,
+            CbInstruction::Set(Register8Bit::E, 6) => 0xf3,
+            CbInstruction::Set(Register8Bit::H, 6) => 0xf4,
+            CbInstruction::Set(Register8Bit::L, 6) => 0xf5,
+            CbInstruction::Set(Register8Bit::A, 6) => 0xf7,
+            // 7 bit
+            CbInstruction::Set(Register8Bit::B, 7) => 0xf8,
+            CbInstruction::Set(Register8Bit::C, 7) => 0xf9,
+            CbInstruction::Set(Register8Bit::D, 7) => 0xfa,
+            CbInstruction::Set(Register8Bit::E, 7) => 0xfb,
+            CbInstruction::Set(Register8Bit::H, 7) => 0xfc,
+            CbInstruction::Set(Register8Bit::L, 7) => 0xfd,
+            CbInstruction::Set(Register8Bit::A, 7) => 0xff,
             _ => panic!("Invalid instruction"),
         }
     }
