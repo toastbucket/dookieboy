@@ -1690,6 +1690,40 @@ fn test_call() {
     assert_eq!(cpu.pc, 0xa55a);
 }
 
+// Verify setting carry flag
+#[test]
+fn test_scf() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::SetCarryFlag().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::C), true);
+}
+
+// Verify toggling carry flag
+#[test]
+fn test_ccf() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::ToggleCarryFlag().as_byte(),
+        Instruction::ToggleCarryFlag().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_flag(Flag::C, false);
+
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::C), false);
+}
+
 // Verify Res
 #[test]
 fn test_res() {
