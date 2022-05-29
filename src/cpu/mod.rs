@@ -345,6 +345,16 @@ impl Cpu {
         self.set_reg(regop, result);
     }
 
+    fn inc_16(&mut self, pair: Register16Bit) {
+        let r = self.get_reg_16(pair);
+        self.set_reg_16(pair, r.wrapping_add(1));
+    }
+
+    fn dec_16(&mut self, pair: Register16Bit) {
+        let r = self.get_reg_16(pair);
+        self.set_reg_16(pair, r.wrapping_sub(1));
+    }
+
     fn load_register(&mut self, dest: Register8Bit, src: Register8Bit) {
         self.set_reg(dest, self.get_reg(src));
     }
@@ -421,9 +431,17 @@ impl Cpu {
                 self.add(regop, 1, false);
                 (pc + 1, 1)
             },
+            Instruction::Inc16(pair) => {
+                self.inc_16(pair);
+                (pc + 1, 2)
+            },
             Instruction::Dec(regop) => {
                 self.subtract(regop, 1, false);
                 (pc + 1, 1)
+            },
+            Instruction::Dec16(pair) => {
+                self.dec_16(pair);
+                (pc + 1, 2)
             },
             Instruction::And(regop) => {
                 self.and(Register8Bit::A, self.get_reg(regop));
