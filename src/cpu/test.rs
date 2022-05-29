@@ -1900,3 +1900,214 @@ fn test_res() {
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::L), 0b00000000);
 }
+
+// Verify Set
+#[test]
+fn test_set() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 96;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::B, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::C, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::D, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::E, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::H, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Set(Register8Bit::L, 7).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.set_reg(Register8Bit::B, 0x00);
+    cpu.set_reg(Register8Bit::C, 0x00);
+    cpu.set_reg(Register8Bit::D, 0x00);
+    cpu.set_reg(Register8Bit::E, 0x00);
+    cpu.set_reg(Register8Bit::H, 0x00);
+    cpu.set_reg(Register8Bit::L, 0x00);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::B), 0b11111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::C), 0b11111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0b11111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::E), 0b11111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::H), 0b11111111);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::L), 0b11111111);
+}

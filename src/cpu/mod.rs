@@ -624,6 +624,10 @@ impl Cpu {
                 self.clear_bit(regop, shift);
                 (pc + 2, 2)
             }
+            CbInstruction::Set(regop, shift) => {
+                self.set_bit(regop, shift);
+                (pc + 2, 2)
+            }
             _ => panic!("Invalid 16 bit instruction"),
         }
     }
