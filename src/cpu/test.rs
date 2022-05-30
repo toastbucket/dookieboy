@@ -1129,6 +1129,40 @@ fn test_ld_reg16_imm() {
     assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0x8008);
 }
 
+// Verify loading to upper RAM
+#[test]
+fn test_ld_to_upper() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToUpperMem().as_byte(),
+        0x0a,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.read_byte(0xff0a), 0x69);
+}
+
+// Verify loading from upper RAM
+#[test]
+fn test_ld_from_upper() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdFromUpperMem().as_byte(),
+        0x0a,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.write_byte(0xff0a, 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
+}
+
 // Verify noop
 #[test]
 fn test_noop() {

@@ -51,6 +51,8 @@ pub enum Instruction {
     LdFromMemInc(), // Always A and HL
     LdFromMemDec(), // Always A and HL
     LdRegister16Imm(Register16Bit),
+    LdToUpperMem(),
+    LdFromUpperMem(),
     JumpAbs(BranchCondition),
     JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
@@ -291,6 +293,10 @@ impl Instruction {
             0x11 => Some(Instruction::LdRegister16Imm(Register16Bit::DE)),
             0x21 => Some(Instruction::LdRegister16Imm(Register16Bit::HL)),
             0x31 => Some(Instruction::LdRegister16Imm(Register16Bit::SP)),
+            // LD (n) A
+            0xe0 => Some(Instruction::LdToUpperMem()),
+            // LD A (n)
+            0xf0 => Some(Instruction::LdFromUpperMem()),
             // JP
             0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
             0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
@@ -573,6 +579,10 @@ impl Instruction {
             Instruction::LdRegister16Imm(Register16Bit::DE) => 0x11,
             Instruction::LdRegister16Imm(Register16Bit::HL) => 0x21,
             Instruction::LdRegister16Imm(Register16Bit::SP) => 0x31,
+            // LD (n) A
+            Instruction::LdToUpperMem() => 0xe0,
+            // LD A (n)
+            Instruction::LdFromUpperMem() => 0xf0,
             // JP
             Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
             Instruction::JumpAbs(BranchCondition::NC) => 0xd2,
