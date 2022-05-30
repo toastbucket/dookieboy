@@ -2259,3 +2259,95 @@ fn test_set() {
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::L), 0b11111111);
 }
+
+// Verify reset bit from mem
+#[test]
+fn test_reset_from_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 17;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::ResMem(7).as_byte(),
+        0xff,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0x10);
+    
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11111110);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11111100);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11111000);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11110000);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11100000);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11000000);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b10000000);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00000000);
+}
+
+// Verify set bit from mem
+#[test]
+fn test_set_from_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 17;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SetMem(7).as_byte(),
+        0x00,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0x10);
+    
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00000001);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00000011);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00000111);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00001111);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00011111);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00111111);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b01111111);
+    cpu.step();
+    assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11111111);
+}
