@@ -587,6 +587,16 @@ impl Cpu {
                 self.set_reg_16(pair, self.read_word(pc + 1));
                 (pc + 3, 3)
             },
+            Instruction::LdToUpperMem() => {
+                let offset = self.read_byte(pc + 1);
+                self.ld_to_mem(Register8Bit::A, 0xff00 + (offset as u16));
+                (pc + 2, 3)
+            },
+            Instruction::LdFromUpperMem() => {
+                let offset = self.read_byte(pc + 1);
+                self.ld_from_mem(Register8Bit::A, 0xff00 + (offset as u16));
+                (pc + 2, 3)
+            },
             Instruction::JumpAbs(condition) => {
                 if self.should_branch(condition) {
                     let addr = (self.read_byte(pc + 1) as u16)
