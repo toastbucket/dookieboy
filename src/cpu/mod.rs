@@ -47,7 +47,7 @@ pub enum RstVec {
 const NUM_GP_REGS: usize = 10;
 
 #[cfg(test)]
-const TEST_RAM_SIZE: usize = 128;
+const TEST_RAM_SIZE: usize = 0xffff;
 
 #[cfg(test)]
 struct TestRam {
