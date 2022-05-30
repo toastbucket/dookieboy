@@ -418,6 +418,18 @@ impl Cpu {
         self.set_reg(regop, self.get_reg(regop) & !(1 << shift));
     }
 
+    fn set_bit_from_mem(&mut self, shift: usize) {
+        self.write_byte(
+            self.get_reg_16(Register16Bit::HL), 
+            self.read_byte(self.get_reg_16(Register16Bit::HL)) | (1 << shift));
+    }
+
+    fn clear_bit_from_mem(&mut self, shift: usize) {
+        self.write_byte(
+            self.get_reg_16(Register16Bit::HL), 
+            self.read_byte(self.get_reg_16(Register16Bit::HL)) & !(1 << shift));
+    }
+
     // execute instruction
     // return tuple containing (next_pc, # cycles used)
     fn execute_instruction(&mut self, instruction: Instruction) -> (u16, usize) {
@@ -689,6 +701,14 @@ impl Cpu {
             CbInstruction::Set(regop, shift) => {
                 self.set_bit(regop, shift);
                 (pc + 2, 2)
+            }
+            CbInstruction::ResMem(shift) => {
+                self.clear_bit_from_mem(shift);
+                (pc + 2, 4)
+            }
+            CbInstruction::SetMem(shift) => {
+                self.set_bit_from_mem(shift);
+                (pc + 2, 4)
             }
             _ => panic!("Invalid 16 bit instruction"),
         }

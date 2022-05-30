@@ -645,6 +645,8 @@ impl Instruction {
 pub enum CbInstruction {
     Res(Register8Bit, usize),
     Set(Register8Bit, usize),
+    ResMem(usize),
+    SetMem(usize),
 }
 
 impl CbInstruction {
@@ -714,6 +716,15 @@ impl CbInstruction {
             0xbc => Some(CbInstruction::Res(Register8Bit::H, 7)),
             0xbd => Some(CbInstruction::Res(Register8Bit::L, 7)),
             0xbf => Some(CbInstruction::Res(Register8Bit::A, 7)),
+            // always use hl
+            0x86 => Some(CbInstruction::ResMem(0)),
+            0x8e => Some(CbInstruction::ResMem(1)),
+            0x96 => Some(CbInstruction::ResMem(2)),
+            0x9e => Some(CbInstruction::ResMem(3)),
+            0xa6 => Some(CbInstruction::ResMem(4)),
+            0xae => Some(CbInstruction::ResMem(5)),
+            0xb6 => Some(CbInstruction::ResMem(6)),
+            0xbe => Some(CbInstruction::ResMem(7)),
             // 0 bit
             0xc0 => Some(CbInstruction::Set(Register8Bit::B, 0)),
             0xc1 => Some(CbInstruction::Set(Register8Bit::C, 0)),
@@ -778,6 +789,15 @@ impl CbInstruction {
             0xfc => Some(CbInstruction::Set(Register8Bit::H, 7)),
             0xfd => Some(CbInstruction::Set(Register8Bit::L, 7)),
             0xff => Some(CbInstruction::Set(Register8Bit::A, 7)),
+            // always use hl
+            0xc6 => Some(CbInstruction::SetMem(0)),
+            0xce => Some(CbInstruction::SetMem(1)),
+            0xd6 => Some(CbInstruction::SetMem(2)),
+            0xde => Some(CbInstruction::SetMem(3)),
+            0xe6 => Some(CbInstruction::SetMem(4)),
+            0xee => Some(CbInstruction::SetMem(5)),
+            0xf6 => Some(CbInstruction::SetMem(6)),
+            0xfe => Some(CbInstruction::SetMem(7)),
             _ => panic!("Invalid instruction"),
         }
     }
@@ -847,6 +867,15 @@ impl CbInstruction {
             CbInstruction::Res(Register8Bit::H, 7) => 0xbc,
             CbInstruction::Res(Register8Bit::L, 7) => 0xbd,
             CbInstruction::Res(Register8Bit::A, 7) => 0xbf,
+            // always use hl
+            CbInstruction::ResMem(0) => 0x86,
+            CbInstruction::ResMem(1) => 0x8e,
+            CbInstruction::ResMem(2) => 0x96,
+            CbInstruction::ResMem(3) => 0x9e,
+            CbInstruction::ResMem(4) => 0xa6,
+            CbInstruction::ResMem(5) => 0xae,
+            CbInstruction::ResMem(6) => 0xb6,
+            CbInstruction::ResMem(7) => 0xbe,
             // 0 bit
             CbInstruction::Set(Register8Bit::B, 0) => 0xc0,
             CbInstruction::Set(Register8Bit::C, 0) => 0xc1,
@@ -911,6 +940,15 @@ impl CbInstruction {
             CbInstruction::Set(Register8Bit::H, 7) => 0xfc,
             CbInstruction::Set(Register8Bit::L, 7) => 0xfd,
             CbInstruction::Set(Register8Bit::A, 7) => 0xff,
+            // always use hl
+            CbInstruction::SetMem(0) => 0xc6,
+            CbInstruction::SetMem(1) => 0xce,
+            CbInstruction::SetMem(2) => 0xd6,
+            CbInstruction::SetMem(3) => 0xde,
+            CbInstruction::SetMem(4) => 0xe6,
+            CbInstruction::SetMem(5) => 0xee,
+            CbInstruction::SetMem(6) => 0xf6,
+            CbInstruction::SetMem(7) => 0xfe,
             _ => panic!("Invalid instruction"),
         }
     }
