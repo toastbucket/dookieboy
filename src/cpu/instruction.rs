@@ -643,6 +643,14 @@ impl Instruction {
 
 #[derive(Debug, Copy, Clone)]
 pub enum CbInstruction {
+    Rlc(Register8Bit),
+    RlcMem(),
+    Rrc(Register8Bit),
+    RrcMem(),
+    Rl(Register8Bit),
+    RlMem(),
+    Rr(Register8Bit),
+    RrMem(),
     Res(Register8Bit, usize),
     Set(Register8Bit, usize),
     ResMem(usize),
@@ -652,6 +660,47 @@ pub enum CbInstruction {
 impl CbInstruction {
     pub fn from_byte(byte: u8) -> Option<CbInstruction> {
         match byte {
+            // RLC n
+            0x00 => Some(CbInstruction::Rlc(Register8Bit::B)),
+            0x01 => Some(CbInstruction::Rlc(Register8Bit::C)),
+            0x02 => Some(CbInstruction::Rlc(Register8Bit::D)),
+            0x03 => Some(CbInstruction::Rlc(Register8Bit::E)),
+            0x04 => Some(CbInstruction::Rlc(Register8Bit::H)),
+            0x05 => Some(CbInstruction::Rlc(Register8Bit::L)),
+            0x07 => Some(CbInstruction::Rlc(Register8Bit::A)),
+            // RLC (HL)
+            0x06 => Some(CbInstruction::RlcMem()),
+            // RRC n
+            0x08 => Some(CbInstruction::Rrc(Register8Bit::B)),
+            0x09 => Some(CbInstruction::Rrc(Register8Bit::C)),
+            0x0a => Some(CbInstruction::Rrc(Register8Bit::D)),
+            0x0b => Some(CbInstruction::Rrc(Register8Bit::E)),
+            0x0c => Some(CbInstruction::Rrc(Register8Bit::H)),
+            0x0d => Some(CbInstruction::Rrc(Register8Bit::L)),
+            0x0f => Some(CbInstruction::Rrc(Register8Bit::A)),
+            // RRC (HL)
+            0x0e => Some(CbInstruction::RrcMem()),
+            // RL n
+            0x10 => Some(CbInstruction::Rl(Register8Bit::B)),
+            0x11 => Some(CbInstruction::Rl(Register8Bit::C)),
+            0x12 => Some(CbInstruction::Rl(Register8Bit::D)),
+            0x13 => Some(CbInstruction::Rl(Register8Bit::E)),
+            0x14 => Some(CbInstruction::Rl(Register8Bit::H)),
+            0x15 => Some(CbInstruction::Rl(Register8Bit::L)),
+            0x17 => Some(CbInstruction::Rl(Register8Bit::A)),
+            // RL (HL)
+            0x16 => Some(CbInstruction::RlMem()),
+            // RR n
+            0x18 => Some(CbInstruction::Rr(Register8Bit::B)),
+            0x19 => Some(CbInstruction::Rr(Register8Bit::C)),
+            0x1a => Some(CbInstruction::Rr(Register8Bit::D)),
+            0x1b => Some(CbInstruction::Rr(Register8Bit::E)),
+            0x1c => Some(CbInstruction::Rr(Register8Bit::H)),
+            0x1d => Some(CbInstruction::Rr(Register8Bit::L)),
+            0x1f => Some(CbInstruction::Rr(Register8Bit::A)),
+            // RR (HL)
+            0x1e => Some(CbInstruction::RrMem()),
+            // RES n
             // 0 bit
             0x80 => Some(CbInstruction::Res(Register8Bit::B, 0)),
             0x81 => Some(CbInstruction::Res(Register8Bit::C, 0)),
@@ -716,7 +765,7 @@ impl CbInstruction {
             0xbc => Some(CbInstruction::Res(Register8Bit::H, 7)),
             0xbd => Some(CbInstruction::Res(Register8Bit::L, 7)),
             0xbf => Some(CbInstruction::Res(Register8Bit::A, 7)),
-            // always use hl
+            // RES (HL)
             0x86 => Some(CbInstruction::ResMem(0)),
             0x8e => Some(CbInstruction::ResMem(1)),
             0x96 => Some(CbInstruction::ResMem(2)),
@@ -725,6 +774,7 @@ impl CbInstruction {
             0xae => Some(CbInstruction::ResMem(5)),
             0xb6 => Some(CbInstruction::ResMem(6)),
             0xbe => Some(CbInstruction::ResMem(7)),
+            // SET b,r
             // 0 bit
             0xc0 => Some(CbInstruction::Set(Register8Bit::B, 0)),
             0xc1 => Some(CbInstruction::Set(Register8Bit::C, 0)),
@@ -789,7 +839,7 @@ impl CbInstruction {
             0xfc => Some(CbInstruction::Set(Register8Bit::H, 7)),
             0xfd => Some(CbInstruction::Set(Register8Bit::L, 7)),
             0xff => Some(CbInstruction::Set(Register8Bit::A, 7)),
-            // always use hl
+            // SET (HL)
             0xc6 => Some(CbInstruction::SetMem(0)),
             0xce => Some(CbInstruction::SetMem(1)),
             0xd6 => Some(CbInstruction::SetMem(2)),
@@ -803,6 +853,47 @@ impl CbInstruction {
     }
     pub fn as_byte(self) -> u8 {
         match self {
+            // RLC n
+            CbInstruction::Rlc(Register8Bit::B) => 0x00,
+            CbInstruction::Rlc(Register8Bit::C) => 0x01,
+            CbInstruction::Rlc(Register8Bit::D) => 0x02,
+            CbInstruction::Rlc(Register8Bit::E) => 0x03,
+            CbInstruction::Rlc(Register8Bit::H) => 0x04,
+            CbInstruction::Rlc(Register8Bit::L) => 0x05,
+            CbInstruction::Rlc(Register8Bit::A) => 0x07,
+            // RLC (HL)
+            CbInstruction::RlcMem() => 0x06,
+            // RRC n
+            CbInstruction::Rrc(Register8Bit::B) => 0x08,
+            CbInstruction::Rrc(Register8Bit::C) => 0x09,
+            CbInstruction::Rrc(Register8Bit::D) => 0x0a,
+            CbInstruction::Rrc(Register8Bit::E) => 0x0b,
+            CbInstruction::Rrc(Register8Bit::H) => 0x0c,
+            CbInstruction::Rrc(Register8Bit::L) => 0x0d,
+            CbInstruction::Rrc(Register8Bit::A) => 0x0f,
+            // RRC (HL)
+            CbInstruction::RrcMem() => 0x0e,
+            // RL n
+            CbInstruction::Rl(Register8Bit::B) => 0x10,
+            CbInstruction::Rl(Register8Bit::C) => 0x11,
+            CbInstruction::Rl(Register8Bit::D) => 0x12,
+            CbInstruction::Rl(Register8Bit::E) => 0x13,
+            CbInstruction::Rl(Register8Bit::H) => 0x14,
+            CbInstruction::Rl(Register8Bit::L) => 0x15,
+            CbInstruction::Rl(Register8Bit::A) => 0x17,
+            // RL (HL)
+            CbInstruction::RlMem() => 0x16,
+            // RR n
+            CbInstruction::Rr(Register8Bit::B) => 0x18,
+            CbInstruction::Rr(Register8Bit::C) => 0x19,
+            CbInstruction::Rr(Register8Bit::D) => 0x1a,
+            CbInstruction::Rr(Register8Bit::E) => 0x1b,
+            CbInstruction::Rr(Register8Bit::H) => 0x1c,
+            CbInstruction::Rr(Register8Bit::L) => 0x1d,
+            CbInstruction::Rr(Register8Bit::A) => 0x1f,
+            // RR (HL)
+            CbInstruction::RrMem() => 0x1e,
+            // RES b,r
             // 0 bit
             CbInstruction::Res(Register8Bit::B, 0) => 0x80,
             CbInstruction::Res(Register8Bit::C, 0) => 0x81,
@@ -867,7 +958,7 @@ impl CbInstruction {
             CbInstruction::Res(Register8Bit::H, 7) => 0xbc,
             CbInstruction::Res(Register8Bit::L, 7) => 0xbd,
             CbInstruction::Res(Register8Bit::A, 7) => 0xbf,
-            // always use hl
+            // RES b,(HL)
             CbInstruction::ResMem(0) => 0x86,
             CbInstruction::ResMem(1) => 0x8e,
             CbInstruction::ResMem(2) => 0x96,
@@ -876,6 +967,7 @@ impl CbInstruction {
             CbInstruction::ResMem(5) => 0xae,
             CbInstruction::ResMem(6) => 0xb6,
             CbInstruction::ResMem(7) => 0xbe,
+            // SET b,n
             // 0 bit
             CbInstruction::Set(Register8Bit::B, 0) => 0xc0,
             CbInstruction::Set(Register8Bit::C, 0) => 0xc1,
@@ -940,7 +1032,7 @@ impl CbInstruction {
             CbInstruction::Set(Register8Bit::H, 7) => 0xfc,
             CbInstruction::Set(Register8Bit::L, 7) => 0xfd,
             CbInstruction::Set(Register8Bit::A, 7) => 0xff,
-            // always use hl
+            // SET b,(HL)
             CbInstruction::SetMem(0) => 0xc6,
             CbInstruction::SetMem(1) => 0xce,
             CbInstruction::SetMem(2) => 0xd6,

@@ -251,7 +251,7 @@ impl Cpu {
      * If RL, shift left one bit with bit 7 shifting into the carry
      * flag and the carry flag shifting into bit 0.
      */
-    fn shift_left(&mut self, regop: Register8Bit, is_rlc: bool) {
+    fn rotate_left(&mut self, regop: Register8Bit, is_rlc: bool, is_cb: bool) {
         let mut r = self.get_reg(regop);
         let bit7 = (r >> 7) & 1;
 
@@ -267,7 +267,30 @@ impl Cpu {
         r = (r << 1) | bit0;
         self.set_reg(regop, r);
 
-        self.set_flag(Flag::Z, if matches!(regop, Register8Bit::A) { false } else { r == 0 });
+        self.set_flag(Flag::Z, if !is_cb { false } else { r == 0 });
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit7 == 1);
+    }
+
+    fn rotate_left_mem(&mut self, is_rlc: bool) {
+        let offset = self.get_reg_16(Register16Bit::HL);
+        let mut r = self.read_byte(offset);
+        let bit7 = (r >> 7) & 1;
+
+        // If RLC, bit 7 goes to C flag and bit 0
+        // If RL, bit 7 goes to C flag and C flag
+        // goes to bit 0
+        let bit0 = if is_rlc {
+            bit7
+        } else {
+            u8::from(self.get_flag(Flag::C))
+        };
+
+        r = (r << 1) | bit0;
+        self.write_byte(offset, r);
+
+        self.set_flag(Flag::Z, r == 0 );
         self.set_flag(Flag::N, false);
         self.set_flag(Flag::H, false);
         self.set_flag(Flag::C, bit7 == 1);
@@ -281,7 +304,7 @@ impl Cpu {
      * If RR, shift right one bit with bit 0 shifting into the carry
      * flag and the carry flag shifting into bit 7.
      */
-    fn shift_right(&mut self, regop: Register8Bit, is_rrc: bool) {
+    fn rotate_right(&mut self, regop: Register8Bit, is_rrc: bool, is_cb: bool) {
         let mut r = self.get_reg(regop);
         let bit0 = r & 1;
 
@@ -297,7 +320,30 @@ impl Cpu {
         r = (r >> 1) | (bit7 << 7);
         self.set_reg(regop, r);
 
-        self.set_flag(Flag::Z, if matches!(regop, Register8Bit::A) { false } else { r == 0 });
+        self.set_flag(Flag::Z, if !is_cb { false } else { r == 0 });
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit0 == 1);
+    }
+
+    fn rotate_right_mem(&mut self, is_rrc: bool) {
+        let offset = self.get_reg_16(Register16Bit::HL);
+        let mut r = self.read_byte(offset);
+        let bit0 = r & 1;
+
+        // If RRC, bit 0 goes to C flag and bit 7
+        // If RR, bit 0 goes to C flag and C flag
+        // goes to bit 7
+        let bit7 = if is_rrc {
+            bit0
+        } else {
+            u8::from(self.get_flag(Flag::C))
+        };
+
+        r = (r >> 1) | (bit7 << 7);
+        self.write_byte(offset, r);
+
+        self.set_flag(Flag::Z, r == 0 );
         self.set_flag(Flag::N, false);
         self.set_flag(Flag::H, false);
         self.set_flag(Flag::C, bit0 == 1);
@@ -504,19 +550,19 @@ impl Cpu {
                 (pc + 2, 2)
             },
             Instruction::Rla() => {
-                self.shift_left(Register8Bit::A, false);
+                self.rotate_left(Register8Bit::A, false, false);
                 (pc + 1, 1)
             },
             Instruction::Rlca() => {
-                self.shift_left(Register8Bit::A, true);
+                self.rotate_left(Register8Bit::A, true, false);
                 (pc + 1, 1)
             },
             Instruction::Rra() => {
-                self.shift_right(Register8Bit::A, false);
+                self.rotate_right(Register8Bit::A, false, false);
                 (pc + 1, 1)
             },
             Instruction::Rrca() => {
-                self.shift_right(Register8Bit::A, true);
+                self.rotate_right(Register8Bit::A, true, false);
                 (pc + 1, 1)
             },
             Instruction::Add(regop) => {
@@ -694,6 +740,38 @@ impl Cpu {
     fn execute_extended_instruction(&mut self, instruction: CbInstruction) -> (u16, usize) {
         let pc = self.pc;
         match instruction {
+            CbInstruction::Rl(regop) => {
+                self.rotate_left(regop, false, true);
+                (pc + 2, 2)
+            }
+            CbInstruction::Rlc(regop) => {
+                self.rotate_left(regop, true, true);
+                (pc + 2, 2)
+            }
+            CbInstruction::RlMem() => {
+                self.rotate_left_mem(false);
+                (pc + 2, 4)
+            }
+            CbInstruction::RlcMem() => {
+                self.rotate_left_mem(true);
+                (pc + 2, 4)
+            }
+            CbInstruction::Rr(regop) => {
+                self.rotate_right(regop, false, true);
+                (pc + 2, 2)
+            }
+            CbInstruction::Rrc(regop) => {
+                self.rotate_right(regop, true, true);
+                (pc + 2, 2)
+            }
+            CbInstruction::RrMem() => {
+                self.rotate_right_mem(false);
+                (pc + 2, 4)
+            }
+            CbInstruction::RrcMem() => {
+                self.rotate_right_mem(true);
+                (pc + 2, 4)
+            }
             CbInstruction::Res(regop, shift) => {
                 self.clear_bit(regop, shift);
                 (pc + 2, 2)
@@ -710,7 +788,7 @@ impl Cpu {
                 self.set_bit_from_mem(shift);
                 (pc + 2, 4)
             }
-            _ => panic!("Invalid 16 bit instruction"),
+            _ => panic!("Invalid cb instruction"),
         }
     }
 
