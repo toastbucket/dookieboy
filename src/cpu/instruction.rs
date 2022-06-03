@@ -662,6 +662,12 @@ pub enum CbInstruction {
     Rr(Register8Bit),
     RrMem(),
     Bit(Register8Bit, usize),
+    Sla(Register8Bit),
+    SlaMem(),
+    Sra(Register8Bit),
+    SraMem(),
+    Srl(Register8Bit),
+    SrlMem(),
     Res(Register8Bit, usize),
     Set(Register8Bit, usize),
     ResMem(usize),
@@ -789,6 +795,37 @@ impl CbInstruction {
             0x76 => Some(CbInstruction::BitMem(6)),
             0x7e => Some(CbInstruction::BitMem(7)),
             // RES b,r
+            // SLA n
+            0x20 => Some(CbInstruction::Sla(Register8Bit::B)),
+            0x21 => Some(CbInstruction::Sla(Register8Bit::C)),
+            0x22 => Some(CbInstruction::Sla(Register8Bit::D)),
+            0x23 => Some(CbInstruction::Sla(Register8Bit::E)),
+            0x24 => Some(CbInstruction::Sla(Register8Bit::H)),
+            0x25 => Some(CbInstruction::Sla(Register8Bit::L)),
+            0x27 => Some(CbInstruction::Sla(Register8Bit::A)),
+            // SLA (HL)
+            0x26 => Some(CbInstruction::SlaMem()),
+            // SRA n
+            0x28 => Some(CbInstruction::Sra(Register8Bit::B)),
+            0x29 => Some(CbInstruction::Sra(Register8Bit::C)),
+            0x2a => Some(CbInstruction::Sra(Register8Bit::D)),
+            0x2b => Some(CbInstruction::Sra(Register8Bit::E)),
+            0x2c => Some(CbInstruction::Sra(Register8Bit::H)),
+            0x2d => Some(CbInstruction::Sra(Register8Bit::L)),
+            0x2f => Some(CbInstruction::Sra(Register8Bit::A)),
+            // SRA (HL)
+            0x2e => Some(CbInstruction::SraMem()),
+            // SRL n
+            0x38 => Some(CbInstruction::Srl(Register8Bit::B)),
+            0x39 => Some(CbInstruction::Srl(Register8Bit::C)),
+            0x3a => Some(CbInstruction::Srl(Register8Bit::D)),
+            0x3b => Some(CbInstruction::Srl(Register8Bit::E)),
+            0x3c => Some(CbInstruction::Srl(Register8Bit::H)),
+            0x3d => Some(CbInstruction::Srl(Register8Bit::L)),
+            0x3f => Some(CbInstruction::Srl(Register8Bit::A)),
+            // SRL n (HL)
+            0x3e => Some(CbInstruction::SrlMem()),
+            // RES n
             // 0 bit
             0x80 => Some(CbInstruction::Res(Register8Bit::B, 0)),
             0x81 => Some(CbInstruction::Res(Register8Bit::C, 0)),
@@ -991,6 +1028,36 @@ impl CbInstruction {
             CbInstruction::Rr(Register8Bit::A) => 0x1f,
             // RR (HL)
             CbInstruction::RrMem() => 0x1e,
+            // SLA n
+            CbInstruction::Sla(Register8Bit::B) => 0x20,
+            CbInstruction::Sla(Register8Bit::C) => 0x21,
+            CbInstruction::Sla(Register8Bit::D) => 0x22,
+            CbInstruction::Sla(Register8Bit::E) => 0x23,
+            CbInstruction::Sla(Register8Bit::H) => 0x24,
+            CbInstruction::Sla(Register8Bit::L) => 0x25,
+            CbInstruction::Sla(Register8Bit::A) => 0x27,
+            // SLA (HL)
+            CbInstruction::SlaMem() => 0x26,
+            // SRA n
+            CbInstruction::Sra(Register8Bit::B) => 0x28,
+            CbInstruction::Sra(Register8Bit::C) => 0x29,
+            CbInstruction::Sra(Register8Bit::D) => 0x2a,
+            CbInstruction::Sra(Register8Bit::E) => 0x2b,
+            CbInstruction::Sra(Register8Bit::H) => 0x2c,
+            CbInstruction::Sra(Register8Bit::L) => 0x2d,
+            CbInstruction::Sra(Register8Bit::A) => 0x2f,
+            // SRA (HL)
+            CbInstruction::SraMem() => 0x2e,
+            // SRL n
+            CbInstruction::Srl(Register8Bit::B) => 0x38,
+            CbInstruction::Srl(Register8Bit::C) => 0x39,
+            CbInstruction::Srl(Register8Bit::D) => 0x3a,
+            CbInstruction::Srl(Register8Bit::E) => 0x3b,
+            CbInstruction::Srl(Register8Bit::H) => 0x3c,
+            CbInstruction::Srl(Register8Bit::L) => 0x3d,
+            CbInstruction::Srl(Register8Bit::A) => 0x3f,
+            // SRL (HL)
+            CbInstruction::SrlMem() => 0x3e,
             // RES b,r
             // 0 bit
             CbInstruction::Res(Register8Bit::B, 0) => 0x80,
