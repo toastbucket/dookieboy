@@ -301,6 +301,33 @@ impl Cpu {
         self.set_flag(Flag::C, bit7 == 1);
     }
 
+    fn shift_left(&mut self, regop: Register8Bit) {
+        let mut r = self.get_reg(regop);
+        let bit7 = (r >> 7) & 1;
+
+        r = r << 1;
+        self.set_reg(regop, r);
+
+        self.set_flag(Flag::Z, r == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit7 == 1);
+    }
+
+    fn shift_left_mem(&mut self) {
+        let offset = self.get_reg_16(Register16Bit::HL);
+        let mut r = self.read_byte(offset);
+        let bit7 = (r >> 7) & 1;
+
+        r = r << 1;
+        self.write_byte(offset, r);
+
+        self.set_flag(Flag::Z, r == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit7 == 1);
+    }
+
     /*
      * Handle right rotation and right circular rotation.
      * If RRC (circular), shift right one bit and rotate around
@@ -349,6 +376,35 @@ impl Cpu {
         self.write_byte(offset, r);
 
         self.set_flag(Flag::Z, r == 0 );
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit0 == 1);
+    }
+
+    fn shift_right(&mut self, regop: Register8Bit, clear_msb: bool) {
+        let mut r = self.get_reg(regop);
+        let bit0 = r & 1;
+        let bit7: u8 = if clear_msb {0} else {(r >> 7) & 1};
+
+        r = (r >> 1) | (bit7 << 7);
+        self.set_reg(regop, r);
+
+        self.set_flag(Flag::Z, r == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, bit0 == 1);
+    }
+
+    fn shift_right_mem(&mut self, clear_msb: bool) {
+        let offset = self.get_reg_16(Register16Bit::HL);
+        let mut r = self.read_byte(offset);
+        let bit0 = r & 1;
+        let bit7: u8 = if clear_msb {0} else {(r >> 7) & 1};
+
+        r = (r >> 1) | (bit7 << 7);
+        self.write_byte(offset, r);
+
+        self.set_flag(Flag::Z, r == 0);
         self.set_flag(Flag::N, false);
         self.set_flag(Flag::H, false);
         self.set_flag(Flag::C, bit0 == 1);
@@ -839,8 +895,32 @@ impl Cpu {
                 self.rotate_right_mem(true);
                 (pc + 2, 4)
             },
-            CbInstruction::Res(regop, bit) => {
-                self.clear_bit(regop, bit);
+            CbInstruction::Sla(regop) => {
+                self.shift_left(regop);
+                (pc + 2, 2)
+            }
+            CbInstruction::SlaMem() => {
+                self.shift_left_mem();
+                (pc + 2, 4)
+            }
+            CbInstruction::Sra(regop) => {
+                self.shift_right(regop, false); 
+                (pc + 2, 2)
+            }
+            CbInstruction::SraMem() => {
+                self.shift_right_mem(false); 
+                (pc + 2, 4)
+            }
+            CbInstruction::Srl(regop) => {
+                self.shift_right(regop, true); 
+                (pc + 2, 2)
+            }
+            CbInstruction::SrlMem() => {
+                self.shift_right_mem(true); 
+                (pc + 2, 4)
+            }
+            CbInstruction::Res(regop, shift) => {
+                self.clear_bit(regop, shift);
                 (pc + 2, 2)
             },
             CbInstruction::Bit(regop, bit) => {

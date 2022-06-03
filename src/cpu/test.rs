@@ -922,6 +922,96 @@ fn test_rotate() {
     assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
+// Verify shifting
+#[test]
+fn test_shift() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 13;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Sla(Register8Bit::D).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Sra(Register8Bit::A).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Srl(Register8Bit::A).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SlaMem().as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SraMem().as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SrlMem().as_byte(),
+        0x95,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    // SLA D
+    cpu.set_reg(Register8Bit::D, 0x80);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::D), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    // SRA A
+    cpu.set_reg(Register8Bit::A, 0x8a);
+    cpu.set_flag(Flag::C, false);
+    cpu.set_flag(Flag::Z, false);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xc5);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+
+    // SRL A
+    cpu.set_reg(Register8Bit::A, 0x01);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+    cpu.set_flag(Flag::Z, false);
+    cpu.set_flag(Flag::C, false);
+
+    // SLA (HL)
+    let test_ram_offset = (test_ram.len() - 1) as u16;
+    cpu.set_reg_16(Register16Bit::HL, test_ram_offset);
+    cpu.write_byte(test_ram_offset, 0xff);
+    cpu.set_flag(Flag::C, true);
+    cpu.step();
+    assert_eq!(cpu.read_byte(test_ram_offset), 0xfe);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    // SRA (HL)
+    cpu.write_byte(test_ram_offset, 0x01);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.read_byte(test_ram_offset), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+
+    // SRL (HL)
+    cpu.write_byte(test_ram_offset, 0xff);
+    cpu.set_flag(Flag::Z, false);
+    cpu.set_flag(Flag::C, false);
+    cpu.step();
+    assert_eq!(cpu.read_byte(test_ram_offset), 0x7f);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+}
+
 // Verify from memory
 #[test]
 fn test_cp_mem() {
