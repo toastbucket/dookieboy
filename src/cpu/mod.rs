@@ -91,6 +91,8 @@ pub struct Cpu {
     pc: u16,
     mmu: Rc<RefCell<Mmu>>,
     cycles: usize,
+    stopped: bool,
+    halted: bool,
 
     #[cfg(test)]
     test_ram: TestRam,
@@ -109,6 +111,9 @@ impl Cpu {
             pc: 0,
             mmu: mmu,
             cycles: 0,
+
+            stopped: false,
+            halted: false,
 
             #[cfg(test)]
             test_ram: TestRam::new(),
@@ -751,6 +756,14 @@ impl Cpu {
                 self.invert(Register8Bit::A);
                 (pc + 1, 1)
             },
+            Instruction::Stop() => {
+                self.stopped = true;
+                (pc + 2, 1)
+            },
+            Instruction::Halt() => {
+                self.halted = true;
+                (pc + 1, 1)
+            },
             Instruction::CbInstruction() => {
                 let cb_instruction_byte = self.read_byte(self.pc + 1);
 
@@ -888,6 +901,21 @@ impl Cpu {
 
         self.pc = 0x0100;
         self.set_sp(0xfffe);
+
+        self.stopped = false;
+        self.halted = false;
+    }
+
+    pub fn stopped(&self) -> bool {
+        self.stopped
+    }
+
+    pub fn halted(&self) -> bool {
+        self.halted
+    }
+
+    pub fn exit_halt(&mut self) {
+        self.halted = false;
     }
 }
 
