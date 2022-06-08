@@ -1944,6 +1944,39 @@ fn test_cpl() {
     assert_eq!(cpu.get_flag(Flag::H), true);
 }
 
+// Verify stop
+#[test]
+fn test_stop() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Stop().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.step();
+    assert_eq!(cpu.stopped(), true);
+}
+
+// Verify halt
+#[test]
+fn test_halt() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Halt().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.step();
+    assert_eq!(cpu.halted(), true);
+
+    cpu.exit_halt();
+    assert_eq!(cpu.halted(), false);
+}
+
 // Verify Res
 #[test]
 fn test_res() {

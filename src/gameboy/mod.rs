@@ -73,6 +73,12 @@ impl Gameboy {
 
     pub fn run(&mut self) -> Result<(), io::Error> {
 
+        // TODO: handle stop and halt
+        //  If both the interrupt request flag and the corresponding interrupt enable flag are set,
+        //  HALT mode is exited, even if the interrupt master enable flag is not set.
+        //
+        //  If the interrupt master enable flag is set, the contents of the program coounter are
+        //  pushed to the stack and control jumps to the starting address of the interrupt.
         'running: loop {
             self.handle_sdl2_events()?;
             self.cpu.step();
