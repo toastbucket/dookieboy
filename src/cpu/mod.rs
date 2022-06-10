@@ -456,24 +456,24 @@ impl Cpu {
         }
     }
 
-    fn set_bit(&mut self, regop: Register8Bit, shift: usize) {
-        self.set_reg(regop, self.get_reg(regop) | (1 << shift));
+    fn set_bit(&mut self, regop: Register8Bit, bit: usize) {
+        self.set_reg(regop, self.get_reg(regop) | (1 << bit));
     }
 
-    fn clear_bit(&mut self, regop: Register8Bit, shift: usize) {
-        self.set_reg(regop, self.get_reg(regop) & !(1 << shift));
+    fn clear_bit(&mut self, regop: Register8Bit, bit: usize) {
+        self.set_reg(regop, self.get_reg(regop) & !(1 << bit));
     }
 
-    fn set_bit_from_mem(&mut self, shift: usize) {
+    fn set_bit_from_mem(&mut self, bit: usize) {
         self.write_byte(
             self.get_reg_16(Register16Bit::HL), 
-            self.read_byte(self.get_reg_16(Register16Bit::HL)) | (1 << shift));
+            self.read_byte(self.get_reg_16(Register16Bit::HL)) | (1 << bit));
     }
 
-    fn clear_bit_from_mem(&mut self, shift: usize) {
+    fn clear_bit_from_mem(&mut self, bit: usize) {
         self.write_byte(
             self.get_reg_16(Register16Bit::HL), 
-            self.read_byte(self.get_reg_16(Register16Bit::HL)) & !(1 << shift));
+            self.read_byte(self.get_reg_16(Register16Bit::HL)) & !(1 << bit));
     }
 
     // execute instruction
@@ -772,20 +772,20 @@ impl Cpu {
                 self.rotate_right_mem(true);
                 (pc + 2, 4)
             }
-            CbInstruction::Res(regop, shift) => {
-                self.clear_bit(regop, shift);
+            CbInstruction::Res(regop, bit) => {
+                self.clear_bit(regop, bit);
                 (pc + 2, 2)
             }
-            CbInstruction::Set(regop, shift) => {
-                self.set_bit(regop, shift);
+            CbInstruction::Set(regop, bit) => {
+                self.set_bit(regop, bit);
                 (pc + 2, 2)
             }
-            CbInstruction::ResMem(shift) => {
-                self.clear_bit_from_mem(shift);
+            CbInstruction::ResMem(bit) => {
+                self.clear_bit_from_mem(bit);
                 (pc + 2, 4)
             }
-            CbInstruction::SetMem(shift) => {
-                self.set_bit_from_mem(shift);
+            CbInstruction::SetMem(bit) => {
+                self.set_bit_from_mem(bit);
                 (pc + 2, 4)
             }
             _ => panic!("Invalid cb instruction"),
