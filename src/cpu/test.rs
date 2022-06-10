@@ -2049,13 +2049,7 @@ fn test_res() {
     ];
 
     cpu.load_test_ram(&test_ram);
-
-    cpu.set_reg(Register8Bit::B, 0xff);
-    cpu.set_reg(Register8Bit::C, 0xff);
-    cpu.set_reg(Register8Bit::D, 0xff);
-    cpu.set_reg(Register8Bit::E, 0xff);
-    cpu.set_reg(Register8Bit::H, 0xff);
-    cpu.set_reg(Register8Bit::L, 0xff);
+    cpu.set_all_regs(0xff);
 
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::B), 0b11111110);
@@ -2260,13 +2254,7 @@ fn test_set() {
     ];
 
     cpu.load_test_ram(&test_ram);
-
-    cpu.set_reg(Register8Bit::B, 0x00);
-    cpu.set_reg(Register8Bit::C, 0x00);
-    cpu.set_reg(Register8Bit::D, 0x00);
-    cpu.set_reg(Register8Bit::E, 0x00);
-    cpu.set_reg(Register8Bit::H, 0x00);
-    cpu.set_reg(Register8Bit::L, 0x00);
+    cpu.set_all_regs(0x00);
 
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::B), 0b00000001);
