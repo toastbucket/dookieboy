@@ -743,51 +743,51 @@ impl Cpu {
             CbInstruction::Rl(regop) => {
                 self.rotate_left(regop, false, true);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::Rlc(regop) => {
                 self.rotate_left(regop, true, true);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::RlMem() => {
                 self.rotate_left_mem(false);
                 (pc + 2, 4)
-            }
+            },
             CbInstruction::RlcMem() => {
                 self.rotate_left_mem(true);
                 (pc + 2, 4)
-            }
+            },
             CbInstruction::Rr(regop) => {
                 self.rotate_right(regop, false, true);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::Rrc(regop) => {
                 self.rotate_right(regop, true, true);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::RrMem() => {
                 self.rotate_right_mem(false);
                 (pc + 2, 4)
-            }
+            },
             CbInstruction::RrcMem() => {
                 self.rotate_right_mem(true);
                 (pc + 2, 4)
-            }
+            },
             CbInstruction::Res(regop, bit) => {
                 self.clear_bit(regop, bit);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::Set(regop, bit) => {
                 self.set_bit(regop, bit);
                 (pc + 2, 2)
-            }
+            },
             CbInstruction::ResMem(bit) => {
                 self.clear_bit_from_mem(bit);
                 (pc + 2, 4)
-            }
+            },
             CbInstruction::SetMem(bit) => {
                 self.set_bit_from_mem(bit);
                 (pc + 2, 4)
-            }
+            },
             _ => panic!("Invalid cb instruction"),
         }
     }
