@@ -457,23 +457,33 @@ impl Cpu {
     }
 
     fn set_bit(&mut self, regop: Register8Bit, bit: usize) {
-        self.set_reg(regop, self.get_reg(regop) | (1 << bit));
+        let mut byte = self.get_reg(regop);
+        byte |= (1 << bit);
+
+        self.set_reg(regop, byte);
     }
 
     fn clear_bit(&mut self, regop: Register8Bit, bit: usize) {
-        self.set_reg(regop, self.get_reg(regop) & !(1 << bit));
+        let mut byte = self.get_reg(regop);
+        byte &= !(1 << bit);
+
+        self.set_reg(regop, byte);
     }
 
     fn set_bit_from_mem(&mut self, bit: usize) {
-        self.write_byte(
-            self.get_reg_16(Register16Bit::HL), 
-            self.read_byte(self.get_reg_16(Register16Bit::HL)) | (1 << bit));
+        let addr = self.get_reg_16(Register16Bit::HL);
+        let mut byte = self.read_byte(addr);
+        byte |= (1 << bit);
+
+        self.write_byte(addr, byte);
     }
 
     fn clear_bit_from_mem(&mut self, bit: usize) {
-        self.write_byte(
-            self.get_reg_16(Register16Bit::HL), 
-            self.read_byte(self.get_reg_16(Register16Bit::HL)) & !(1 << bit));
+        let addr = self.get_reg_16(Register16Bit::HL);
+        let mut byte = self.read_byte(addr);
+        byte &= !(1 << bit);
+
+        self.write_byte(addr, byte);
     }
 
     // execute instruction
