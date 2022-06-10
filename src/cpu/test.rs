@@ -2149,6 +2149,211 @@ fn test_res() {
     assert_eq!(cpu.get_reg(Register8Bit::L), 0b00000000);
 }
 
+// Verify Bit
+#[test]
+fn test_bit() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 96;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::B, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::C, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::D, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::E, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::H, 7).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Bit(Register8Bit::L, 7).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_all_regs(0xff);
+
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+}
+
 // Verify Set
 #[test]
 fn test_set() {
@@ -2398,6 +2603,67 @@ fn test_reset_from_mem() {
     assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b10000000);
     cpu.step();
     assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b00000000);
+}
+
+// Verify check bit from mem
+#[test]
+fn test_bit_from_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 17;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(0).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(1).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(2).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(3).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(4).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(5).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(6).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::BitMem(7).as_byte(),
+        0xff,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0x10);
+
+    // bit 0
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 1
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 2
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 3
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 4
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 5
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 6
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+
+    // bit 7
+    cpu.step();
+    assert_eq!(cpu.get_flag(Flag::Z), false);
 }
 
 // Verify set bit from mem
