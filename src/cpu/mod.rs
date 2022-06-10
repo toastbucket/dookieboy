@@ -470,6 +470,16 @@ impl Cpu {
         self.set_reg(regop, byte);
     }
 
+    fn check_bit(&mut self, regop: Register8Bit, bit: usize) {
+        let byte = self.get_reg(regop);
+        let is_set = ((byte >> bit) & 1) == 1;
+
+        self.set_flag(Flag::Z, !is_set);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, true);
+        // do not set carry flag
+    }
+
     fn set_bit_from_mem(&mut self, bit: usize) {
         let addr = self.get_reg_16(Register16Bit::HL);
         let mut byte = self.read_byte(addr);
@@ -484,6 +494,17 @@ impl Cpu {
         byte &= !(1 << bit);
 
         self.write_byte(addr, byte);
+    }
+
+    fn check_bit_from_mem(&mut self, bit: usize) {
+        let addr = self.get_reg_16(Register16Bit::HL);
+        let byte = self.read_byte(addr);
+        let is_set = ((byte >> bit) & 1) == 1;
+
+        self.set_flag(Flag::Z, !is_set);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, true);
+        // do not set carry flag
     }
 
     // execute instruction
@@ -786,6 +807,10 @@ impl Cpu {
                 self.clear_bit(regop, bit);
                 (pc + 2, 2)
             },
+            CbInstruction::Bit(regop, bit) => {
+                self.check_bit(regop, bit);
+                (pc + 2, 2)
+            },
             CbInstruction::Set(regop, bit) => {
                 self.set_bit(regop, bit);
                 (pc + 2, 2)
@@ -793,6 +818,10 @@ impl Cpu {
             CbInstruction::ResMem(bit) => {
                 self.clear_bit_from_mem(bit);
                 (pc + 2, 4)
+            },
+            CbInstruction::BitMem(bit) => {
+                self.check_bit_from_mem(bit);
+                (pc + 2, 3)
             },
             CbInstruction::SetMem(bit) => {
                 self.set_bit_from_mem(bit);
