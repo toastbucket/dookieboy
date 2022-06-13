@@ -512,6 +512,29 @@ impl Cpu {
         // do not set carry flag
     }
 
+    fn swap(&mut self, regop: Register8Bit) {
+        let mut byte = self.get_reg(regop);
+        byte = (byte << 4) | ((byte & 0xf0) >> 4);
+
+        self.set_reg(regop, byte);
+        self.set_flag(Flag::Z, byte == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, false);
+    }
+
+    fn swap_mem(&mut self) {
+        let addr = self.get_reg_16(Register16Bit::HL);
+        let mut byte = self.read_byte(addr);
+        byte = (byte << 4) | ((byte & 0xf0) >> 4);
+
+        self.write_byte(addr, byte);
+        self.set_flag(Flag::Z, byte == 0);
+        self.set_flag(Flag::N, false);
+        self.set_flag(Flag::H, false);
+        self.set_flag(Flag::C, false);
+    }
+
     // execute instruction
     // return tuple containing (next_pc, # cycles used)
     fn execute_instruction(&mut self, instruction: Instruction) -> (u16, usize) {
@@ -838,6 +861,14 @@ impl Cpu {
             },
             CbInstruction::SetMem(bit) => {
                 self.set_bit_from_mem(bit);
+                (pc + 2, 4)
+            },
+            CbInstruction::Swap(regop) => {
+                self.swap(regop);
+                (pc + 2, 2)
+            },
+            CbInstruction::SwapMem() => {
+                self.swap_mem();
                 (pc + 2, 4)
             },
             _ => panic!("Invalid cb instruction"),
