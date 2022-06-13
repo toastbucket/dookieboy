@@ -657,6 +657,8 @@ pub enum CbInstruction {
     ResMem(usize),
     BitMem(usize),
     SetMem(usize),
+    Swap(Register8Bit),
+    SwapMem(),
 }
 
 impl CbInstruction {
@@ -924,6 +926,16 @@ impl CbInstruction {
             0xee => Some(CbInstruction::SetMem(5)),
             0xf6 => Some(CbInstruction::SetMem(6)),
             0xfe => Some(CbInstruction::SetMem(7)),
+            // SWAP n
+            0x30 => Some(CbInstruction::Swap(Register8Bit::B)),
+            0x31 => Some(CbInstruction::Swap(Register8Bit::C)),
+            0x32 => Some(CbInstruction::Swap(Register8Bit::D)),
+            0x33 => Some(CbInstruction::Swap(Register8Bit::E)),
+            0x34 => Some(CbInstruction::Swap(Register8Bit::H)),
+            0x35 => Some(CbInstruction::Swap(Register8Bit::L)),
+            0x37 => Some(CbInstruction::Swap(Register8Bit::A)),
+            // SWAP (HL)
+            0x36 => Some(CbInstruction::SwapMem()),
             _ => panic!("Invalid instruction"),
         }
     }
@@ -1191,6 +1203,16 @@ impl CbInstruction {
             CbInstruction::SetMem(5) => 0xee,
             CbInstruction::SetMem(6) => 0xf6,
             CbInstruction::SetMem(7) => 0xfe,
+            // SWAP n
+            CbInstruction::Swap(Register8Bit::B) => 0x30,
+            CbInstruction::Swap(Register8Bit::C) => 0x31,
+            CbInstruction::Swap(Register8Bit::D) => 0x32,
+            CbInstruction::Swap(Register8Bit::E) => 0x33,
+            CbInstruction::Swap(Register8Bit::H) => 0x34,
+            CbInstruction::Swap(Register8Bit::L) => 0x35,
+            CbInstruction::Swap(Register8Bit::A) => 0x37,
+            // SWAP (HL)
+            CbInstruction::SwapMem() => 0x36,
             _ => panic!("Invalid instruction"),
         }
     }

@@ -2711,3 +2711,65 @@ fn test_set_from_mem() {
     cpu.step();
     assert_eq!(cpu.read_byte(cpu.get_reg_16(Register16Bit::HL)), 0b11111111);
 }
+
+#[test]
+fn test_swap() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Swap(Register8Bit::A).as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::Swap(Register8Bit::A).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.set_reg(Register8Bit::A, 0x00);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+
+    cpu.set_reg(Register8Bit::A, 0x0f);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xf0);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+}
+
+#[test]
+fn test_swap_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 6;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SwapMem().as_byte(),
+        Instruction::CbInstruction().as_byte(),
+        CbInstruction::SwapMem().as_byte(),
+        0x00,
+        0x0f,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.set_reg_16(Register16Bit::HL, 0x04);
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x04), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+
+    cpu.set_reg_16(Register16Bit::HL, 0x05);
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x05), 0xf0);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+}
