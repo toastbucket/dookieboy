@@ -170,6 +170,34 @@ fn test_add_overflow() {
     }
 }
 
+#[test]
+fn test_add_16() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::Add16(Register16Bit::BC).as_byte(),
+        Instruction::Add16(Register16Bit::HL).as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::BC, 0x0605);
+    cpu.set_reg_16(Register16Bit::HL, 0x8a23);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x9028);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+
+    cpu.set_flag(Flag::H, false);
+    cpu.set_reg_16(Register16Bit::HL, 0x8a23);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x1446);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+}
+
 // Verify adding to registers with carry
 #[test]
 fn test_add_carry() {
