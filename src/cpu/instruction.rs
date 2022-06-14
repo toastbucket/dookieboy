@@ -73,6 +73,7 @@ pub enum Instruction {
     LdToCUpperMem(),
     LdFromCUpperMem(),
     LdHlToSp(), 
+    LdSpOffsetToHl(), // honestly out of name ideas
     JumpAbs(BranchCondition),
     JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
@@ -336,6 +337,8 @@ impl Instruction {
             0xf2 => Some(Instruction::LdFromCUpperMem()),
             // LD SP HL
             0xf9 => Some(Instruction::LdHlToSp()),
+            // LD HL SP+s8
+            0xf8 => Some(Instruction::LdSpOffsetToHl()),
             // JP
             0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
             0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
@@ -643,6 +646,8 @@ impl Instruction {
             Instruction::LdFromCUpperMem() => 0xf2,
             // LD SP HL
             Instruction::LdHlToSp() => 0xf9,
+            // LD HL SP+s8
+            Instruction::LdSpOffsetToHl() => 0xf8,
             // JP
             Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
             Instruction::JumpAbs(BranchCondition::NC) => 0xd2,
