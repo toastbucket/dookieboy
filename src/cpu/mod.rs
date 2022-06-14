@@ -836,6 +836,11 @@ impl Cpu {
                 self.ld_from_mem(Register8Bit::A, 0xff00 + offset);
                 (pc + 1, 2)
             },
+            Instruction::LdHlToSp() => {
+                let hl = self.get_reg_16(Register16Bit::HL);
+                self.set_reg_16(Register16Bit::SP, hl);
+                (pc + 1, 2)
+            },
             Instruction::JumpAbs(condition) => {
                 if self.should_branch(condition) {
                     let addr = (self.read_byte(pc + 1) as u16)
