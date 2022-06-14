@@ -96,7 +96,14 @@ impl Gameboy {
         'running: loop {
             self.handle_sdl2_events()?;
             self.handle_interrupts();
-            self.cpu.step();
+
+            if !self.cpu.halted() {
+                self.cpu.step();
+            } else {
+                // just sleep for 10ms now until we decide what
+                // to do
+                sleep(Duration::from_millis(10));
+            }
         }
 
         Ok(())
@@ -105,18 +112,28 @@ impl Gameboy {
     fn handle_interrupts(&mut self) {
         for interrupt in Interrupt::iterator() {
             let mut should_trigger = false;
+            let mut ime = false;
 
+            //TODO: find out how to borrow both
             {
                 let intc = &mut self.mmu.borrow_mut().intc;
                 should_trigger = intc.should_trigger(interrupt);
-                if should_trigger {
+                ime = intc.get_ime();
+
+                if should_trigger && ime {
                     intc.set_ime(false);
                     intc.clear_request(interrupt);
                 }
             }
 
-            if should_trigger {
+            if should_trigger && ime {
                 self.cpu.trigger_interrupt(interrupt);
+
+                // TODO: emulate halt bug
+                // https://gbdev.io/pandocs/halt.html#halt-bug
+                if self.cpu.halted() {
+                    self.cpu.exit_halt();
+                }
 
                 // break from loop, we only handle one interrupt at
                 // a time
