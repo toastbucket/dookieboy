@@ -1491,6 +1491,22 @@ fn test_ld_from_c_mem() {
     assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
 }
 
+// Verify loading contents of HL to SP
+#[test]
+fn test_ld_sp_hl() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdHlToSp().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0x6969);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0x6969);
+}
+
 // Verify noop
 #[test]
 fn test_noop() {
