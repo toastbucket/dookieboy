@@ -1507,6 +1507,50 @@ fn test_ld_sp_hl() {
     assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0x6969);
 }
 
+// Verify loading contents of SP + s8 to HL
+#[test]
+fn test_ld_hl_sp_plus_s8() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 8;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdSpOffsetToHl().as_byte(),
+        0xff,
+        Instruction::LdSpOffsetToHl().as_byte(),
+        0x1,
+        Instruction::LdSpOffsetToHl().as_byte(),
+        0x8,
+        Instruction::LdSpOffsetToHl().as_byte(),
+        0xff,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    // if SP = 0 and s8 = -1 (0xff), ADDING that value will NOT result in carry
+    cpu.set_reg_16(Register16Bit::SP, 0x00);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0xffff);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    cpu.set_reg_16(Register16Bit::SP, 0xffff);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x00);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    cpu.set_flag(Flag::C, false);
+    cpu.set_flag(Flag::H, true);
+    cpu.set_reg_16(Register16Bit::SP, 0xf);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x17);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    cpu.set_flag(Flag::H, false);
+    cpu.set_reg_16(Register16Bit::SP, 0xffff);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0xfffe);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+}
+
 // Verify noop
 #[test]
 fn test_noop() {

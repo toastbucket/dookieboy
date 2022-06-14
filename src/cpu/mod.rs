@@ -511,6 +511,19 @@ impl Cpu {
         self.set_reg(regop, self.read_byte(addr));
     }
 
+    // TODO consolidate ALU operations
+    fn ld_sp_offset_to_hl(&mut self, pc: u16) {
+        let operand = self.read_byte(pc + 1) as i8;
+        let sp = self.get_reg_16(Register16Bit::SP);
+        let (result, did_carry) = sp.overflowing_add(operand as u16);
+        let did_half_carry = ((sp & 0xf) + (operand as u16 & 0xf)) & 0x10 == 0x10;
+        self.set_reg_16(Register16Bit::HL, result);
+        self.set_flag(Flag::C, did_carry);
+        self.set_flag(Flag::H, did_half_carry);
+        self.set_flag(Flag::Z, false);
+        self.set_flag(Flag::N, false);
+    }
+
     fn push(&mut self, val: u16) {
         self.set_sp(self.get_sp() - 2);
         self.write_word(self.get_sp(), val);
@@ -840,6 +853,10 @@ impl Cpu {
                 let hl = self.get_reg_16(Register16Bit::HL);
                 self.set_reg_16(Register16Bit::SP, hl);
                 (pc + 1, 2)
+            },
+            Instruction::LdSpOffsetToHl() => {
+                self.ld_sp_offset_to_hl(pc);
+                (pc + 2, 3)
             },
             Instruction::JumpAbs(condition) => {
                 if self.should_branch(condition) {
