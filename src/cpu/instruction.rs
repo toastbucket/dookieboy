@@ -66,10 +66,12 @@ pub enum Instruction {
     LdFromMemInc(), // Always A and HL
     LdFromMemDec(), // Always A and HL
     LdRegister16Imm(Register16Bit),
-    LdToUpperMem(),
-    LdFromUpperMem(),
+    LdToImmUpperMem(),
+    LdFromImmUpperMem(),
     LdToImmMem(),
     LdFromImmMem(),
+    LdToCUpperMem(),
+    LdFromCUpperMem(),
     JumpAbs(BranchCondition),
     JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
@@ -320,13 +322,17 @@ impl Instruction {
             0x21 => Some(Instruction::LdRegister16Imm(Register16Bit::HL)),
             0x31 => Some(Instruction::LdRegister16Imm(Register16Bit::SP)),
             // LD (n) A
-            0xe0 => Some(Instruction::LdToUpperMem()),
+            0xe0 => Some(Instruction::LdToImmUpperMem()),
             // LD A (n)
-            0xf0 => Some(Instruction::LdFromUpperMem()),
+            0xf0 => Some(Instruction::LdFromImmUpperMem()),
             // LD (a16) A
             0xea => Some(Instruction::LdToImmMem()),
             // LD A (a16)
             0xfa => Some(Instruction::LdFromImmMem()),
+            // LD (C) A
+            0xe2 => Some(Instruction::LdToCUpperMem()),
+            // LD A (C)
+            0xf2 => Some(Instruction::LdFromCUpperMem()),
             // JP
             0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
             0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
@@ -621,13 +627,17 @@ impl Instruction {
             Instruction::LdRegister16Imm(Register16Bit::HL) => 0x21,
             Instruction::LdRegister16Imm(Register16Bit::SP) => 0x31,
             // LD (n) A
-            Instruction::LdToUpperMem() => 0xe0,
+            Instruction::LdToImmUpperMem() => 0xe0,
             // LD A (n)
-            Instruction::LdFromUpperMem() => 0xf0,
+            Instruction::LdFromImmUpperMem() => 0xf0,
             // LD (a16) A
             Instruction::LdToImmMem() => 0xea,
             // LD A (a16)
             Instruction::LdFromImmMem() => 0xfa,
+            // LD (C) A
+            Instruction::LdToCUpperMem() => 0xe2,
+            // LD A (C)
+            Instruction::LdFromCUpperMem() => 0xf2,
             // JP
             Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
             Instruction::JumpAbs(BranchCondition::NC) => 0xd2,
