@@ -92,12 +92,13 @@ fn main() {
     if debug {
         let mut last_cmd: Option<Cmd> = None;
         let mut cmd: Option<Cmd> = None;
+        let mut shell = Shell::new();
 
         'debug: loop {
             cmd = Shell::get_cmd();
-            let ret = Shell::run_cmd(&mut gameboy, &cmd);
+            let ret = shell.run_cmd(&mut gameboy, &cmd);
             if !ret {
-                Shell::run_cmd(&mut gameboy, &last_cmd);
+                shell.run_cmd(&mut gameboy, &last_cmd);
             } else {
                 last_cmd = cmd.take();
             }

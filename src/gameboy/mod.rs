@@ -41,6 +41,16 @@ pub struct Gameboy {
     height: u32,
 }
 
+impl Memory for Gameboy {
+    fn mem_read_byte(&self, addr: u16) -> u8 {
+        self.mmu.borrow_mut().mem_read_byte(addr)
+    }
+
+    fn mem_write_byte(&mut self, addr: u16, val: u8) {
+        self.mmu.borrow_mut().mem_write_byte(addr, val);
+    }
+}
+
 impl Gameboy {
     pub fn new(width: u32, height: u32) -> Gameboy {
         let mmu = Rc::new(RefCell::new(Mmu::new()));
