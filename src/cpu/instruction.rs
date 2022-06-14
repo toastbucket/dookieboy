@@ -55,6 +55,8 @@ pub enum Instruction {
     LdRegister16Imm(Register16Bit),
     LdToUpperMem(),
     LdFromUpperMem(),
+    LdToImmMem(),
+    LdFromImmMem(),
     JumpAbs(BranchCondition),
     JumpAbsFromReg(), // always uses HL
     JumpRel(BranchCondition),
@@ -308,6 +310,10 @@ impl Instruction {
             0xe0 => Some(Instruction::LdToUpperMem()),
             // LD A (n)
             0xf0 => Some(Instruction::LdFromUpperMem()),
+            // LD (a16) A
+            0xea => Some(Instruction::LdToImmMem()),
+            // LD A (a16)
+            0xfa => Some(Instruction::LdFromImmMem()),
             // JP
             0xc2 => Some(Instruction::JumpAbs(BranchCondition::NZ)),
             0xd2 => Some(Instruction::JumpAbs(BranchCondition::NC)),
@@ -605,6 +611,10 @@ impl Instruction {
             Instruction::LdToUpperMem() => 0xe0,
             // LD A (n)
             Instruction::LdFromUpperMem() => 0xf0,
+            // LD (a16) A
+            Instruction::LdToImmMem() => 0xea,
+            // LD A (a16)
+            Instruction::LdFromImmMem() => 0xfa,
             // JP
             Instruction::JumpAbs(BranchCondition::NZ) => 0xc2,
             Instruction::JumpAbs(BranchCondition::NC) => 0xd2,
