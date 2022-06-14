@@ -1393,7 +1393,7 @@ fn test_ld_to_upper() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdToUpperMem().as_byte(),
+        Instruction::LdToImmUpperMem().as_byte(),
         0x0a,
     ];
 
@@ -1410,7 +1410,7 @@ fn test_ld_from_upper() {
     let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
     const INSTRUCTIONS_LEN: usize = 2;
     let test_ram: [u8; INSTRUCTIONS_LEN] = [
-        Instruction::LdFromUpperMem().as_byte(),
+        Instruction::LdFromImmUpperMem().as_byte(),
         0x0a,
     ];
 
@@ -1452,6 +1452,40 @@ fn test_ld_from_mem_imm() {
 
     cpu.load_test_ram(&test_ram);
     cpu.write_byte(0x69, 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);
+}
+
+// Verify loading A to 0xff00 + C register
+#[test]
+fn test_ld_to_c_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToCUpperMem().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::C, 0x69);
+    cpu.set_reg(Register8Bit::A, 0x69);
+
+    cpu.step();
+    assert_eq!(cpu.read_byte(0xff69), 0x69);
+}
+
+// Verify loading A from 0xff00 + C register
+#[test]
+fn test_ld_from_c_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 1;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdFromCUpperMem().as_byte(),
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.write_byte(0xff69, 0x69);
+    cpu.set_reg(Register8Bit::C, 0x69);
 
     cpu.step();
     assert_eq!(cpu.get_reg(Register8Bit::A), 0x69);

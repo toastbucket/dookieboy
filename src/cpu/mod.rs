@@ -806,12 +806,12 @@ impl Cpu {
                 self.set_reg_16(pair, self.read_word(pc + 1));
                 (pc + 3, 3)
             },
-            Instruction::LdToUpperMem() => {
+            Instruction::LdToImmUpperMem() => {
                 let offset = self.read_byte(pc + 1);
                 self.ld_to_mem(Register8Bit::A, 0xff00 + (offset as u16));
                 (pc + 2, 3)
             },
-            Instruction::LdFromUpperMem() => {
+            Instruction::LdFromImmUpperMem() => {
                 let offset = self.read_byte(pc + 1);
                 self.ld_from_mem(Register8Bit::A, 0xff00 + (offset as u16));
                 (pc + 2, 3)
@@ -825,6 +825,16 @@ impl Cpu {
                 let addr = self.read_word(pc + 1);
                 self.ld_from_mem(Register8Bit::A, addr);
                 (pc + 3, 4)
+            },
+            Instruction::LdToCUpperMem() => {
+                let offset = self.get_reg(Register8Bit::C) as u16;
+                self.ld_to_mem(Register8Bit::A, 0xff00 + offset);
+                (pc + 1, 2)
+            },
+            Instruction::LdFromCUpperMem() => {
+                let offset = self.get_reg(Register8Bit::C) as u16;
+                self.ld_from_mem(Register8Bit::A, 0xff00 + offset);
+                (pc + 1, 2)
             },
             Instruction::JumpAbs(condition) => {
                 if self.should_branch(condition) {
