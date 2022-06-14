@@ -35,6 +35,7 @@ pub enum Instruction {
     Add(Register8Bit),
     AddImm(),
     AddFromMem(), // always uses HL
+    Add16(Register16Bit),
     Adc(Register8Bit),
     AdcFromMem(), // always uses HL
     Sub(Register8Bit),
@@ -168,6 +169,11 @@ impl Instruction {
             0xc6 => Some(Instruction::AddImm()),
             // ADD A,(HL)
             0x86 => Some(Instruction::AddFromMem()),
+            // ADD HL,(nn)
+            0x09 => Some(Instruction::Add16(Register16Bit::BC)),
+            0x19 => Some(Instruction::Add16(Register16Bit::DE)),
+            0x29 => Some(Instruction::Add16(Register16Bit::HL)),
+            0x39 => Some(Instruction::Add16(Register16Bit::SP)),
             // ADC A,r
             0x88 => Some(Instruction::Adc(Register8Bit::B)),
             0x89 => Some(Instruction::Adc(Register8Bit::C)),
@@ -458,6 +464,11 @@ impl Instruction {
             Instruction::AddImm() => 0xc6,
             // ADD A,(HL)
             Instruction::AddFromMem() => 0x86,
+            // ADD HL,(nn)
+            Instruction::Add16(Register16Bit::BC) => 0x09,
+            Instruction::Add16(Register16Bit::DE) => 0x19,
+            Instruction::Add16(Register16Bit::HL) => 0x29,
+            Instruction::Add16(Register16Bit::SP) => 0x39,
             // ADC A,R
             Instruction::Adc(Register8Bit::B) => 0x88,
             Instruction::Adc(Register8Bit::C) => 0x89,

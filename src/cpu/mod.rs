@@ -396,6 +396,18 @@ impl Cpu {
         self.set_reg(regop, result);
     }
 
+    fn add_16(&mut self, pair: Register16Bit) {
+        let hl = self.get_reg_16(Register16Bit::HL);
+        let op = self.get_reg_16(pair);
+        let (result, did_wrap) = hl.overflowing_add(op);
+
+        self.set_reg_16(Register16Bit::HL, result);
+        self.set_flag(Flag::N, false);
+        let h = (hl & 0xfff).wrapping_add(op & 0xfff) > 0xfff;
+        self.set_flag(Flag::H, h);
+        self.set_flag(Flag::C, did_wrap);
+    }
+
     fn inc_16(&mut self, pair: Register16Bit) {
         let r = self.get_reg_16(pair);
         self.set_reg_16(pair, r.wrapping_add(1));
@@ -638,6 +650,10 @@ impl Cpu {
             },
             Instruction::AddFromMem() => {
                 self.add(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), false);
+                (pc + 1, 2)
+            },
+            Instruction::Add16(pair) => {
+                self.add_16(pair);
                 (pc + 1, 2)
             },
             Instruction::AdcFromMem() => {
