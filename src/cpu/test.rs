@@ -195,6 +195,32 @@ fn test_add_16() {
     assert_eq!(cpu.get_reg_16(Register16Bit::HL), 0x1446);
     assert_eq!(cpu.get_flag(Flag::H), true);
     assert_eq!(cpu.get_flag(Flag::N), false);
+}
+
+fn test_add_sp_s8() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 4;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AddSpS8().as_byte(),
+        2,
+        Instruction::AddSpS8().as_byte(),
+        0xff,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+
+    cpu.set_reg_16(Register16Bit::SP, 0xfff8);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0xfffa);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), false);
+    assert_eq!(cpu.get_flag(Flag::C), false);
+
+    cpu.set_reg_16(Register16Bit::SP, 0xffff);
+    cpu.step();
+    assert_eq!(cpu.get_reg_16(Register16Bit::SP), 0xfffe);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
     assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
