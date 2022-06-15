@@ -1589,6 +1589,41 @@ fn test_ld_hl_sp_plus_s8() {
     assert_eq!(cpu.get_flag(Flag::H), true);
 }
 
+// Verify loading sp in memory
+#[test]
+fn test_ld_sp_imm_mem() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 3;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdSpToImmMem().as_byte(),
+        0x42,
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::SP, 0x6996);
+
+    cpu.step();
+    assert_eq!(cpu.read_word(0x6942), 0x6996);
+}
+
+// Verify loading d8 into offset (HL)
+#[test]
+fn test_ld_d8_to_mem_imm() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::LdToMemImm().as_byte(),
+        0x69,
+    ];
+
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg_16(Register16Bit::HL, 0x6969);
+
+    cpu.step();
+    assert_eq!(cpu.read_byte(0x6969), 0x69);
+}
+
 // Verify noop
 #[test]
 fn test_noop() {

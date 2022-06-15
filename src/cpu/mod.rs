@@ -524,6 +524,12 @@ impl Cpu {
         self.set_flag(Flag::N, false);
     }
 
+    fn ld_sp_to_imm_mem(&mut self, pc: u16) {
+        let sp = self.get_reg_16(Register16Bit::SP);
+        let addr = self.read_word(pc + 1);
+        self.write_word(addr, sp);
+    }
+
     fn push(&mut self, val: u16) {
         self.set_sp(self.get_sp() - 2);
         self.write_word(self.get_sp(), val);
@@ -866,6 +872,16 @@ impl Cpu {
             },
             Instruction::LdSpOffsetToHl() => {
                 self.ld_sp_offset_to_hl(pc);
+                (pc + 2, 3)
+            },
+            Instruction::LdSpToImmMem() => {
+                self.ld_sp_to_imm_mem(pc);
+                (pc + 3, 5)
+            },
+            Instruction::LdToMemImm() => {
+                let operand = self.read_byte(pc + 1);
+                let addr = self.get_reg_16(Register16Bit::HL);
+                self.write_byte(addr, operand);
                 (pc + 2, 3)
             },
             Instruction::JumpAbs(condition) => {
