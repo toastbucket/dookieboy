@@ -1137,6 +1137,7 @@ impl Cpu {
 
         self.pc = 0x0100;
         self.set_sp(0xfffe);
+        self.cycles = 0;
 
         self.stopped = false;
         self.halted = false;
