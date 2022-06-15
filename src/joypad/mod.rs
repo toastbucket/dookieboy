@@ -11,6 +11,7 @@
 // ░░▐█▐▄░░▀░░░░░░▐░█▄▄░░
 // ░░░▀▀░▄TSM▄░░░▐▄▄▄▀░░░
 
+use crate::int_src::InterruptSource;
 use crate::memory::Memory;
 
 #[derive(Debug, Copy, Clone)]
@@ -29,6 +30,17 @@ pub struct Joypad {
    action_select: bool,
    direction_select: bool,
    buttons: [bool; 8],
+   int_req: bool,
+}
+
+impl InterruptSource for Joypad {
+    fn check_int_req(&self) -> bool {
+        self.int_req
+    }
+
+    fn consume_int_req(&mut self) {
+        self.int_req = false;
+    }
 }
 
 impl Memory for Joypad {
@@ -57,11 +69,35 @@ impl Joypad {
             action_select: false,
             direction_select: false,
             buttons: [false; 8],
+            int_req: false,
         }
     }
 
     pub fn update_button(&mut self, button: Button, state: bool) {
         let idx = button as usize;
+        let cur_state = self.buttons[idx];
+
+        // TODO: emulate switch bounce?
+        match button {
+            Button::A      |
+            Button::B      |
+            Button::SELECT |
+            Button::START => {
+                if self.action_select && !cur_state && state {
+                    self.int_req = true;
+                }
+            },
+            Button::RIGHT |
+            Button::LEFT  |
+            Button::UP    |
+            Button::DOWN => {
+                if self.direction_select && !cur_state && state {
+                    self.int_req = true;
+                }
+            },
+            _ => {},
+        }
+
         self.buttons[idx] = state;
     }
 
