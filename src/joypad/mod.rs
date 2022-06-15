@@ -13,17 +13,22 @@
 
 use crate::memory::Memory;
 
+#[derive(Debug, Copy, Clone)]
+pub enum Button {
+    RIGHT = 0,
+    LEFT,
+    UP,
+    DOWN,
+    A,
+    B,
+    SELECT,
+    START,
+}
+
 pub struct Joypad {
-   pub action_select: bool,
-   pub direction_select: bool,
-   pub up: bool,
-   pub down: bool,
-   pub left: bool,
-   pub right: bool,
-   pub a: bool,
-   pub b: bool,
-   pub start: bool,
-   pub select: bool,
+   action_select: bool,
+   direction_select: bool,
+   buttons: [bool; 8],
 }
 
 impl Memory for Joypad {
@@ -51,34 +56,36 @@ impl Joypad {
         Joypad {
             action_select: false,
             direction_select: false,
-            up: false,
-            down: false,
-            left: false,
-            right: false,
-            a: false,
-            b: false,
-            start: false,
-            select: false,
+            buttons: [false; 8],
         }
+    }
+
+    pub fn update_button(&mut self, button: Button, state: bool) {
+        let idx = button as usize;
+        self.buttons[idx] = state;
+    }
+
+    pub fn update_dir_select(&mut self, state: bool) {
+        self.direction_select = state;
+    }
+
+    pub fn update_act_select(&mut self, state: bool) {
+        self.action_select = state;
     }
 
     // All bits are represented inverted in the P1 register
     // i.e. 0b00011110 indicates that action buttons are
     // selected and only the A button is pressed
     fn build_reg(&self) -> u8 {
-        let reg;
-        if self.action_select {
-            reg = (!self.a as u8)
-                | (!self.b as u8) << 1
-                | (!self.select as u8) << 2
-                | (!self.start as u8) << 3;
-        } else {
-            reg = (!self.right as u8)
-                | (!self.left as u8) << 1
-                | (!self.up as u8) << 2
-                | (!self.down as u8) << 3;
-        }
-         reg | ((!self.direction_select as u8) << 4) | ((!self.action_select as u8) << 5)
+        // TODO: fix this logic
+        let start: usize = if self.action_select { 4 } else { 0 };
+
+        (!self.buttons[start] as u8)   << 0 |
+        (!self.buttons[start+1]as u8)  << 1 |
+        (!self.buttons[start+2]as u8)  << 2 |
+        (!self.buttons[start+3]as u8)  << 3 |
+        (!self.direction_select as u8) << 4 |
+        (!self.action_select as u8)    << 5
     }
 }
 
