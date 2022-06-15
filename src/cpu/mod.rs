@@ -779,6 +779,16 @@ impl Cpu {
                 self.subtract(Register8Bit::A, self.read_byte(self.get_reg_16(Register16Bit::HL)), true);
                 (pc + 1, 2)
             },
+            Instruction::AdcAD8() => {
+                let operand = self.read_byte(pc + 1);
+                self.add(Register8Bit::A, operand, true);
+                (pc + 2, 2)
+            },
+            Instruction::SbcAD8() => {
+                let operand = self.read_byte(pc + 1);
+                self.subtract(Register8Bit::A, operand, true);
+                (pc + 2, 2)
+            },
             Instruction::LdRegister(dest, src) => {
                 self.load_register(dest, src);
                 (pc + 1, 1)

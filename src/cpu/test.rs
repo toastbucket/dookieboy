@@ -1183,6 +1183,44 @@ fn test_sbc_mem_carry_overflow() {
     assert_eq!(cpu.get_flag(Flag::C), true);
 }
 
+// Verify adding immediate operand d8 to A
+#[test]
+fn test_adc_a_d8() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::AdcAD8().as_byte(),
+        0xff,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x1);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0x00);
+    assert_eq!(cpu.get_flag(Flag::Z), true);
+    assert_eq!(cpu.get_flag(Flag::N), false);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+}
+
+// Verify subtracting immediate operand d8 to A
+#[test]
+fn test_sbc_a_d8() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+    const INSTRUCTIONS_LEN: usize = 2;
+    let test_ram: [u8; INSTRUCTIONS_LEN] = [
+        Instruction::SbcAD8().as_byte(),
+        0x69,
+    ];
+    cpu.load_test_ram(&test_ram);
+    cpu.set_reg(Register8Bit::A, 0x42);
+    cpu.step();
+    assert_eq!(cpu.get_reg(Register8Bit::A), 0xd9);
+    assert_eq!(cpu.get_flag(Flag::Z), false);
+    assert_eq!(cpu.get_flag(Flag::N), true);
+    assert_eq!(cpu.get_flag(Flag::H), true);
+    assert_eq!(cpu.get_flag(Flag::C), true);
+}
+
 // Verify loading register B
 #[test]
 fn test_ld_b_a() {
