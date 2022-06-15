@@ -57,6 +57,8 @@ pub enum Instruction {
     SubFromMem(), // always uses HL
     Sbc(Register8Bit),
     SbcFromMem(), // always uses HL
+    AdcAD8(),
+    SbcAD8(),
     LdRegister(Register8Bit, Register8Bit),
     LdImm(Register8Bit),
     LdToMem(Register8Bit, Register16Bit),
@@ -228,6 +230,10 @@ impl Instruction {
             0x9f => Some(Instruction::Sbc(Register8Bit::A)),
             // SBC A,(HL)
             0x9e => Some(Instruction::SbcFromMem()),
+            // ADC A,d8
+            0xce => Some(Instruction::AdcAD8()),
+            // SBC A,d8
+            0xde => Some(Instruction::SbcAD8()),
             // LD B, X
             0x40 => Some(Instruction::LdRegister(Register8Bit::B, Register8Bit::B)),
             0x41 => Some(Instruction::LdRegister(Register8Bit::B, Register8Bit::C)),
@@ -537,6 +543,10 @@ impl Instruction {
             Instruction::Sbc(Register8Bit::A) => 0x9f,
             // SBC A,(HL)
             Instruction::SbcFromMem() => 0x9e,
+            // ADC A,d8
+            Instruction::AdcAD8() => 0xce,
+            // SBC A,d8
+            Instruction::SbcAD8() => 0xde,
             // LD B, Y
             Instruction::LdRegister(Register8Bit::B, Register8Bit::B) => 0x40,
             Instruction::LdRegister(Register8Bit::B, Register8Bit::C) => 0x41,
