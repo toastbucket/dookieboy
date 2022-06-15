@@ -28,7 +28,7 @@ use crate::shell::{Shell, Cmd};
 use crate::cpu::Cpu;
 use crate::intc::Interrupt;
 use crate::mmu::Mmu;
-use crate::joypad::Joypad;
+use crate::joypad::{Joypad, Button};
 use crate::memory::Memory;
 
 pub struct Gameboy {
@@ -155,6 +155,7 @@ impl Gameboy {
     fn handle_sdl2_events(&mut self) -> Result<(), io::Error> {
         if let Some(context) = &self.sdl_context {
             let mut pump = context.event_pump().unwrap();
+            let mut joypad = &mut self.mmu.borrow_mut().joypad;
             for event in pump.poll_iter() {
                 match event {
                     Event::Quit {..}
@@ -164,59 +165,57 @@ impl Gameboy {
                         ..
                     } => return Err(io::Error::from_raw_os_error(0)),
                     Event::KeyDown { keycode: Some(Keycode::A), repeat: false, .. } => {
-                        println!("got a");
-                        self.mmu.borrow_mut().joypad.left = true;
+                        joypad.update_button(Button::LEFT, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::D), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.right = true;
+                        joypad.update_button(Button::RIGHT, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::W), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.up = true;
+                        joypad.update_button(Button::UP, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::S), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.down = true;
+                        joypad.update_button(Button::DOWN, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::J), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.a = true;
+                        joypad.update_button(Button::A, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::K), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.b = true;
+                        joypad.update_button(Button::B, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::Return), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.start = true;
+                        joypad.update_button(Button::START, true);
                     },
                     Event::KeyDown { keycode: Some(Keycode::RShift), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.select = true;
+                        joypad.update_button(Button::SELECT, true);
                     },
                     Event::KeyUp { keycode: Some(Keycode::A), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.left = false;
+                        joypad.update_button(Button::LEFT, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::D), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.right = false;
+                        joypad.update_button(Button::RIGHT, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::W), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.up = false;
+                        joypad.update_button(Button::UP, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::S), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.down = false;
+                        joypad.update_button(Button::DOWN, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::J), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.a = false;
+                        joypad.update_button(Button::A, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::K), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.b = false;
+                        joypad.update_button(Button::B, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::Return), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.start = false;
+                        joypad.update_button(Button::START, false);
                     },
                     Event::KeyUp { keycode: Some(Keycode::RShift), repeat: false, .. } => {
-                        self.mmu.borrow_mut().joypad.select = false;
+                        joypad.update_button(Button::SELECT, false);
                     },
                     _ => continue,
                 }
             }
         }
-
         Ok(())
     }
 }
