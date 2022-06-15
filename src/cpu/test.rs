@@ -3161,3 +3161,49 @@ fn test_swap_mem() {
     assert_eq!(cpu.get_flag(Flag::H), false);
     assert_eq!(cpu.get_flag(Flag::C), false);
 }
+
+#[test]
+fn test_trigger_interrupt() {
+    let mut cpu = Cpu::new(Rc::new(RefCell::new(Mmu::new())));
+
+    cpu.reset();
+    cpu.trigger_interrupt(Interrupt::VBLANK);
+    let stack_top = cpu.get_reg_16(Register16Bit::SP);
+    let old_pc = cpu.read_word(stack_top);
+    assert_eq!(old_pc, 0x0100);
+    assert_eq!(cpu.pc, 0x0040);
+    assert_eq!(cpu.cycles, 5);
+
+    cpu.reset();
+    cpu.trigger_interrupt(Interrupt::LCD_STAT);
+    let stack_top = cpu.get_reg_16(Register16Bit::SP);
+    let old_pc = cpu.read_word(stack_top);
+    assert_eq!(old_pc, 0x0100);
+    assert_eq!(cpu.pc, 0x0048);
+    assert_eq!(cpu.cycles, 5);
+
+
+    cpu.reset();
+    cpu.trigger_interrupt(Interrupt::TIMER);
+    let stack_top = cpu.get_reg_16(Register16Bit::SP);
+    let old_pc = cpu.read_word(stack_top);
+    assert_eq!(old_pc, 0x0100);
+    assert_eq!(cpu.pc, 0x0050);
+    assert_eq!(cpu.cycles, 5);
+
+    cpu.reset();
+    cpu.trigger_interrupt(Interrupt::SERIAL);
+    let stack_top = cpu.get_reg_16(Register16Bit::SP);
+    let old_pc = cpu.read_word(stack_top);
+    assert_eq!(old_pc, 0x0100);
+    assert_eq!(cpu.pc, 0x0058);
+    assert_eq!(cpu.cycles, 5);
+
+    cpu.reset();
+    cpu.trigger_interrupt(Interrupt::JOYPAD);
+    let stack_top = cpu.get_reg_16(Register16Bit::SP);
+    let old_pc = cpu.read_word(stack_top);
+    assert_eq!(old_pc, 0x0100);
+    assert_eq!(cpu.pc, 0x0060);
+    assert_eq!(cpu.cycles, 5);
+}
