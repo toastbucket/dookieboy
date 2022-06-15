@@ -84,6 +84,10 @@ impl InterruptController {
         self.ime
     }
 
+    pub fn request(&mut self, interrupt: Interrupt) {
+        self.flag |= (1 << (interrupt as u8));
+    }
+
     pub fn clear_request(&mut self, interrupt: Interrupt) {
         self.flag &= !(1 << (interrupt as u8));
     }
