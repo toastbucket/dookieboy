@@ -19,6 +19,7 @@ mod int_src;
 mod joypad;
 mod memory;
 mod mmu;
+mod renderer;
 mod serial;
 mod shell;
 
