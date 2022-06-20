@@ -53,13 +53,8 @@ impl Memory for Joypad {
     }
 
     fn mem_write_byte(&mut self, addr: u16, val: u8) {
-        if val & (1 << 4) != 0 {
-            self.direction_select = true;
-        }
-
-        if val & (1<< 5) != 0 {
-            self.action_select = true;
-        }
+        self.direction_select = (val & (1 << 4)) == 0;
+        self.action_select = (val & (1 << 5)) == 0;
     }
 }
 
