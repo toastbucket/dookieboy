@@ -53,8 +53,10 @@ impl Memory for Joypad {
     }
 
     fn mem_write_byte(&mut self, addr: u16, val: u8) {
-        self.direction_select = (val & (1 << 4)) == 0;
-        self.action_select = (val & (1 << 5)) == 0;
+        if addr == 0xff00 {
+            self.direction_select = (val & (1 << 4)) == 0;
+            self.action_select = (val & (1 << 5)) == 0;
+        }
     }
 }
 
@@ -90,17 +92,18 @@ impl Joypad {
                     self.int_req = true;
                 }
             },
-            _ => {},
         }
 
         self.buttons[idx] = state;
     }
 
-    pub fn update_dir_select(&mut self, state: bool) {
+    #[cfg(test)]
+    fn update_dir_select(&mut self, state: bool) {
         self.direction_select = state;
     }
 
-    pub fn update_act_select(&mut self, state: bool) {
+    #[cfg(test)]
+    fn update_act_select(&mut self, state: bool) {
         self.action_select = state;
     }
 

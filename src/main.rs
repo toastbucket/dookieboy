@@ -22,7 +22,6 @@ mod mmu;
 mod shell;
 
 use std::env;
-use std::io;
 
 use crate::gameboy::Gameboy;
 use crate::shell::{Cmd, Shell};
@@ -82,7 +81,7 @@ fn main() {
     let mut gameboy = Gameboy::new(WIDTH, HEIGHT);
     match gameboy.load_rom(rom) {
         Ok(_) => {},
-        Err(e) => {
+        Err(_e) => {
             println!("unable to load rom file");
             print_usage();
             std::process::exit(1);
@@ -92,10 +91,10 @@ fn main() {
 
     if debug {
         let mut last_cmd: Option<Cmd> = None;
-        let mut cmd: Option<Cmd> = None;
+        let mut cmd: Option<Cmd>;
         let mut shell = Shell::new();
 
-        'debug: loop {
+        loop {
             cmd = Shell::get_cmd();
             let ret = shell.run_cmd(&mut gameboy, &cmd);
             if !ret {
@@ -107,7 +106,7 @@ fn main() {
     } else {
         match gameboy.init_sdl() {
             Ok(_) => {},
-            Err(e) => {
+            Err(_e) => {
                 println!("dookieboy couldn't initialize SDL :'(");
                 print_usage();
                 std::process::exit(1);

@@ -12,24 +12,21 @@
 // ░░░▀▀░▄TSM▄░░░▐▄▄▄▀░░░
 
 use std::cell::RefCell;
-use std::collections::HashSet;
 use std::io;
 use std::rc::Rc;
 use std::time::Duration;
 use std::thread::sleep;
 
 use sdl2::Sdl;
-use sdl2::EventPump;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::render::WindowCanvas;
 
-use crate::shell::{Shell, Cmd};
 use crate::cpu::Cpu;
 use crate::intc::Interrupt;
 use crate::int_src::InterruptSource;
 use crate::mmu::Mmu;
-use crate::joypad::{Joypad, Button};
+use crate::joypad::Button;
 use crate::memory::Memory;
 
 pub struct Gameboy {
@@ -104,7 +101,7 @@ impl Gameboy {
         //
         //  If the interrupt master enable flag is set, the contents of the program coounter are
         //  pushed to the stack and control jumps to the starting address of the interrupt.
-        'running: loop {
+        loop {
             self.handle_sdl2_events()?;
             self.check_for_interrupts();
             self.handle_interrupts();
@@ -117,12 +114,10 @@ impl Gameboy {
                 sleep(Duration::from_millis(10));
             }
         }
-
-        Ok(())
     }
 
     fn check_for_interrupts(&mut self) {
-        let mut mmu = &mut self.mmu.borrow_mut();
+        let mmu = &mut self.mmu.borrow_mut();
 
         if mmu.joypad.check_and_consume_int_req() {
             mmu.intc.request(Interrupt::JOYPAD);
@@ -131,8 +126,8 @@ impl Gameboy {
 
     fn handle_interrupts(&mut self) {
         for interrupt in Interrupt::iterator() {
-            let mut should_trigger = false;
-            let mut ime = false;
+            let should_trigger: bool;
+            let ime: bool;
 
             //TODO: find out how to borrow both
             {
@@ -165,7 +160,7 @@ impl Gameboy {
     fn handle_sdl2_events(&mut self) -> Result<(), io::Error> {
         if let Some(context) = &self.sdl_context {
             let mut pump = context.event_pump().unwrap();
-            let mut joypad = &mut self.mmu.borrow_mut().joypad;
+            let joypad = &mut self.mmu.borrow_mut().joypad;
             for event in pump.poll_iter() {
                 match event {
                     Event::Quit {..}

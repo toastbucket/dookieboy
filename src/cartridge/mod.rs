@@ -12,7 +12,6 @@
 // ░░░▀▀░▄TSM▄░░░▐▄▄▄▀░░░
 
 use std::fs;
-use std::path::Path;
 use std::io;
 
 use crate::memory::Memory;
@@ -121,6 +120,7 @@ impl Cartridge {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn is_loaded(&self) -> bool {
         self.loaded
     }
@@ -255,7 +255,7 @@ impl Memory for Cartridge {
         self.rom[addr as usize]
     }
 
-    fn mem_write_byte(&mut self, addr: u16, val: u8) {
+    fn mem_write_byte(&mut self, _addr: u16, _val: u8) {
         // do nothing
     }
 }

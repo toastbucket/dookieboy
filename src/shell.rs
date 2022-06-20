@@ -99,10 +99,10 @@ impl Shell {
                         const INVAL: usize = 0x10000;
 
                         if cmd.args.len() >= 2 {
-                            let mut addr = usize::from_str_radix(cmd.args[0].as_ref(), 16)
+                            let addr = usize::from_str_radix(cmd.args[0].as_ref(), 16)
                                 .unwrap_or(INVAL);
 
-                            let mut val = usize::from_str_radix(cmd.args[1].as_ref(), 16)
+                            let val = usize::from_str_radix(cmd.args[1].as_ref(), 16)
                                 .unwrap_or(INVAL);
 
                             if addr < INVAL && val < INVAL {
@@ -114,7 +114,7 @@ impl Shell {
                         const INVAL: usize = 0x10000;
 
                         if cmd.args.len() >= 1 {
-                            let mut addr = usize::from_str_radix(cmd.args[0].as_ref(), 16)
+                            let addr = usize::from_str_radix(cmd.args[0].as_ref(), 16)
                                 .unwrap_or(INVAL);
 
                             if addr < INVAL {
@@ -139,7 +139,7 @@ impl Shell {
 
     fn display_prompt() {
         print!("{}", PROMPT);
-        stdout().flush();
+        let _ = stdout().flush();
     }
 
     fn dump_the_dookie(gb: &mut Gameboy) {

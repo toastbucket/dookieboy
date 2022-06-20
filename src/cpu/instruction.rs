@@ -418,6 +418,7 @@ impl Instruction {
         }
     }
 
+    #[cfg(test)]
     pub fn as_byte(self) -> u8 {
         match self {
             // NOOP
@@ -1075,6 +1076,8 @@ impl CbInstruction {
             _ => panic!("Invalid instruction"),
         }
     }
+
+    #[cfg(test)]
     pub fn as_byte(self) -> u8 {
         match self {
             // RLC n
