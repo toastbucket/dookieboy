@@ -3175,7 +3175,7 @@ fn test_trigger_interrupt() {
     assert_eq!(cpu.cycles, 5);
 
     cpu.reset();
-    cpu.trigger_interrupt(Interrupt::LCD_STAT);
+    cpu.trigger_interrupt(Interrupt::STAT);
     let stack_top = cpu.get_reg_16(Register16Bit::SP);
     let old_pc = cpu.read_word(stack_top);
     assert_eq!(old_pc, 0x0100);

@@ -196,6 +196,7 @@ impl Cpu {
         self.rf[idx + 1] = (val & 0xff) as u8;
     }
 
+    #[cfg(test)]
     fn set_all_regs(&mut self, val: u8) {
         self.rf.iter_mut().for_each(|x| *x = val);
     }
@@ -203,8 +204,8 @@ impl Cpu {
     fn set_flag(&mut self, flag: Flag, val: bool) {
         let mut flags = self.get_reg(Register8Bit::F);
 
-        if (val) {
-            flags |= (1 << (flag as u8));
+        if val {
+            flags |= 1 << (flag as u8);
         } else {
             flags &= !(1 << (flag as u8));
         }
@@ -576,7 +577,7 @@ impl Cpu {
 
     fn set_bit(&mut self, regop: Register8Bit, bit: usize) {
         let mut byte = self.get_reg(regop);
-        byte |= (1 << bit);
+        byte |= 1 << bit;
 
         self.set_reg(regop, byte);
     }
@@ -601,7 +602,7 @@ impl Cpu {
     fn set_bit_from_mem(&mut self, bit: usize) {
         let addr = self.get_reg_16(Register16Bit::HL);
         let mut byte = self.read_byte(addr);
-        byte |= (1 << bit);
+        byte |= 1 << bit;
 
         self.write_byte(addr, byte);
     }

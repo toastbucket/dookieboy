@@ -17,21 +17,17 @@ use crate::memory::Memory;
 #[derive(Debug, Copy, Clone)]
 pub enum Interrupt {
     VBLANK = 0,
-    LCD_STAT = 1,
+    STAT = 1,
     TIMER = 2,
     SERIAL = 3,
     JOYPAD = 4,
 }
 
 impl Interrupt {
-    pub fn priority(&self) -> usize {
-       *self as usize
-    }
-
     pub fn vector(&self) -> u16 {
         match self {
             VBLANK => 0x0040,
-            LCD_STAT => 0x0048,
+            STAT => 0x0048,
             TIMER => 0x0050,
             SERIAL => 0x0058,
             JOYPAD => 0x0060,
@@ -39,7 +35,7 @@ impl Interrupt {
     }
 
     pub fn iterator() -> impl Iterator<Item = Interrupt> {
-        [VBLANK, LCD_STAT, TIMER, SERIAL, JOYPAD].iter().copied()
+        [VBLANK, STAT, TIMER, SERIAL, JOYPAD].iter().copied()
     }
 }
 
@@ -85,7 +81,7 @@ impl InterruptController {
     }
 
     pub fn request(&mut self, interrupt: Interrupt) {
-        self.flag |= (1 << (interrupt as u8));
+        self.flag |= 1 << (interrupt as u8);
     }
 
     pub fn clear_request(&mut self, interrupt: Interrupt) {
