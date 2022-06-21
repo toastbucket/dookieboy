@@ -15,6 +15,7 @@ use crate::cartridge::Cartridge;
 use crate::intc::InterruptController;
 use crate::joypad::Joypad;
 use crate::memory::Memory;
+use crate::serial::Serial;
 
 const WRAM_BASE: usize = 0xc000;
 const WRAM_BANK_BASE: usize = 0xd000;
@@ -44,6 +45,7 @@ pub struct Mmu {
     pub cartridge: Cartridge,
     pub intc: InterruptController,
     pub joypad: Joypad,
+    serial: Serial,
     wram: [[u8; WRAM_SIZE]; NUM_WRAM_BANKS],
     svbk: usize,
     hram: [u8; HRAM_SIZE],
@@ -63,6 +65,7 @@ impl Memory for Mmu {
                 self.wram[bank][idx]
             },
             0xff00 => self.joypad.mem_read_byte(addr),
+            0xff01..=0xff02 => self.serial.mem_read_byte(addr),
             0xff70 => self.svbk as u8,
             0xff80..=0xfffe => {
                 let idx = (addr as usize) - HRAM_BASE;
@@ -86,6 +89,7 @@ impl Memory for Mmu {
                 self.wram[bank][idx] = val;
             },
             0xff00 => self.joypad.mem_write_byte(addr, val),
+            0xff01..=0xff02 => self.serial.mem_write_byte(addr, val),
             0xff70 => self.svbk = (val & 0x7) as usize,
             0xff80..=0xfffe => {
                 let idx = (addr as usize) - HRAM_BASE;
@@ -103,6 +107,7 @@ impl Mmu {
             cartridge: Cartridge::new(),
             intc: InterruptController::new(),
             joypad: Joypad::new(),
+            serial: Serial::new(),
             wram: [[0; WRAM_SIZE]; NUM_WRAM_BANKS],
             svbk: 0,
             hram: [0; HRAM_SIZE],
