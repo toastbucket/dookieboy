@@ -31,4 +31,8 @@ impl Serial {
     pub fn new() -> Serial {
         Serial { }
     }
+
+    pub fn reset(&mut self) {
+        // TODO: implement reset
+    }
 }
