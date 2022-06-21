@@ -63,6 +63,18 @@ impl Renderer {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.scy = 0;
+        self.scx = 0;
+        self.ly = 0;
+        self.lyc = 0;
+        self.wy = 0;
+        self.wx = 0;
+
+        self.lcdc.reset();
+        self.lcds.reset();
+    }
+
     fn get_rect_color(&self, x: usize, y: usize) -> pixels::Color {
         if x > SCREEN_WIDTH || y > SCREEN_HEIGHT {
             panic!("pixel out of bounds [{}][{}]", x, y);

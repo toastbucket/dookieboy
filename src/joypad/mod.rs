@@ -70,6 +70,13 @@ impl Joypad {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.action_select = false;
+        self.direction_select = false;
+        self.buttons.iter_mut().for_each(|x| *x = false);
+        self.int_req = false;
+    }
+
     pub fn update_button(&mut self, button: Button, state: bool) {
         let idx = button as usize;
         let cur_state = self.buttons[idx];

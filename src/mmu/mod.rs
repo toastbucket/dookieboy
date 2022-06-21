@@ -124,4 +124,12 @@ impl Mmu {
             hram: [0; HRAM_SIZE],
         }
     }
+
+    pub fn reset(&mut self) {
+        self.cartridge.reset();
+        self.intc.reset();
+        self.joypad.reset();
+        self.renderer.reset();
+        self.serial.reset();
+    }
 }

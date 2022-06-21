@@ -105,6 +105,10 @@ impl Cartridge {
         }
     }
 
+    pub fn reset(&mut self) {
+        // do nothing
+    }
+
     pub fn load_rom(&mut self, path: String) -> Result<(), io::Error> {
         self.rom = fs::read(path)?;
         if self.rom.len() < (HEADER_START + HEADER_SIZE) {

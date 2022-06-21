@@ -52,6 +52,17 @@ impl Lcdc {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.bg_win_prio = true;
+        self.obj_en = false;
+        self.obj_size = false;
+        self.bg_tile_map = false;
+        self.bg_win_tile_data = true;
+        self.win_enable = false;
+        self.win_tile_map = false;
+        self.lcd_ppu_en = true;
+    }
+
     pub fn build_reg(&self) -> u8 {
         (self.lcd_ppu_en as u8) << 0
         | (self.win_tile_map as u8) << 1

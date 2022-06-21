@@ -91,9 +91,12 @@ impl Gameboy {
 
     pub fn reset(&mut self) {
         self.cpu.reset();
+        self.mmu.borrow_mut().reset();
     }
 
     pub fn run(&mut self) -> Result<(), io::Error> {
+
+        self.reset();
 
         // TODO: handle stop and halt
         //  If both the interrupt request flag and the corresponding interrupt enable flag are set,

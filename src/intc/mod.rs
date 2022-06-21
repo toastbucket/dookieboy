@@ -72,6 +72,12 @@ impl InterruptController {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.enable = 0;
+        self.flag = 0xe1;
+        self.ime = true;
+    }
+
     pub fn set_ime(&mut self, val: bool) {
         self.ime = val;
     }
