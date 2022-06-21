@@ -19,6 +19,7 @@ mod int_src;
 mod joypad;
 mod memory;
 mod mmu;
+mod serial;
 mod shell;
 
 use std::env;
