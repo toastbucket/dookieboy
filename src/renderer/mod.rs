@@ -30,6 +30,7 @@ pub struct Renderer {
     lyc: u8,
     wy: u8,
     wx: u8,
+    fb: Vec<pixels::Color>,
 }
 
 impl Renderer {
